@@ -264,7 +264,7 @@ xfburn_data_composition_init (XfburnDataComposition * composition)
   gtk_builder_set_translation_domain(priv->ui_manager, GETTEXT_PACKAGE);
 
   xfce_resource_push_path (XFCE_RESOURCE_DATA, DATADIR);
-  popup_ui = xfce_resource_lookup (XFCE_RESOURCE_DATA, "xfburn/xfburn-popup-menus.ui");
+  popup_ui = xfce_resource_lookup (XFCE_RESOURCE_DATA, PACKAGE "/xfburn-x-popup-menus.ui");
   gtk_builder_add_from_file (priv->ui_manager, popup_ui, NULL);
 
   hbox_toolbar = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 5);
@@ -1868,8 +1868,8 @@ generate_iso_image (XfburnDataComposition * dc)
   GSList *errors = NULL;
 
   iso_image_new (gtk_entry_get_text (GTK_ENTRY (priv->entry_volume_name)), &image);
-  iso_image_set_application_id (image, "Xfburn");
-  iso_image_set_data_preparer_id (image, "Xfburn");
+  iso_image_set_application_id (image, "Xfburn-X");
+  iso_image_set_data_preparer_id (image, "Xfburn-X");
 
   model = gtk_tree_view_get_model (GTK_TREE_VIEW (priv->content));
   if (gtk_tree_model_get_iter_first (model, &iter)) {

@@ -1,5 +1,6 @@
 /*
  *  Copyright (c) 2005-2006 Jean-François Wauthy (pollux@xfce.org)
+ *  Copyright (c) 2026      Dominik Klein
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -120,7 +121,7 @@ xfburn_settings_init (XfburnSettings *settings)
 
   priv->settings = g_hash_table_new_full (g_str_hash, g_str_equal, (GDestroyNotify) g_free, (GDestroyNotify) value_destroy);
 
-  priv->full_path = xfce_resource_save_location (XFCE_RESOURCE_CONFIG, "xfburn/settings.xml", TRUE);
+  priv->full_path = xfce_resource_save_location (XFCE_RESOURCE_CONFIG, PACKAGE "/settings.xml", TRUE);
 }
 
 /*************/

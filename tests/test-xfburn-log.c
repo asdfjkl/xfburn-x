@@ -124,12 +124,12 @@ test_init_and_header (void)
   g_assert_true (ok);
   g_assert_nonnull (contents);
 
-  g_assert_nonnull (strstr (contents, "[XFBURN DIAGNOSTIC FLIGHT RECORDER LOG - FORMAT v1.0]"));
-  g_assert_nonnull (strstr (contents, "[ENV] app=\"xfburn\""));
+  g_assert_nonnull (strstr (contents, "[XFBURN-X DIAGNOSTIC FLIGHT RECORDER LOG - FORMAT v1.0]"));
+  g_assert_nonnull (strstr (contents, "[ENV] app=\"xfburn-x\""));
   g_assert_nonnull (strstr (contents, "[ENV] libs gtk="));
   g_assert_nonnull (strstr (contents, "[SYS] "));
   g_assert_nonnull (strstr (contents, "[TEST] hello world 42"));
-  g_assert_nonnull (strstr (contents, "[GLIB] domain=\"xfburn\" msg=\"test glib structured message capture\""));
+  g_assert_nonnull (strstr (contents, "[GLIB] domain=\"xfburn-x\" msg=\"test glib structured message capture\""));
   g_assert_nonnull (strstr (contents, "Session log closing cleanly."));
 
   ok = g_file_get_contents (export_path, &export_contents, NULL, &error);

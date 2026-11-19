@@ -37,9 +37,9 @@ xfburn/xfburn-transcoder-basic.c
 xfburn/xfburn-transcoder-gst.c
 xfburn/xfburn-transcoder.c
 xfburn/xfburn-device.c
-xfburn.ui
-xfburn-popup-menus.ui
+xfburn-x.ui
+xfburn-x-popup-menus.ui
 
-desktop-integration/thunar-sendto-xfburn.desktop.in
-xfburn.desktop.in
-org.xfce.xfburn.appdata.xml.in
+desktop-integration/thunar-sendto-xfburn-x.desktop.in
+xfburn-x.desktop.in
+io.github.asdfjkl.xfburn-x.metainfo.xml.in

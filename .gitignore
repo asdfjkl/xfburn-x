@@ -1,0 +1,17 @@
+# Meson build directories
+build/
+builddir/
+
+# Local test fixtures and helper scripts
+test_data/
+compile.sh
+compile2.sh
+
+# Diagnostic logs and scratch files
+*.log
+*.o
+*.swp
+*~
+log_framework_plan.txt
+log_framework_pr_description.txt
+update.txt

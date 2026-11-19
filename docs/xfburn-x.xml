@@ -1,31 +1,30 @@
 <!--
-  $Id: xfburn.xml 22971 2006-08-31 23:14:10Z benny $
-
+  Copyright (c) 2026 Dominik Klein
   Copyright (c) 2009 David Mohr <squisher@xfce.org>
   Copyright (c) 2006 Benedikt Meurer <benny@xfce.org>
 -->
 
-<refentry id="xfburn">
+<refentry id="xfburn-x">
   <refmeta>
-    <refentrytitle>xfburn</refentrytitle>
+    <refentrytitle>xfburn-x</refentrytitle>
     <refmiscinfo class="manual">User Commands</refmiscinfo>
     <refmiscinfo class="source"> </refmiscinfo>
     <manvolnum>1</manvolnum>
   </refmeta>
 
   <refnamediv>
-    <refname>xfburn</refname>
-    <refpurpose>An easy to use burning application</refpurpose>
+    <refname>xfburn-x</refname>
+    <refpurpose>An easy to use optical disc burning application with post-burn verification and diagnostic logging</refpurpose>
   </refnamediv>
 
   <refsynopsisdiv>
     <cmdsynopsis>
-      <command>xfburn</command>
+      <command>xfburn-x</command>
       <arg choice="plain">--burn-image</arg>
       <arg choice="opt">IMAGE</arg>
     </cmdsynopsis>
     <cmdsynopsis>
-      <command>xfburn</command>
+      <command>xfburn-x</command>
       <arg choice="opt">options</arg>
       <group choice="plain">
         <arg choice="plain">--data-composition</arg>
@@ -36,11 +35,11 @@
       </arg>
     </cmdsynopsis>
     <cmdsynopsis>
-      <command>xfburn</command>
+      <command>xfburn-x</command>
       <arg choice="plain">--blank</arg>
     </cmdsynopsis>
     <cmdsynopsis>
-      <command>xfburn</command>
+      <command>xfburn-x</command>
       <arg choice="plain">--transcoder</arg>
       <group choice="plain">
         <arg choice="plain">list</arg>
@@ -53,23 +52,25 @@
   <refsect1>
     <title>Description</title>
     <para>
-      <command>xfburn</command> is an easy to use burning application based on the libburnia libraries.
-      So far it features burning to CD, and DVD, as well as blanking rewritable discs. Data and audio
-      compositions can get created from scratch. Images in .iso format can be burned, or created.
+      <command>xfburn-x</command> is an enhanced fork of Xfce's <command>xfburn</command> based on the
+      libburnia libraries, designed to install cleanly side-by-side with <command>xfburn</command>.
+      It supports burning CD, DVD, and Blu-ray (including M-DISC) media, blanking rewritable discs,
+      creating and burning ISO images, creating audio CDs, automatic post-burn per-sector hash
+      verification, and user-mode diagnostic flight-recorder logging.
     </para>
   </refsect1>
 
   <refsect1>
     <title>Invocation</title>
     <para>
-      <command>xfburn</command> can be called with <option>--burn-image</option> to immediately show the burn
-      image dialog. Optionally the <replaceable>image file</replaceable> can be preselected by appending it to 
+      <command>xfburn-x</command> can be called with <option>--burn-image</option> to immediately show the burn
+      image dialog. Optionally the <replaceable>image file</replaceable> can be preselected by appending it to
       the command line.
     </para>
 
     <para>
-      When the <option>--data-composition</option> or the <option>--audio-composition</option> options is specified,
-      then <command>xfburn</command>'s main window will open up with the selected composition type instead of the welcome
+      When the <option>--data-composition</option> or the <option>--audio-composition</option> option is specified,
+      then <command>xfburn-x</command>'s main window will open up with the selected composition type instead of the welcome
       tab. The <replaceable>filename(s)</replaceable> of the contents of the composition may follow the composition option.
     </para>
 
@@ -112,7 +113,7 @@
           <term><option>-d</option>, <option>--data-composition</option> <optional>FILE(S)</optional></term>
           <listitem>
             <para>
-              Opens <command>xfburn</command> with a new data composition. Optionally <replaceable>FILE(S)</replaceable>
+              Opens <command>xfburn-x</command> with a new data composition. Optionally <replaceable>FILE(S)</replaceable>
               to be added to the composition follow.
             </para>
           </listitem>
@@ -122,7 +123,7 @@
           <term><option>-a</option>, <option>--audio-composition</option> <optional>MUSIC FILE(S)</optional></term>
           <listitem>
             <para>
-              Opens <command>xfburn</command> with a new audio composition. Optionally <replaceable>MUSIC FILE(S)</replaceable>
+              Opens <command>xfburn-x</command> with a new audio composition. Optionally <replaceable>MUSIC FILE(S)</replaceable>
               to be added to the composition follow.
             </para>
           </listitem>
@@ -133,9 +134,9 @@
           <listitem>
             <para>
               Selects the transcoder to use when creating audio compositions. Specify <replaceable>list</replaceable> to see
-              all available options. Currently implemented are the gst and the basic transcoder. 
-              <emphasis role="bold">gst</emphasis> uses gstreamer, and can allows the use of any gstreamer-supported media file.
-              <emphasis role="bold">basic</emphasis> only allows using audio files already in CD format: 48khz uncompressed WAV
+              all available options. Currently implemented are the gst and the basic transcoder.
+              <emphasis role="bold">gst</emphasis> uses gstreamer, and allows the use of any gstreamer-supported media file.
+              <emphasis role="bold">basic</emphasis> only allows using audio files already in CD format: uncompressed WAV
               files.
             </para>
           </listitem>
@@ -145,9 +146,21 @@
           <term><option>-m</option>, <option>--main</option></term>
           <listitem>
             <para>
-              When the <option>--burn-image</option> or the <option>--blank</option> option is selected, xfburn will quit after the
-              dialog exists, unless the <option>--main</option> option is given. In that case the main <command>xfburn</command>
-              window is shown after the dialog has been closed.
+              When the <option>--burn-image</option> or the <option>--blank</option> option is selected,
+              <command>xfburn-x</command> will quit after the dialog exits, unless the <option>--main</option>
+              option is given. In that case the main <command>xfburn-x</command> window is shown after the dialog
+              has been closed.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term><option>-l</option>, <option>--log-file=PATH</option></term>
+          <listitem>
+            <para>
+              Write the diagnostic flight-recorder session log to <replaceable>PATH</replaceable> instead of
+              the default directory <filename>~/.local/state/xfburn-x/logs/</filename>. Can also be set via
+              the <envar>XFBURN_X_LOG_FILE</envar> environment variable.
             </para>
           </listitem>
         </varlistentry>
@@ -166,7 +179,8 @@
   <refsect1>
     <title>Author</title>
     <para>
-      <command>xfburn</command> was written by
+      <command>xfburn-x</command> is maintained by Dominik Klein as a fork of <command>xfburn</command>.
+      The original <command>xfburn</command> was written by
       David Mohr <email>squisher@xfce.org</email>,
       Jean-François Wauthy <email>pollux@xfce.org</email>,
       Mario Đanić <email>mario@libburnia-project.org</email>,
@@ -175,7 +189,7 @@
       and the Xfce development team.
     </para>
     <para>
-      This manual page was written by David Mohr <email>squisher@xfce.org</email>. It is based on Benedikt Meurer's Thunar man page.
+      This manual page was originally written by David Mohr <email>squisher@xfce.org</email> based on Benedikt Meurer's Thunar man page, and updated for <command>xfburn-x</command> by Dominik Klein.
     </para>
   </refsect1>
 </refentry>

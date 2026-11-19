@@ -115,7 +115,7 @@ xfburn_burn_data_composition_base_dialog_init(XfburnBurnDataCompositionBaseDialo
 
   gtk_window_set_title (GTK_WINDOW (obj), _("Burn Composition"));
   gtk_window_set_destroy_with_parent (GTK_WINDOW (obj), TRUE);
-  gtk_window_set_icon_name (GTK_WINDOW (obj), "stock_xfburn");
+  gtk_window_set_icon_name (GTK_WINDOW (obj), "stock_xfburn-x");
 
   /* burning devices list */
   priv->device_box = xfburn_device_box_new (SHOW_CD_WRITERS | SHOW_CDRW_WRITERS | SHOW_MODE_SELECTION | SHOW_SPEED_SELECTION);
@@ -192,7 +192,7 @@ xfburn_burn_data_composition_base_dialog_init(XfburnBurnDataCompositionBaseDialo
 
   priv->entry_path_iso = gtk_entry_new ();
   tmp_dir = xfburn_settings_get_string ("temporary-dir", g_get_tmp_dir ());
-  default_path = g_build_filename (tmp_dir, "xfburn.iso", NULL);
+  default_path = g_build_filename (tmp_dir, "xfburn-x.iso", NULL);
   gtk_entry_set_text (GTK_ENTRY (priv->entry_path_iso), default_path);
   g_free (default_path);
   g_free (tmp_dir);
@@ -217,7 +217,7 @@ xfburn_burn_data_composition_base_dialog_init(XfburnBurnDataCompositionBaseDialo
   gtk_widget_show (button);
   gtk_dialog_add_action_widget (GTK_DIALOG (obj), button, GTK_RESPONSE_CANCEL);
 
-  priv->button_proceed = button = xfce_gtk_button_new_mixed ("stock_xfburn", _("_Burn Composition"));
+  priv->button_proceed = button = xfce_gtk_button_new_mixed ("stock_xfburn-x", _("_Burn Composition"));
 
   gtk_widget_show (button);
   gtk_dialog_add_action_widget (GTK_DIALOG (obj), button, GTK_RESPONSE_OK);

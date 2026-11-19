@@ -86,7 +86,7 @@ xfburn_sources += gnome.genmarshal(
 )
 
 xfburn = executable(
-  'xfburn',
+  'xfburn-x',
   xfburn_sources,
   sources: xfce_revision_h,
   dependencies: [

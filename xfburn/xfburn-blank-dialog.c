@@ -164,7 +164,7 @@ xfburn_blank_dialog_init (XfburnBlankDialog * obj)
 
   gtk_window_set_title (GTK_WINDOW (obj), _("Blank Disc"));
   gtk_window_set_destroy_with_parent (GTK_WINDOW (obj), TRUE);
-  gtk_window_set_icon_name (GTK_WINDOW (obj), "stock_xfburn-blank-cdrw");
+  gtk_window_set_icon_name (GTK_WINDOW (obj), "stock_xfburn-x-blank-cdrw");
 
   /* devices list */
   priv->device_box = xfburn_device_box_new (SHOW_CDRW_WRITERS | BLANK_MODE);
@@ -206,7 +206,7 @@ xfburn_blank_dialog_init (XfburnBlankDialog * obj)
   gtk_widget_show (button);
   gtk_dialog_add_action_widget (GTK_DIALOG (obj), button, GTK_RESPONSE_CANCEL);
 
-  button = xfce_gtk_button_new_mixed ("stock_xfburn-blank-cdrw", _("_Blank"));
+  button = xfce_gtk_button_new_mixed ("stock_xfburn-x-blank-cdrw", _("_Blank"));
   gtk_widget_show (button);
   gtk_dialog_add_action_widget (GTK_DIALOG (obj), button, GTK_RESPONSE_OK);
   gtk_widget_set_can_default (button, TRUE);

@@ -1,21 +1,21 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=Xfburn
+Name=Xfburn-X
 GenericName=Disk Burning
-Comment=CD and DVD burning application
-Exec=xfburn %F
-TryExec=xfburn
-Icon=stock_xfburn
+Comment=CD, DVD, and Blu-ray burning application with post-burn verification
+Exec=xfburn-x %F
+TryExec=xfburn-x
+Icon=stock_xfburn-x
 MimeType=application/x-cd-image;x-content/audio-cdda;x-content/blank-cd;
 Terminal=false
 Categories=X-XFCE;GTK;DiscBurning;Archiving;AudioVideo;Utility;
-Keywords=Burn;CD;DVD;ISO;Disc;Write;Audio;Video;
+Keywords=Burn;CD;DVD;BD;Blu-ray;ISO;Disc;Write;Verify;Audio;Video;
 StartupNotify=true
 
 Actions=BurnImage;
 
 [Desktop Action BurnImage]
-Icon=stock_xfburn
-Exec=xfburn -i %f
-Name=Burn Image (xfburn)
+Icon=stock_xfburn-x
+Exec=xfburn-x -i %f
+Name=Burn Image (Xfburn-X)

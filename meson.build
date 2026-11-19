@@ -1,7 +1,7 @@
 project(
-  'xfburn',
+  'xfburn-x',
   'c',
-  version: '0.8.0-dev',
+  version: '0.9.0',
   license: 'GPL-2.0-or-later',
   meson_version: '>= 0.56.0',
   default_options: [
@@ -13,7 +13,7 @@ project(
 
 project_namespace = 'apps'
 pkgdatadir = get_option('prefix') / get_option('datadir') / meson.project_name()
-copyright_year = '2025'
+copyright_year = '2026'
 
 cc = meson.get_compiler('c')
 fs = import('fs')
@@ -139,7 +139,7 @@ extra_cflags += [
   '-DPACKAGE_DATADIR="@0@"'.format(pkgdatadir),
   '-DCOPYRIGHT_YEAR="@0@"'.format(copyright_year),
   '-DPACKAGE_LOCALE_DIR="@0@"'.format(get_option('prefix') / get_option('localedir')),
-  '-DPACKAGE_BUGREPORT="https://gitlab.xfce.org/@0@/@1@/-/issues"'.format(project_namespace, meson.project_name()),
+  '-DPACKAGE_BUGREPORT="https://github.com/asdfjkl/xfburn-x/issues"',
   '-DGETTEXT_PACKAGE="@0@"'.format(meson.project_name()),
   '-DPREFIX="@0@"'.format(get_option('prefix')),
   '-DBINDIR="@0@"'.format(get_option('prefix') / get_option('bindir')),
@@ -167,8 +167,8 @@ xfce_revision_h = vcs_tag(
 )
 
 i18n.merge_file(
-    input: 'org.xfce.xfburn.appdata.xml.in',
-    output: 'org.xfce.xfburn.appdata.xml',
+    input: 'io.github.asdfjkl.xfburn-x.metainfo.xml.in',
+    output: 'io.github.asdfjkl.xfburn-x.metainfo.xml',
     po_dir: 'po',
     type: 'xml',
     install: true,
@@ -176,8 +176,8 @@ i18n.merge_file(
 )
 
 i18n.merge_file(
-    input: 'xfburn.desktop.in',
-    output: 'xfburn.desktop',
+    input: 'xfburn-x.desktop.in',
+    output: 'xfburn-x.desktop',
     po_dir: 'po',
     type: 'desktop',
     install: true,
@@ -185,8 +185,8 @@ i18n.merge_file(
 )
 
 install_data(
-  ['xfburn-popup-menus.ui', 'xfburn-toolbars.ui', 'xfburn.ui'],
-  install_dir: get_option('prefix') / get_option('datadir') / 'xfburn',
+  ['xfburn-x-popup-menus.ui', 'xfburn-x-toolbars.ui', 'xfburn-x.ui'],
+  install_dir: pkgdatadir,
 )
 
 subdir('desktop-integration')

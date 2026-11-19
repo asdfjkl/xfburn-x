@@ -1,15 +1,14 @@
 sizes = [16, 22, 24, 32, 48]
 names = [
-  'stock_xfburn-audio-cd',
-  'stock_xfburn-audio-copy',
-  'stock_xfburn-blank-cdrw',
-  'stock_xfburn-burn-cd',
-  'stock_xfburn-data-copy',
-  'stock_xfburn-data-copy',
-  'stock_xfburn-format-dvdrw',
-  'stock_xfburn-import-session',
-  'stock_xfburn-new-data-composition',
-  'stock_xfburn',
+  'stock_xfburn-x-audio-cd',
+  'stock_xfburn-x-audio-copy',
+  'stock_xfburn-x-blank-cdrw',
+  'stock_xfburn-x-burn-cd',
+  'stock_xfburn-x-data-copy',
+  'stock_xfburn-x-format-dvdrw',
+  'stock_xfburn-x-import-session',
+  'stock_xfburn-x-new-data-composition',
+  'stock_xfburn-x',
 ]
 
 foreach name : names

@@ -1,5 +1,6 @@
 /*
  *  Copyright (c) 2005-2006 Jean-François Wauthy (pollux@xfce.org)
+ *  Copyright (c) 2026      Dominik Klein
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -104,7 +105,7 @@ xfburn_preferences_dialog_init (XfburnPreferencesDialog * obj)
   gint idx;
 
   gtk_window_set_title (GTK_WINDOW (obj), _("Preferences"));
-  xfce_titled_dialog_set_subtitle (XFCE_TITLED_DIALOG (obj), _("Tune how Xfburn behaves"));
+  xfce_titled_dialog_set_subtitle (XFCE_TITLED_DIALOG (obj), _("Tune how Xfburn-X behaves"));
   gtk_window_set_default_size (GTK_WINDOW (obj), 775, 400);
   gtk_window_set_destroy_with_parent (GTK_WINDOW (obj), TRUE);
   gtk_window_set_icon_name (GTK_WINDOW (obj), "preferences-system");

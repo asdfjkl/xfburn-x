@@ -1,5 +1,5 @@
 test_xfburn_log = executable(
-  'test-xfburn-log',
+  'test-xfburn-x-log',
   [
     'test-xfburn-log.c',
     '../xfburn/xfburn-log.c',
@@ -23,4 +23,4 @@ test_xfburn_log = executable(
   install: false,
 )
 
-test('xfburn-log', test_xfburn_log)
+test('xfburn-x-log', test_xfburn_log)

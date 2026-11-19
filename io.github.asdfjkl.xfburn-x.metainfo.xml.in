@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2014 Eric Koegel <eric.koegel@gmail.com> and Simon Steinbeiss <simon@xfce.org> -->
+<!-- Copyright 2026 Dominik Klein -->
+<component type="desktop-application">
+  <id>io.github.asdfjkl.xfburn-x</id>
+  <launchable type="desktop-id">xfburn-x.desktop</launchable>
+  <metadata_license>CC-BY-3.0</metadata_license>
+  <project_license>GPL-2.0-or-later</project_license>
+  <name>Xfburn-X</name>
+  <summary>CD, DVD, and Blu-ray burning tool with verification and diagnostic logging</summary>
+
+  <developer id="io.github.asdfjkl">
+    <name>Dominik Klein</name>
+  </developer>
+
+  <description>
+    <p>Xfburn-X is an enhanced fork of Xfburn based on the libburnia libraries,
+        designed to install side-by-side with upstream Xfburn without conflicts.
+        It can blank rewritable discs, burn and create ISO images, create audio CDs,
+        and burn data compositions to CD, DVD, or Blu-ray (including M-DISC),
+        with built-in post-burn per-sector hash verification and a user-mode
+        diagnostic flight-recorder logger.
+    </p>
+  </description>
+
+  <categories>
+    <category>AudioVideo</category>
+    <category>DiscBurning</category>
+  </categories>
+
+  <url type="homepage">https://github.com/asdfjkl/xfburn-x</url>
+  <url type="bugtracker">https://github.com/asdfjkl/xfburn-x/issues</url>
+
+  <releases>
+    <release version="0.9.0" date="2026-11-19">
+      <description>
+        <p>Initial Xfburn-X release forked from Xfburn with post-burn verification, GDK/udev threading deadlock fixes, and user-mode diagnostic logging.</p>
+      </description>
+    </release>
+  </releases>
+
+  <provides>
+    <binary>xfburn-x</binary>
+  </provides>
+  <translation type="gettext">xfburn-x</translation>
+  <content_rating type="oars-1.0" />
+</component>

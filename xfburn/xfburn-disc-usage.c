@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2005-2006 Jean-François Wauthy (pollux@xfce.org)
  * Copyright (c) 2008      David Mohr <david@mcbf.net>
+ * Copyright (c) 2026      Dominik Klein
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -112,7 +113,7 @@ xfburn_disc_usage_init (XfburnDiscUsage* disc_usage)
   gtk_box_pack_start (GTK_BOX (disc_usage), disc_usage->combo, FALSE, FALSE, BORDER);
   gtk_widget_show (disc_usage->combo);
 
-  disc_usage->button = xfce_gtk_button_new_mixed ("stock_xfburn", _("Proceed to Burn"));
+  disc_usage->button = xfce_gtk_button_new_mixed ("stock_xfburn-x", _("Proceed to Burn"));
   gtk_box_pack_start (GTK_BOX (disc_usage), disc_usage->button, FALSE, FALSE, BORDER);
   gtk_widget_set_sensitive (disc_usage->button, FALSE);
   gtk_widget_show (disc_usage->button);

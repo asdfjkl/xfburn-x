@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2005-2006 Jean-François Wauthy (pollux@xfce.org)
+ * Copyright (c) 2026      Dominik Klein
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -247,7 +248,7 @@ xfburn_audio_composition_init (XfburnAudioComposition * composition)
   icon_theme = gtk_icon_theme_get_for_screen (screen);
 
   xfce_resource_push_path (XFCE_RESOURCE_DATA, DATADIR);
-  popup_ui = xfce_resource_lookup (XFCE_RESOURCE_DATA, "xfburn/xfburn-popup-menus.ui");
+  popup_ui = xfce_resource_lookup (XFCE_RESOURCE_DATA, PACKAGE "/xfburn-x-popup-menus.ui");
 
   gtk_icon_size_lookup (GTK_ICON_SIZE_SMALL_TOOLBAR, &x, &y);
   if (!icon_directory)

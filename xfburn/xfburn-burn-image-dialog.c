@@ -142,7 +142,7 @@ xfburn_burn_image_dialog_init (XfburnBurnImageDialog * obj)
 
   gtk_window_set_title (GTK_WINDOW (obj), _("Burn image"));
   gtk_window_set_destroy_with_parent (GTK_WINDOW (obj), TRUE);
-  gtk_window_set_icon_name (GTK_WINDOW (obj), "stock_xfburn");
+  gtk_window_set_icon_name (GTK_WINDOW (obj), "stock_xfburn-x");
 
   /* file */
   priv->chooser_image = gtk_file_chooser_button_new (_("Image to burn"), GTK_FILE_CHOOSER_ACTION_OPEN);
@@ -230,7 +230,7 @@ xfburn_burn_image_dialog_init (XfburnBurnImageDialog * obj)
   gtk_widget_show (button);
   gtk_dialog_add_action_widget (GTK_DIALOG (obj), button, GTK_RESPONSE_CANCEL);
 
-  priv->burn_button = xfce_gtk_button_new_mixed ("stock_xfburn", _("_Burn image"));
+  priv->burn_button = xfce_gtk_button_new_mixed ("stock_xfburn-x", _("_Burn image"));
   gtk_widget_show (priv->burn_button);
   g_signal_connect (G_OBJECT (priv->burn_button), "clicked", G_CALLBACK (cb_clicked_ok), obj);
 #if LIBXFCE4UI_CHECK_VERSION(4, 21, 0)

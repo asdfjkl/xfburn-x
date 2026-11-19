@@ -1203,7 +1203,7 @@ xfburn_perform_burn_write (GtkWidget *dialog_progress,
 
   /* Install the default libburn abort signal handler.
    * Hopefully this means the drive won't be left in a burning state if we catch a signal */
-  burn_set_signal_handling ("xfburn", NULL, 0);
+  burn_set_signal_handling (PACKAGE, NULL, 0);
 
   t_call = g_get_monotonic_time ();
   XFBURN_LOG_CALL_ENTER ("burn_disc_write", "addr=\"%s\" total_sectors=%d", drive_addr, total_sectors);

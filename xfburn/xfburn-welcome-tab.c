@@ -1,6 +1,7 @@
 /*
  *  Copyright (c) 2005-2006 Jean-François Wauthy (pollux@xfce.org)
  *  Copyright (c) 2008      David Mohr (dmohr@mcbf.net)
+ *  Copyright (c) 2026      Dominik Klein
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -95,7 +96,7 @@ xfburn_welcome_tab_init (XfburnWelcomeTab * obj)
   gtk_box_pack_start (GTK_BOX (vbox), align, TRUE, TRUE, 0);
   gtk_widget_show (align);
 
-  label_welcome = gtk_label_new (_("Welcome to Xfburn!"));
+  label_welcome = gtk_label_new (_("Welcome to Xfburn-X!"));
   gtk_widget_set_valign (GTK_WIDGET (label_welcome), GTK_ALIGN_END);
   gtk_box_pack_start (GTK_BOX (vbox), label_welcome, FALSE, FALSE, BORDER);
   gtk_widget_show (label_welcome);
@@ -115,22 +116,22 @@ xfburn_welcome_tab_init (XfburnWelcomeTab * obj)
   gtk_widget_show (align);
 
   /* buttons */
-  priv->button_image = create_welcome_button ("stock_xfburn", _("<big>Burn _Image</big>"), _("Burn a prepared composition, i.e. an .ISO file"));
+  priv->button_image = create_welcome_button ("stock_xfburn-x", _("<big>Burn _Image</big>"), _("Burn a prepared composition, i.e. an .ISO file"));
   gtk_grid_attach (GTK_GRID (table), priv->button_image, 0, 0, 1, 1);
   gtk_widget_show (priv->button_image);
   g_signal_connect (G_OBJECT(priv->button_image), "clicked", G_CALLBACK(burn_image), obj);
 
-  priv->button_data_comp = create_welcome_button ("stock_xfburn-new-data-composition", _("<big>New _Data Composition</big>"), _("Create a new data disc with the files of your choosing"));
+  priv->button_data_comp = create_welcome_button ("stock_xfburn-x-new-data-composition", _("<big>New _Data Composition</big>"), _("Create a new data disc with the files of your choosing"));
   gtk_grid_attach (GTK_GRID (table), priv->button_data_comp, 1, 0, 1, 1);
   gtk_widget_show (priv->button_data_comp);
   g_signal_connect (G_OBJECT(priv->button_data_comp), "clicked", G_CALLBACK(new_data_composition), obj);
 
-  priv->button_blank = create_welcome_button ("stock_xfburn-blank-cdrw", _("<big>_Blank Disc</big>"), _("Prepare the rewriteable disc for a new burn"));
+  priv->button_blank = create_welcome_button ("stock_xfburn-x-blank-cdrw", _("<big>_Blank Disc</big>"), _("Prepare the rewriteable disc for a new burn"));
   gtk_grid_attach (GTK_GRID (table), priv->button_blank, 0, 1, 1, 1);
   gtk_widget_show (priv->button_blank);
   g_signal_connect (G_OBJECT(priv->button_blank), "clicked", G_CALLBACK(blank_disc), obj);
 
-  priv->button_audio_comp = create_welcome_button ("stock_xfburn-audio-cd", _("<big>_Audio CD</big>"), _("Audio CD playable in regular stereos"));
+  priv->button_audio_comp = create_welcome_button ("stock_xfburn-x-audio-cd", _("<big>_Audio CD</big>"), _("Audio CD playable in regular stereos"));
   gtk_grid_attach (GTK_GRID (table), priv->button_audio_comp, 1, 1, 1, 1);
   gtk_widget_show (priv->button_audio_comp);
   g_signal_connect (G_OBJECT(priv->button_audio_comp), "clicked", G_CALLBACK(new_audio_cd), obj);

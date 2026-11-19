@@ -1,155 +1,80 @@
-xfburn
-======
+# Xfburn-X
 
-[xfburn's website](https://docs.xfce.org/apps/xfburn/start)
+**Xfburn-X** (`xfburn-x`) is an actively enhanced fork of Xfce's [Xfburn](https://gitlab.xfce.org/apps/xfburn) optical disc burning application, powered by the [libburnia](https://dev.lovelyhq.com/libburnia/web/wiki) (`libburn` / `libisofs`) libraries.
 
-An easy to use burning software for the Xfce desktop environment (but of
-course will work with others). It uses libburn and libisofs as a backend, in
-difference to most other GUI programs at the moment. Visit
-https://dev.lovelyhq.com/libburnia/web/wiki for more information about these libraries.
+Xfburn-X is designed for reliable archival burning (including CD, DVD, Blu-ray, and M-DISC BD-R media) and **installs cleanly side-by-side with upstream `xfburn`** with zero filename, desktop, icon, translation, or configuration conflicts.
 
-Functionality
-=============
+## What's New in Xfburn-X (vs. Upstream Xfburn)
 
-xfburn is still a new program, and does not yet do all common burning related
-tasks.
+### 1. Automatic Post-Burn Per-Sector Verification ("Verify after burn")
+* Enabled by default on ISO image burns, Data compositions (CD / DVD / BD), and Audio CD compositions (automatically disabled for Dummy write and ISO-only creation).
+* Hashes every sector on the fly as data flows to the burner (64-bit FNV-1a + Murmur3 finalizer, ~8 bytes/sector in RAM, no temporary disk space required).
+* Re-assesses the disc after writing and reads back all written sectors via `libburn` (`burn_read_data` / `burn_read_audio`) with internal retries disabled, reporting exact failing LBA ranges if any read error or hash mismatch occurs.
 
-Currently implemented is:
- * Create data compositions
-  - Burn to CD, DVD, or BluRay (BD)
-  - Create ISO images
- * Burn ISO images
- * Create and burn audio CDs
- * Blank discs
- * Format and deformat DVD-RW discs
+### 2. User-Mode Diagnostic Flight-Recorder Logging
+* Automatically writes a structured, single-line-per-event diagnostic log to `~/.local/state/xfburn-x/logs/xfburn-x-YYYYMMDD-HHMMSS-<pid>.log` (keeping the 10 most recent sessions), overridable via `--log-file=PATH` (`-l`) or `XFBURN_X_LOG_FILE`.
+* Runs 100% in standard unprivileged user mode (no root permissions required).
+* Captures:
+  * Real-time `libburn` and `libisofs` messages (all severities, error codes, OS `errno`, and SCSI sense errors).
+  * Kernel SCSI device state and I/O counters (`iorequest_cnt`, `iodone_cnt`, `ioerr_cnt`), USB link speed (`speed_mbps`), bus power budget (`bMaxPower`), and runtime power management (`power/control`, `power/runtime_status`) from `/sys`.
+  * Udev `block`, `scsi`, and `usb` hotplug/disconnect events and GIO unmount timings.
+  * Call-duration tracing, loop stall watchdogs, 2-second burn/verify progress heartbeats, and async-signal-safe crash stack traces (`SIGSEGV`/`SIGABRT`/`SIGBUS`/`SIGFPE`).
+* Includes a **"Save Log..."** button directly in the burn progress dialog for attaching logs to bug reports.
 
-At this time there is no multi-session support.
+### 3. Threading, GDK Mutex & Drive Reliability Fixes
+* Fixes GDK thread lock corruption and UI freezes triggered by udev callbacks and background unmount loops.
+* Prevents concurrent drive grab/refresh races during active burns/verifications and eliminates blocking `usleep()` calls on the GTK main thread.
+* Replaces fatal `g_error()` aborts on transient drive communication errors with graceful error handling.
 
-Note: Stream Recording disables error management for BD only, which increases
-the burning speed. Using it seems to be the best option since discs with
-errors tend to fail even when stream recording is disabled.
+## Side-by-Side Co-Installation with Upstream `xfburn`
 
-------------------------
-Audio CD support details
-------------------------
+Xfburn-X uses completely isolated names and paths so both applications can be installed on the same machine simultaneously:
 
-Included are two transcoders: basic, which just passes through uncompressed
-wav data, and gst (gstreamer), which can decode any audio file for which a
-gstreamer plugin is present.
+| Component | Upstream `xfburn` | `xfburn-x` |
+|---|---|---|
+| Binary | `xfburn` | `xfburn-x` |
+| Desktop launcher | `xfburn.desktop` (`Xfburn`) | `xfburn-x.desktop` (`Xfburn-X`) |
+| AppStream ID | `org.xfce.xfburn` | `io.github.asdfjkl.xfburn-x` |
+| UI data directory | `<datadir>/xfburn/` | `<datadir>/xfburn-x/` |
+| Hicolor icons | `stock_xfburn*` | `stock_xfburn-x*` |
+| Translations | `xfburn.mo` | `xfburn-x.mo` |
+| Man page | `xfburn(1)` | `xfburn-x(1)` |
+| User settings | `~/.config/xfburn/settings.xml` | `~/.config/xfburn-x/settings.xml` |
+| Diagnostic logs | *(n/a)* | `~/.local/state/xfburn-x/logs/` |
 
-The basic transcoder:
-- - - - - - - - - - -
-Only CD-quality, uncompressed (PCM) Wave files can be added to an audio
-compilation. Use i.e. your favorite audio player with a disc writer output
-mode / plugin to decompress your existing audio files. If .wav files are added
-to the compilation, their headers get checked to make sure they are of the
-right format. Note that this check is not very well tested (in particular it's
-not likely to work on big-endian machines like PowerPC). It does not require
-any external libraries
+## Requirements
 
-The gst transcoder:
-- - - - - - - - - -
-Based on the gstreamer library, it can decode pretty much any audio content,
-as long as you have the appropriate plugins installed. Note that by default
-most distributions do _not_ install these plugins. But a simple search for
-gstreamer plugins in your package manager should quickly allow you to install
-them.
+* `libisofs` >= 0.6.2
+* `libburn` >= 0.4.2 (0.5.6+ recommended)
+* `gtk+-3.0` >= 3.24.0, `glib-2.0` >= 2.66.0
+* `libxfce4util-1.0` >= 4.18.0, `libxfce4ui-2` >= 4.18.0
+* `gudev-1.0` >= 145 (recommended)
+* `gstreamer-1.0` + `gstreamer-pbutils-1.0` + plugins (optional, for compressed Audio CD sources)
+* `xsltproc` (for building the man page)
 
-You can at startup switch between the transcoders, see the command line help
-for more information.
+## Building, Testing & Installing
 
+```bash
+meson setup build --prefix="$HOME/.local"
+meson compile -C build
+meson test -C build --verbose
+meson install -C build
+```
 
-Requirements
-============
- * libisofs version 0.6.2 or newer
- * libburn version 0.4.2 or newer
-    * WARNING: libburn 0.4.2 - 0.5.4 are API compatible, but might trigger
-            an error in libburn's fifo code.
-            RECOMMENDED is version 0.5.6 or newer, where the bug was fixed.
+Run `xfburn-x` from your application menu (**Xfburn-X**) or terminal:
 
-Optional, but highly recommended
---------------------------------
- * gstreamer  (1.0+, required for burning audio CDs from compressed music
-               files)
-    * gstreamer pbutils (they usually come with gstreamer as far as I know)
-    * gstreamer plugins (look for the good, the bad and the ugly plugin pack,
-                         most likely you want all of these)
+```bash
+xfburn-x
+# Or with a custom diagnostic log path:
+xfburn-x --log-file=/tmp/xfburn-x-debug.log
+```
 
-Let the **highly recommended** part be highlighted once more. Of course
-gstreamer will not matter if you do not plan on burning audio CDs, but the
-other two libraries will come in handy in almost all situations.
+## Bugs & Feedback
 
-Optional, for maintenance 
--------------------------
- * libxslt (for creating docs)
+Please report bugs and attach your diagnostic log file (saved via **"Save Log..."** or from `~/.local/state/xfburn-x/logs/`) at:
+[https://github.com/asdfjkl/xfburn-x/issues](https://github.com/asdfjkl/xfburn-x/issues)
 
+## License & Attribution
 
-The author works with both hal and thunar-vfs enabled, so there might be the
-occasional bug that breaks compilation without these components. Xfburn should
-work without these optional components, but it is not well tested at all.
-Should something not compile or work as expected, please report a bug, and it
-will get fixed.
-
-Future Plans
-============
-
-Missing functionality that would be nice to have:
- * Save and load compositions
- * Verification
- * Copy discs (needs backend support)
- * Automatic checksum creation
- * Plugin support
-
-There is no, and never will be, a timeline for these. Let us know if you think
-something is missing on this list. If you really need something implemented,
-feel free to help us out :-).
-
-At present development is in maintenance mode, as the author does not have a
-lot of time.
-
-
-Bugs & Feedback
-===============
-
-Any comments are welcome! We aim to make xfburn a very easily usable program.
-So if you think something could be implemented differently, feel free to speak
-up and it will be considered. Please send any feedback to xfburn@xfce.org, or
-use the Xfce mailing lists. Bugs are best placed in the [Xfce bugtracker](https://gitlab.xfce.org/apps/xfburn/).
-
-Debugging
----------
-
-If xfburn crashes, freezes, or somehow makes no progress for you, then you can
-help greatly in debugging the problem. It does require you to build xfburn from
-the sources, and to install gdb. If you can handle that, here are the exact
-instructions:
-
-1) Rebuild xfburn with debugging support - grab the sources, and run:
-   ```
-   $ meson setup build
-   $ meson compile -C build
-   ```
-2) Enable core dumps, then run xfburn until it hangs, or crashes:
-   ```
-   $ ulimit -c unlimited; xfburn/xfburn 2>&1 | tee xfburn.output
-   ```
-3) From another terminal, kill xfburn (only if it hasn't crashed already, of course)
-   ```
-   $ kill -SEGV `pidof xfburn` 
-   ```
-4) Get a backtrace from the coredump:
-   ```
-   $ gdb xfburn/xfburn core.32270 --batch -ex 'thread apply all bt' > xfburn.backtrace
-   ```
-   (Note that sometimes the core.xxxxxx file is just called core, and that 32270 is
-    just an arbitrary number which was the process id - yours will be different)
-5) Open up a bug report at our [issue tracker](https://gitlab.xfce.org/apps/xfburn/) for xfburn, and add
-   both the xfburn.output and the xfburn.backtrace files to it. Done!
-   There is no need to attach the core dump, as it is heavily system dependent.
-
-
-License
-=======
-
-This program is released under the GNU GPL version 2 or newer. See COPYING for
-the full text of the license.
+Xfburn-X is released under the **GNU General Public License v2.0 or later** (`GPL-2.0-or-later`). See [COPYING](COPYING) for the full license text.
+Xfburn-X is forked from [Xfce Xfburn](https://gitlab.xfce.org/apps/xfburn) (Copyright 2005–2025 Xfce development team), with additions and maintenance Copyright 2026 Dominik Klein.

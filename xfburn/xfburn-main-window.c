@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2005-2006 Jean-François Wauthy (pollux@xfce.org)
+ * Copyright (c) 2026      Dominik Klein
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -140,8 +141,8 @@ xfburn_main_window_init (XfburnMainWindow * mainwin)
 
   /* the window itself */
   gtk_window_set_position (GTK_WINDOW (mainwin), GTK_WIN_POS_CENTER_ON_PARENT);
-  gtk_window_set_title (GTK_WINDOW (mainwin), _("Xfburn"));
-  gtk_window_set_icon_name (GTK_WINDOW (mainwin), "stock_xfburn");
+  gtk_window_set_title (GTK_WINDOW (mainwin), _("Xfburn-X"));
+  gtk_window_set_icon_name (GTK_WINDOW (mainwin), "stock_xfburn-x");
   gtk_window_resize (GTK_WINDOW (mainwin), xfburn_settings_get_int ("main-window-width", 790),
 		     xfburn_settings_get_int ("main-window-height", 500));
 
@@ -157,7 +158,7 @@ xfburn_main_window_init (XfburnMainWindow * mainwin)
   g_action_map_add_action_entries (G_ACTION_MAP (priv->action_map), toggle_action_entries, G_N_ELEMENTS(toggle_action_entries), mainwin);
 
   xfce_resource_push_path (XFCE_RESOURCE_DATA, DATADIR);
-  file = xfce_resource_lookup (XFCE_RESOURCE_DATA, "xfburn/xfburn.ui");
+  file = xfce_resource_lookup (XFCE_RESOURCE_DATA, PACKAGE "/xfburn-x.ui");
 
   if (G_LIKELY (file != NULL)) {
     GError *error = NULL;
@@ -168,7 +169,7 @@ xfburn_main_window_init (XfburnMainWindow * mainwin)
     g_free (file);
   }
   else {
-    g_warning ("Unable to locate xfburn/xfburn.ui !");
+    g_warning ("Unable to locate " PACKAGE "/xfburn-x.ui !");
   }
 
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
@@ -194,18 +195,18 @@ xfburn_main_window_init (XfburnMainWindow * mainwin)
   gtk_widget_insert_action_group (priv->toolbars, "app", G_ACTION_GROUP (priv->action_map));
 
   xfburn_add_button_to_toolbar (GTK_TOOLBAR (priv->toolbars),
-    "stock_xfburn-new-data-composition", _("New data composition"), "app.new-data-composition", NULL);
+    "stock_xfburn-x-new-data-composition", _("New data composition"), "app.new-data-composition", NULL);
 
   xfburn_add_button_to_toolbar (GTK_TOOLBAR (priv->toolbars),
-    "stock_xfburn-audio-cd", _("New audio composition"), "app.new-audio-composition", NULL);
+    "stock_xfburn-x-audio-cd", _("New audio composition"), "app.new-audio-composition", NULL);
 
   gtk_toolbar_insert (GTK_TOOLBAR (priv->toolbars), gtk_separator_tool_item_new(), -1);
 
   xfburn_add_button_to_toolbar (GTK_TOOLBAR (priv->toolbars),
-    "stock_xfburn-blank-cdrw", _("Blank CD-RW"), "app.blank-disc", NULL);
+    "stock_xfburn-x-blank-cdrw", _("Blank CD-RW"), "app.blank-disc", NULL);
 
   xfburn_add_button_to_toolbar (GTK_TOOLBAR (priv->toolbars),
-    "stock_xfburn", _("Burn Image"), "app.burn-image", NULL);
+    "stock_xfburn-x", _("Burn Image"), "app.burn-image", NULL);
 
   gtk_toolbar_insert (GTK_TOOLBAR (priv->toolbars), gtk_separator_tool_item_new(), -1);
 
@@ -259,8 +260,9 @@ cb_delete_main_window (XfburnMainWindow * mainwin, GdkEvent * event, XfburnMainW
 static gboolean
 cb_key_press_event (GtkWidget *widget, GdkEventKey *event)
 {
-  if (event->keyval == GDK_KEY_F1)
-    xfce_dialog_show_help (GTK_WINDOW (widget), "xfburn", "start", "");
+  if (event->keyval == GDK_KEY_F1) {
+    gtk_show_uri_on_window (GTK_WINDOW (widget), "https://github.com/asdfjkl/xfburn-x", GDK_CURRENT_TIME, NULL);
+  }
 
   return GDK_EVENT_PROPAGATE;
 }
@@ -317,13 +319,14 @@ action_quit (GAction * action, GVariant* param, XfburnMainWindow * window)
 static void
 action_contents (GAction *action, GVariant *param, XfburnMainWindow *window)
 {
-  xfce_dialog_show_help (GTK_WINDOW (window), "xfburn", "start", "");
+  gtk_show_uri_on_window (GTK_WINDOW (window), "https://github.com/asdfjkl/xfburn-x", GDK_CURRENT_TIME, NULL);
 }
 
 static void
 action_about (GAction * action, GVariant* param, XfburnMainWindow * window)
 {
-  const gchar *auth[] = { "David Mohr david@mcbf.net",
+  const gchar *auth[] = { "Dominik Klein (Xfburn-X maintainer)",
+			  "David Mohr david@mcbf.net",
 			  "Mario Đanić mario@libburnia-project.org",
 			  "Jean-François Wauthy pollux@xfce.org",
 			  "Rene Kjellerup rk.katana.steel@gmail.com",
@@ -364,13 +367,13 @@ action_about (GAction * action, GVariant* param, XfburnMainWindow * window)
     "Cosmo Chene cosmolax@gmail.com zh_TW\n";
 
   gtk_show_about_dialog(GTK_WINDOW (window),
-		  "logo-icon-name", "media-optical",
-		  "program-name", "Xfburn",
+		  "logo-icon-name", "stock_xfburn-x",
+		  "program-name", "Xfburn-X",
 		  "license", xfce_get_license_text (XFCE_LICENSE_TEXT_GPL),
 		  "version", VERSION_FULL,
-		  "comments", _("Another cd burning GUI"),
-		  "website", "https://docs.xfce.org/apps/xfburn/start",
-		  "copyright", "2005-" COPYRIGHT_YEAR " Xfce development team",
+		  "comments", _("CD, DVD, and Blu-ray burning GUI (fork of Xfburn with post-burn verification and diagnostic logging)"),
+		  "website", "https://github.com/asdfjkl/xfburn-x",
+		  "copyright", "2005-2025 Xfce development team\n" COPYRIGHT_YEAR " Dominik Klein",
 		  "authors", auth,
 		  "translator-credits", translators,
 		  NULL);

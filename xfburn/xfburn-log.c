@@ -162,7 +162,7 @@ prune_old_logs (const gchar *log_dir)
   }
 
   while ((entry = g_dir_read_name (dir)) != NULL) {
-    if (g_str_has_prefix (entry, "xfburn-") && g_str_has_suffix (entry, ".log")) {
+    if (g_str_has_prefix (entry, PACKAGE "-") && g_str_has_suffix (entry, ".log")) {
       files = g_list_prepend (files, g_strdup (entry));
     }
   }
@@ -480,7 +480,7 @@ write_session_header (void)
   const gchar *gudev_state;
   const gchar *header_banner =
     "================================================================================\n"
-    "[XFBURN DIAGNOSTIC FLIGHT RECORDER LOG - FORMAT v1.0]\n"
+    "[XFBURN-X DIAGNOSTIC FLIGHT RECORDER LOG - FORMAT v1.0]\n"
     "================================================================================\n";
 
   g_mutex_lock (&log_mutex);
@@ -560,7 +560,7 @@ xfburn_log_init (const gchar *custom_path)
   if (custom_path != NULL && custom_path[0] != '\0') {
     target_path = custom_path;
   } else {
-    env_path = g_getenv ("XFBURN_LOG_FILE");
+    env_path = g_getenv ("XFBURN_X_LOG_FILE");
     if (env_path != NULL && env_path[0] != '\0') {
       target_path = env_path;
     }
@@ -576,9 +576,9 @@ xfburn_log_init (const gchar *custom_path)
   } else {
     const gchar *xdg_state = g_getenv ("XDG_STATE_HOME");
     if (xdg_state != NULL && xdg_state[0] != '\0') {
-      auto_dir = g_build_filename (xdg_state, "xfburn", "logs", NULL);
+      auto_dir = g_build_filename (xdg_state, PACKAGE, "logs", NULL);
     } else {
-      auto_dir = g_build_filename (g_get_home_dir (), ".local", "state", "xfburn", "logs", NULL);
+      auto_dir = g_build_filename (g_get_home_dir (), ".local", "state", PACKAGE, "logs", NULL);
     }
     g_mkdir_with_parents (auto_dir, 0700);
     prune_old_logs (auto_dir);
@@ -592,7 +592,7 @@ xfburn_log_init (const gchar *custom_path)
       ts_str = g_strdup ("00000000-000000");
     }
 
-    auto_filename = g_strdup_printf ("xfburn-%s-%d.log", ts_str, (int) getpid ());
+    auto_filename = g_strdup_printf ("%s-%s-%d.log", PACKAGE, ts_str, (int) getpid ());
     log_file_path = g_build_filename (auto_dir, auto_filename, NULL);
     g_free (ts_str);
     g_free (auto_filename);

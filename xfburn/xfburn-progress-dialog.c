@@ -358,7 +358,7 @@ cb_button_save_log_clicked (GtkWidget *button, XfburnProgressDialog *dialog)
   if (cur_log_path != NULL && cur_log_path[0] != '\0') {
     default_name = g_path_get_basename (cur_log_path);
   } else {
-    default_name = g_strdup ("xfburn-diagnostic.log");
+    default_name = g_strdup ("xfburn-x-diagnostic.log");
   }
   gtk_file_chooser_set_current_name (GTK_FILE_CHOOSER (chooser), default_name);
   g_free (default_name);

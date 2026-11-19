@@ -1,6 +1,6 @@
 i18n.merge_file(
-    input: 'thunar-sendto-xfburn.desktop.in',
-    output: 'thunar-sendto-xfburn.desktop',
+    input: 'thunar-sendto-xfburn-x.desktop.in',
+    output: 'thunar-sendto-xfburn-x.desktop',
     po_dir: '..' / 'po',
     type: 'desktop',
     install: true,

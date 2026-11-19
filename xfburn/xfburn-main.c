@@ -196,7 +196,8 @@ main (int argc, char **argv)
   XfburnTranscoder *transcoder;
   XfburnDeviceList *devlist;
 
-  g_set_application_name (_("Xfburn"));
+  g_set_prgname (PACKAGE);
+  g_set_application_name (_("Xfburn-X"));
 
   gdk_threads_init ();
   gdk_threads_enter ();

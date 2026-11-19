@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Data Composition (Xfburn-X)
+Icon=stock_xfburn-x
+TryExec=xfburn-x
+Exec=xfburn-x --data-composition %F
