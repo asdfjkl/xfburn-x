@@ -1,6 +1,7 @@
 /*
  *  Copyright (c) 2005-2006 Jean-François Wauthy (pollux@xfce.org)
  *  Copyright (c) 2008      David Mohr (dmohr@mcbf.net)
+ *  Copyright (c) 2026      Dominik Klein
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,6 +43,7 @@
 #include "xfburn-global.h"
 #include "xfburn-error.h"
 #include "xfburn-settings.h"
+#include "xfburn-log.h"
 
 #include "xfburn-transcoder-gst.h"
 #include "xfburn-audio-track.h"
@@ -382,13 +384,17 @@ bus_call (GstBus *bus, GstMessage *msg, gpointer data)
   #endif
 #endif
 
+      XFBURN_LOG_INFO ("GST", "EOS for track=\"%s\" closing pipe fd_in=%d",
+                       priv->curr_track->inputfile, gtrack->fd_in);
       close (gtrack->fd_in);
 
       if (gst_element_set_state (priv->pipeline, GST_STATE_NULL) == GST_STATE_CHANGE_FAILURE) {
+        XFBURN_LOG_WARN ("GST", "Gstreamer failed to transition to GST_STATE_NULL after EOS");
         g_warning ("Gstreamer did not want to get ready after EOS!");
       }
 
       if (!transcode_next_track (trans, &error)) {
+        XFBURN_LOG_ERROR ("GST", "Error while switching track: %s", error->message);
         g_warning ("Error while switching track: %s", error->message);
         g_error_free (error);
         /* FIXME: abort here? */
@@ -398,10 +404,16 @@ bus_call (GstBus *bus, GstMessage *msg, gpointer data)
     }
 
     case GST_MESSAGE_ERROR: {
-      gchar  *debug;
+      gchar  *debug = NULL;
       GError *error = NULL;
+      const gchar *dbg_str = "none";
 
       gst_message_parse_error (msg, &error, &debug);
+      if (debug != NULL) {
+        dbg_str = debug;
+      }
+      XFBURN_LOG_ERROR ("GST", "GStreamer bus error (state=%d): msg=\"%s\" debug=\"%s\"",
+                        priv->state, error->message, dbg_str);
       g_free (debug);
 
       switch (priv->state) {
@@ -789,13 +801,15 @@ prepare (XfburnTranscoder *trans, GError **error)
   ret = transcode_next_track (gst, error);
 
   end_time = g_get_monotonic_time () + SIGNAL_WAIT_TIMEOUT_MS * G_TIME_SPAN_MILLISECOND;
-  while (!priv->gst_done)
+  while (!priv->gst_done) {
     if (!g_cond_wait_until (&priv->gst_cond, &priv->gst_mutex, end_time)) {
+      XFBURN_LOG_ERROR ("GST", "GStreamer transcode start timed out after %d ms", SIGNAL_WAIT_TIMEOUT_MS);
       recreate_pipeline (gst);
       g_set_error (error, XFBURN_ERROR, XFBURN_ERROR_GST_TIMEOUT,
                   _("Gstreamer did not want to start transcoding (timed out)"));
       return FALSE;
     }
+  }
 
   priv->state = XFBURN_TRANSCODER_GST_STATE_TRANSCODING;
 

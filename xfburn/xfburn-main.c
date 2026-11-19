@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2005-2006 Jean-François Wauthy (pollux@xfce.org)
+ * Copyright (c) 2026      Dominik Klein
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +38,7 @@
 
 #include "xfburn-main.h"
 #include "xfburn-global.h"
+#include "xfburn-log.h"
 #include "xfburn-device-list.h"
 #include "xfburn-utils.h"
 #include "xfburn-settings.h"
@@ -68,6 +70,7 @@ static gboolean add_audio_composition = FALSE;
 static gboolean blank = FALSE;
 static gchar *transcoder_selection = NULL;
 static gchar *initial_dir = NULL;
+static gchar *log_filename = NULL;
 
 static GOptionEntry optionentries[] = {
   { "burn-image", 'i', G_OPTION_FLAG_OPTIONAL_ARG /* || G_OPTION_FLAG_FILENAME */, G_OPTION_ARG_CALLBACK, &parse_option,
@@ -82,6 +85,8 @@ static GOptionEntry optionentries[] = {
     N_("Select the transcoder, run with --transcoder=list to see the available ones"), NULL },
   { "directory", 'D', G_OPTION_FLAG_OPTIONAL_ARG , G_OPTION_ARG_CALLBACK, &parse_option,
     N_("Start the file browser in the specified directory, or the current directory if none is specified (the default is to start in your home directory)"), NULL },
+  { "log-file", 'l', 0, G_OPTION_ARG_FILENAME, &log_filename,
+    N_("Write diagnostic session log to the specified file path"), NULL },
   { "version", 'V', 0 , G_OPTION_ARG_NONE, &show_version,
     N_("Display program version and exit"), NULL },
   { "main", 'm', 0, G_OPTION_ARG_NONE, &show_main,
@@ -207,17 +212,23 @@ main (int argc, char **argv)
     }
   }
 
+  xfburn_log_init (log_filename);
+
   if (!burn_initialize ()) {
     g_critical ("Unable to initialize libburn");
     xfce_dialog_show_error (NULL, NULL, _("Unable to initialize the burning backend."));
+    xfburn_log_shutdown ();
     gdk_threads_leave ();
     return EXIT_FAILURE;
   }
+
+  xfburn_log_configure_backends ();
 
 #ifdef HAVE_GST
   if (!gst_init_check (&argc, &argv, &error)) {
     g_critical ("Failed to initialize gstreamer!");
     /* I'm assuming this pretty much never happens. If it does, we should make this a soft failure and fall back to basic */
+    xfburn_log_shutdown ();
     gdk_threads_leave ();
     burn_finish ();
     return EXIT_FAILURE;
@@ -237,23 +248,28 @@ main (int argc, char **argv)
 #ifdef HAVE_GST
     gst_version (&gst_major, &gst_minor, &gst_micro, &gst_nano);
 
-    if (gst_nano == 1)
+    if (gst_nano == 1) {
       nano_str = " (CVS)";
-    else if (gst_nano == 2)
+    } else if (gst_nano == 2) {
       nano_str = " (Prerelease)";
-    else
+    } else {
       nano_str = "";
+    }
 
     g_print ("\tGStreamer support (built with %d.%d.%d, linked against %u.%u.%u%s)\n",
              GST_VERSION_MAJOR, GST_VERSION_MINOR, GST_VERSION_MICRO,
              gst_major, gst_minor, gst_micro, nano_str);
 
 #endif
+    xfburn_log_shutdown ();
+    burn_finish ();
+    gdk_threads_leave ();
     exit (EXIT_SUCCESS);
   }
 
   if (transcoder_selection && strcmp (transcoder_selection, "list") == 0) {
     print_available_transcoders();
+    xfburn_log_shutdown ();
     gdk_threads_leave ();
     burn_finish ();
     return EXIT_SUCCESS;
@@ -267,6 +283,7 @@ main (int argc, char **argv)
   error_msg = xfburn_udev_manager_create_global ();
   if (error_msg) {
     xfce_dialog_show_error (NULL, NULL, "%s", error_msg);
+    xfburn_log_shutdown ();
     gdk_threads_leave ();
     burn_finish ();
     return EXIT_FAILURE;
@@ -312,6 +329,7 @@ main (int argc, char **argv)
              transcoder_selection);
     g_print ("\n");
     print_available_transcoders();
+    xfburn_log_shutdown ();
     gdk_threads_leave ();
     burn_finish ();
     return EXIT_FAILURE;
@@ -405,6 +423,8 @@ main (int argc, char **argv)
 
   xfburn_settings_flush ();
   xfburn_settings_free ();
+
+  xfburn_log_shutdown ();
 
   burn_finish ();
 

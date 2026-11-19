@@ -38,6 +38,7 @@
 #include "xfburn-perform-burn.h"
 #include "xfburn-audio-composition.h"
 #include "xfburn-transcoder.h"
+#include "xfburn-log.h"
 
 #define XFBURN_BURN_AUDIO_CD_COMPOSITION_DIALOG_GET_PRIVATE(obj) (xfburn_burn_audio_cd_composition_dialog_get_instance_private (XFBURN_BURN_AUDIO_CD_COMPOSITION_DIALOG (obj)))
 
@@ -241,24 +242,39 @@ thread_burn_prep_and_burn (ThreadBurnCompositionParams * params, struct burn_dri
   GtkWidget *dialog_progress = params->dialog_progress;
 
   struct burn_write_opts * burn_options;
-  gint ret,i;
+  gint ret, i;
+  int simulate_flag = 0;
+  int burnfree_flag = 0;
 
   ret = burn_disc_add_session (disc, session, BURN_POS_END);
   if (ret == 0) {
+    XFBURN_LOG_ERROR ("JOB_OPTS", "Unable to add session to audio disc object");
     g_warning ("Unable to create disc object");
     xfburn_progress_dialog_burning_failed (XFBURN_PROGRESS_DIALOG (dialog_progress), _("A problem with the burn backend occurred."));
     return;
   }
 
-  for (i=0; i<n_tracks; i++) {
+  for (i = 0; i < n_tracks; i++) {
     burn_session_add_track (session, tracks[i], BURN_POS_END);
   }
+
+  if (params->dummy) {
+    simulate_flag = 1;
+  }
+  if (params->burnfree) {
+    burnfree_flag = 1;
+  }
+
+  XFBURN_LOG_INFO ("JOB_OPTS",
+                   "job=\"audio_cd\" n_tracks=%d speed_kbps=%d write_mode=%d dummy=%d burnfree=%d eject=%d verify=%d",
+                   n_tracks, params->speed, params->write_mode, simulate_flag, burnfree_flag,
+                   params->eject, params->verify);
 
   burn_options = burn_write_opts_new (drive);
   burn_write_opts_set_perform_opc (burn_options, 0);
   burn_write_opts_set_multi (burn_options, 0);
-  burn_write_opts_set_simulate(burn_options, params->dummy ? 1 : 0);
-  burn_write_opts_set_underrun_proof (burn_options, params->burnfree ? 1 : 0);
+  burn_write_opts_set_simulate (burn_options, simulate_flag);
+  burn_write_opts_set_underrun_proof (burn_options, burnfree_flag);
 
   if (!xfburn_set_write_mode (burn_options, params->write_mode, disc, WRITE_MODE_SAO)) {
     xfburn_progress_dialog_burning_failed (XFBURN_PROGRESS_DIALOG (dialog_progress), _("The write mode is not supported currently."));
@@ -292,6 +308,8 @@ thread_burn_composition (ThreadBurnCompositionParams * params)
   GError *error = NULL;
 
   struct burn_drive_info *drive_info = NULL;
+
+  xfburn_log_set_thread_name ("burn_audio");
 
   disc = burn_disc_create ();
   session = burn_session_create ();

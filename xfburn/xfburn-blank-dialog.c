@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2005-2006 Jean-François Wauthy (pollux@xfce.org)
+ * Copyright (c) 2026      Dominik Klein
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,6 +28,7 @@
 #include "xfburn-device-list.h"
 #include "xfburn-udev-manager.h"
 #include "xfburn-main.h"
+#include "xfburn-log.h"
 
 #include "xfburn-blank-dialog.h"
 
@@ -282,10 +284,7 @@ thread_blank_perform_blank (ThreadBlankParams * params, struct burn_drive_info *
 
   int ret;
   gboolean error = FALSE;
-  int error_code;
   char msg_text[BURN_MSGS_MESSAGE_LEN];
-  int os_errno;
-  char severity[80];
   const char *final_status_text;
   XfburnProgressDialogStatus final_status;
   gchar *final_message = NULL;
@@ -324,38 +323,52 @@ thread_blank_perform_blank (ThreadBlankParams * params, struct burn_drive_info *
   }
 
   /* set us up to receive fatal errors */
+  msg_text[0] = '\0';
+  xfburn_log_drain_backend_messages ("blank_pre", NULL, 0);
   ret = burn_msgs_set_severities ("ALL", "NEVER", "libburn");
 
-  if (ret <= 0)
+  if (ret <= 0) {
     g_warning ("Failed to set libburn message severities, burn errors might not get detected!");
+  }
 
-  switch (params->blank_mode) {
-    case XFBURN_BLANK_FAST:
-      burn_disc_erase(drive, 1);
-      break;
-    case XFBURN_BLANK_COMPLETE:
-      burn_disc_erase(drive, 0);
-      break;
-    case XFBURN_FORMAT_FAST:
-      burn_disc_format(drive, 0, 0);
-      break;
-    case XFBURN_FORMAT_COMPLETE:
-      burn_disc_format(drive, XFBURN_FORMAT_COMPLETE_SIZE, 1);
-      break;
-    case XFBURN_DEFORMAT_FAST:
-      burn_disc_erase(drive, 1);
-      break;
-    case XFBURN_DEFORMAT_COMPLETE:
-      burn_disc_erase(drive, 0);
-      break;
-    default:
-      g_error ("Invalid blank mode %d, this is a bug.", params->blank_mode);
+  XFBURN_LOG_INFO ("JOB_START", "job=\"blank_or_format\" blank_mode=%d disc_state=%d eject=%d",
+                   params->blank_mode, disc_state, params->eject);
+
+  {
+    gint64 t_call = g_get_monotonic_time ();
+    XFBURN_LOG_CALL_ENTER ("burn_disc_erase_or_format", "blank_mode=%d", params->blank_mode);
+    switch (params->blank_mode) {
+      case XFBURN_BLANK_FAST:
+        burn_disc_erase(drive, 1);
+        break;
+      case XFBURN_BLANK_COMPLETE:
+        burn_disc_erase(drive, 0);
+        break;
+      case XFBURN_FORMAT_FAST:
+        burn_disc_format(drive, 0, 0);
+        break;
+      case XFBURN_FORMAT_COMPLETE:
+        burn_disc_format(drive, XFBURN_FORMAT_COMPLETE_SIZE, 1);
+        break;
+      case XFBURN_DEFORMAT_FAST:
+        burn_disc_erase(drive, 1);
+        break;
+      case XFBURN_DEFORMAT_COMPLETE:
+        burn_disc_erase(drive, 0);
+        break;
+      default:
+        g_error ("Invalid blank mode %d, this is a bug.", params->blank_mode);
+    }
+    XFBURN_LOG_CALL_EXIT ("burn_disc_erase_or_format", t_call, "dispatched");
   }
   sleep(1);
 
   xfburn_progress_dialog_set_status_with_text (XFBURN_PROGRESS_DIALOG (dialog_progress), XFBURN_PROGRESS_DIALOG_STATUS_RUNNING, _("Blanking disc..."));
 
   while (burn_drive_get_status (drive, &progress) != BURN_DRIVE_IDLE) {
+    if (xfburn_log_drain_backend_messages ("blank_loop", msg_text, sizeof (msg_text)) > 0) {
+      error = TRUE;
+    }
     if(progress.sectors>0 && progress.sector>=0) {
       gdouble percent = 1.0 + ((gdouble) progress.sector+1.0) / ((gdouble) progress.sectors) * 98.0;
 
@@ -365,19 +378,11 @@ thread_blank_perform_blank (ThreadBlankParams * params, struct burn_drive_info *
   }
 
   /* check the libburn message queue for errors */
-#ifndef DEBUG
-  while ((ret = burn_msgs_obtain ("FAILURE", &error_code, msg_text, &os_errno, severity)) == 1) {
-    g_warning ("[%s] %d: %s (%d)", severity, error_code, msg_text, os_errno);
+  if (xfburn_log_drain_backend_messages ("blank_post", msg_text, sizeof (msg_text)) > 0) {
     error = TRUE;
   }
-#else
-  while ((ret = burn_msgs_obtain ("ALL", &error_code, msg_text, &os_errno, severity)) == 1) {
-    g_warning ("[%s] %d: %s (%d)", severity, error_code, msg_text, os_errno);
-  }
-#endif
 
-  if (ret < 0)
-    g_warning ("Fatal error while trying to retrieve libburn message!");
+  XFBURN_LOG_INFO ("BURN_END", "job=\"blank_or_format\" error=%d last_msg=\"%s\"", error, msg_text);
 
   if (G_LIKELY (!error)) {
     final_message = g_strdup_printf (_("Done"));
@@ -398,6 +403,8 @@ static void*
 thread_blank (ThreadBlankParams * params)
 {
   struct burn_drive_info *drive_info = NULL;
+
+  xfburn_log_set_thread_name ("burn_blank");
 
   if (!xfburn_device_grab (params->device, &drive_info)) {
     xfburn_progress_dialog_burning_failed (XFBURN_PROGRESS_DIALOG (params->dialog_progress), _("Unable to grab the drive."));

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2005-2006 Jean-François Wauthy (pollux@xfce.org)
+ * Copyright (c) 2026      Dominik Klein
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,6 +45,7 @@
 
 #include "xfburn-data-composition.h"
 #include "xfburn-global.h"
+#include "xfburn-log.h"
 
 #include "xfburn-adding-progress.h"
 #include "xfburn-composition.h"
@@ -432,7 +434,10 @@ cb_begin_burn (XfburnDataDiscUsage * du, XfburnDataComposition * dc)
     return;
   }
 
+  xfburn_log_configure_backends ();
+
   image = generate_iso_image (XFBURN_DATA_COMPOSITION (dc));
+  xfburn_log_drain_backend_messages ("generate_iso_image", NULL, 0);
 
   switch (xfburn_disc_usage_get_disc_type (XFBURN_DISC_USAGE (du))) {
   case CD_DISC:

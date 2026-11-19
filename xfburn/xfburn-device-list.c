@@ -33,6 +33,7 @@
 #include "xfburn-global.h"
 #include "xfburn-udev-manager.h"
 #include "xfburn-utils.h"
+#include "xfburn-log.h"
 
 #include "xfburn-device-list.h"
 #include "xfburn-cclosure-marshal.h"
@@ -254,19 +255,28 @@ get_libburn_device_list (XfburnDeviceList *devlist)
 
   struct burn_drive_info *drives;
   gint i, ret;
-  guint num_drives;
+  guint num_drives = 0;
+  gint64 t_call;
 
   DBG ("Before scanning for drives");
-  while ((ret = burn_drive_scan (&drives, &(num_drives))) == 0)
+  t_call = g_get_monotonic_time ();
+  XFBURN_LOG_CALL_ENTER ("burn_drive_scan", "scanning");
+  while ((ret = burn_drive_scan (&drives, &(num_drives))) == 0) {
     usleep (1002);
+  }
+  XFBURN_LOG_CALL_EXIT ("burn_drive_scan", t_call, "ret=%d num_drives=%u", ret, num_drives);
+  xfburn_log_drain_backend_messages ("burn_drive_scan", NULL, 0);
   DBG ("After scanning for drives");
 
   priv->num_drives = (gint) num_drives;
 
-  if (ret < 0)
+  if (ret < 0) {
+    XFBURN_LOG_ERROR ("DEV", "An error occurred while scanning for available drives (ret=%d)", ret);
     g_warning ("An error occurred while scanning for available drives");
+  }
 
   if (priv->num_drives < 1) {
+    XFBURN_LOG_WARN ("DEV", "No drives were found (ret=%d)", ret);
     g_warning ("No drives were found! If this is in error, check the permissions");
   }
 
@@ -283,16 +293,22 @@ get_libburn_device_list (XfburnDeviceList *devlist)
 
     xfburn_device_fillin_libburn_info (device, &drives[i]);
 
-
     ret = burn_drive_d_get_adr (drives[i].drive, addr);
-    if (ret <= 0)
-      g_error ("Unable to get drive %s address (ret=%d). Please report this problem to libburn-hackers@pykix.org", name, ret);
+    if (ret <= 0) {
+      XFBURN_LOG_ERROR ("DEV", "Unable to get drive \"%s\" address (ret=%d)", name, ret);
+      xfburn_log_drain_backend_messages ("get_adr", NULL, 0);
+      g_warning ("Unable to get drive %s address (ret=%d). Please report this problem to libburn-hackers@pykix.org", name, ret);
+      g_object_unref (device);
+      burn_drive_snooze (drives[i].drive, 0);
+      continue;
+    }
 
     g_object_set (device, "address", addr, NULL);
 
     if (xfburn_device_can_burn (device)) {
       priv->devices = g_list_append (priv->devices, device);
       priv->num_burners++;
+      xfburn_log_dump_device_hardware (addr, NULL);
     } else {
       g_message ("Ignoring reader '%s' at '%s'", name, addr);
       g_object_unref (device);

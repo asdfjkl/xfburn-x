@@ -36,6 +36,7 @@
 #include "xfburn-burn-data-composition-base-dialog.h"
 #include "xfburn-progress-dialog.h"
 #include "xfburn-perform-burn.h"
+#include "xfburn-log.h"
 
 #define XFBURN_BURN_DATA_COMPOSITION_BASE_DIALOG_GET_PRIVATE(obj) (xfburn_burn_data_composition_base_dialog_get_instance_private (XFBURN_BURN_DATA_COMPOSITION_BASE_DIALOG(obj)))
 
@@ -431,15 +432,21 @@ thread_burn_prep_and_burn (ThreadBurnCompositionParams * params, struct burn_dri
   struct burn_source **fifos = NULL;
   gint ret;
   int sectors[1];
+  int simulate_flag = 0;
+  int burnfree_flag = 0;
+  int stream_rec_val = 0;
+  int verify_flag = 0;
 
   ret = burn_disc_add_session (disc, session, BURN_POS_END);
   if (ret == 0) {
+    XFBURN_LOG_ERROR ("JOB_OPTS", "Unable to add session to disc object");
     g_warning ("Unable to create disc object");
     xfburn_progress_dialog_burning_failed (XFBURN_PROGRESS_DIALOG (dialog_progress), _("An error occurred in the burn backend."));
     return;
   }
 
   if (burn_track_set_source (track, params->src) != BURN_SOURCE_OK) {
+    XFBURN_LOG_ERROR ("JOB_OPTS", "Cannot attach source object to track object");
     g_warning ("Cannot attach source object to track object");
     xfburn_progress_dialog_burning_failed (XFBURN_PROGRESS_DIALOG (dialog_progress), _("An error occurred in the burn backend."));
     return;
@@ -447,22 +454,40 @@ thread_burn_prep_and_burn (ThreadBurnCompositionParams * params, struct burn_dri
 
   burn_session_add_track (session, track, BURN_POS_END);
 
+  if (params->dummy) {
+    simulate_flag = 1;
+  }
+  if (params->burnfree) {
+    burnfree_flag = 1;
+  }
+  if (params->stream_recording) {
+    stream_rec_val = 32;
+  }
+  if (params->verify_data != NULL) {
+    verify_flag = 1;
+  }
+
+  XFBURN_LOG_INFO ("JOB_OPTS",
+                   "job=\"data_composition\" speed_kbps=%d write_mode=%d dummy=%d burnfree=%d stream_recording=%d eject=%d verify=%d fifo_kb=%d",
+                   params->speed, params->write_mode, simulate_flag, burnfree_flag,
+                   stream_rec_val, params->eject, verify_flag,
+                   xfburn_settings_get_int ("fifo-size", FIFO_DEFAULT_SIZE));
+
   burn_options = burn_write_opts_new (drive);
   burn_write_opts_set_perform_opc (burn_options, 0);
   burn_write_opts_set_multi (burn_options, 0);
-  burn_write_opts_set_simulate(burn_options, params->dummy ? 1 : 0);
-  burn_write_opts_set_underrun_proof (burn_options, params->burnfree ? 1 : 0);
+  burn_write_opts_set_simulate (burn_options, simulate_flag);
+  burn_write_opts_set_underrun_proof (burn_options, burnfree_flag);
   /*
    * 32 is the number of blocks to skip. This will increase reliability with BD disks that
    * are used for multisessions. xfburn doesn't support this, but other programs may be using
    * the disc that way, so we respect that here.
    */
-  burn_write_opts_set_stream_recording (burn_options, params->stream_recording ? 32 : 0);
+  burn_write_opts_set_stream_recording (burn_options, stream_rec_val);
 
   if (!xfburn_set_write_mode (burn_options, params->write_mode, disc, WRITE_MODE_TAO)) {
     xfburn_progress_dialog_burning_failed (XFBURN_PROGRESS_DIALOG (dialog_progress), _("The write mode is not supported currently."));
   } else {
-
     DBG ("Set speed to %d kb/s", params->speed);
     burn_drive_set_speed (drive, 0, params->speed);
 
@@ -493,6 +518,8 @@ thread_burn_composition (ThreadBurnCompositionParams * params)
   struct burn_track *track;
 
   struct burn_drive_info *drive_info = NULL;
+
+  xfburn_log_set_thread_name ("burn_data");
 
   disc = burn_disc_create ();
   session = burn_session_create ();
@@ -541,9 +568,12 @@ cb_dialog_response (XfburnBurnDataCompositionBaseDialog * dialog, gint response_
 
     if (iso_image_create_burn_source (priv->image, write_opts, &src) < 0) {
       /* could not create source */
+      xfburn_log_drain_backend_messages ("iso_create_burn_source_err", NULL, 0);
+      XFBURN_LOG_ERROR ("LIBISOFS", "iso_image_create_burn_source failed");
       xfce_dialog_show_error (NULL, NULL, _("Could not create ISO source structure."));
       return;
     }
+    xfburn_log_drain_backend_messages ("iso_create_burn_source", NULL, 0);
 
     /* iso_image_create_burn_source copies the data it needs */
     iso_write_opts_free (write_opts);

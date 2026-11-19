@@ -35,6 +35,7 @@
 #include "xfburn-global.h"
 #include "xfburn-progress-dialog.h"
 #include "xfburn-device-list.h"
+#include "xfburn-log.h"
 
 #include "xfburn-udev-manager.h"
 
@@ -92,7 +93,7 @@ static void
 xfburn_udev_manager_init (XfburnUdevManager * obj)
 {
   XfburnUdevManagerPrivate *priv = XFBURN_UDEV_MANAGER_GET_PRIVATE (obj);
-  const gchar* const subsystems[] = { "block", NULL };
+  const gchar* const subsystems[] = { "block", "scsi", "usb", NULL };
 
   priv->error = NULL;
   priv->volume_monitor = NULL;
@@ -126,19 +127,103 @@ static void cb_device_monitor_uevent(GUdevClient  *client,
 				     XfburnUdevManager *obj)
 {
   const gchar *id_type;
+  const gchar *subsys;
+  const gchar *devfile;
+  const gchar *sysfs_path;
+  const gchar *id_bus;
+  const gchar *id_model;
   gboolean is_cdrom;
 
   DBG ("UDEV: device uevent: %s", action);
 
-  if (udevice == NULL)
+  if (udevice == NULL || action == NULL) {
     return;
+  }
+
+  subsys = g_udev_device_get_subsystem (udevice);
+  devfile = g_udev_device_get_device_file (udevice);
+  sysfs_path = g_udev_device_get_sysfs_path (udevice);
+  id_bus = g_udev_device_get_property (udevice, "ID_BUS");
+  id_model = g_udev_device_get_property (udevice, "ID_MODEL");
 
   id_type = g_udev_device_get_property (udevice, "ID_TYPE");
   is_cdrom = g_udev_device_get_property_as_boolean (udevice, "ID_CDROM") ||
              g_strcmp0 (id_type, "cd") == 0 ||
              g_strcmp0 (id_type, "cd/dvd") == 0;
-  if (!is_cdrom)
+
+  if (!is_cdrom) {
+    if (g_strcmp0 (subsys, "usb") == 0 || g_strcmp0 (subsys, "scsi") == 0) {
+      const gchar *act_str = action;
+      const gchar *sub_str = "unknown";
+      const gchar *dev_str = "none";
+      const gchar *sys_str = "unknown";
+      const gchar *mod_str = "unknown";
+
+      if (subsys != NULL) {
+        sub_str = subsys;
+      }
+      if (devfile != NULL) {
+        dev_str = devfile;
+      }
+      if (sysfs_path != NULL) {
+        sys_str = sysfs_path;
+      }
+      if (id_model != NULL) {
+        mod_str = id_model;
+      }
+
+      if (g_str_equal (action, "remove") || g_str_equal (action, "unbind")) {
+        XFBURN_LOG_WARN ("UDEV",
+                         "uevent action=\"%s\" subsys=\"%s\" dev=\"%s\" model=\"%s\" sysfs=\"%s\"",
+                         act_str, sub_str, dev_str, mod_str, sys_str);
+      } else {
+        XFBURN_LOG_INFO ("UDEV",
+                         "uevent action=\"%s\" subsys=\"%s\" dev=\"%s\" model=\"%s\" sysfs=\"%s\"",
+                         act_str, sub_str, dev_str, mod_str, sys_str);
+      }
+    }
     return;
+  }
+
+  {
+    const gchar *sub_str = "block";
+    const gchar *dev_str = "unknown";
+    const gchar *bus_str = "unknown";
+    const gchar *mod_str = "unknown";
+    const gchar *fs_type = g_udev_device_get_property (udevice, "ID_FS_TYPE");
+    const gchar *media_chg = g_udev_device_get_property (udevice, "DISK_MEDIA_CHANGE");
+    const gchar *fs_str = "none";
+    const gchar *chg_str = "0";
+
+    if (subsys != NULL) {
+      sub_str = subsys;
+    }
+    if (devfile != NULL) {
+      dev_str = devfile;
+    }
+    if (id_bus != NULL) {
+      bus_str = id_bus;
+    }
+    if (id_model != NULL) {
+      mod_str = id_model;
+    }
+    if (fs_type != NULL) {
+      fs_str = fs_type;
+    }
+    if (media_chg != NULL) {
+      chg_str = media_chg;
+    }
+
+    if (g_str_equal (action, "remove")) {
+      XFBURN_LOG_WARN ("UDEV",
+                       "cdrom uevent action=\"%s\" subsys=\"%s\" dev=\"%s\" bus=\"%s\" model=\"%s\" fs=\"%s\" media_change=\"%s\"",
+                       action, sub_str, dev_str, bus_str, mod_str, fs_str, chg_str);
+    } else {
+      XFBURN_LOG_INFO ("UDEV",
+                       "cdrom uevent action=\"%s\" subsys=\"%s\" dev=\"%s\" bus=\"%s\" model=\"%s\" fs=\"%s\" media_change=\"%s\"",
+                       action, sub_str, dev_str, bus_str, mod_str, fs_str, chg_str);
+    }
+  }
 
   if (g_str_equal (action, "remove") || g_str_equal (action, "add") ||
       g_str_equal (action, "change")) {
@@ -286,6 +371,9 @@ xfburn_udev_manager_get_devices (XfburnUdevManager *udevman, gint *drives, gint 
           (*burners)++;
           device_list = g_list_append (device_list, device);
           DBG ("Found writer '%s' at '%s'", name, addr);
+          XFBURN_LOG_INFO ("UDEV", "Discovered writer name=\"%s\" addr=\"%s\" rev=\"%s\" cdr=%d cdrw=%d dvdr=%d dvdram=%d bd=%d",
+                           name, addr, rev, cdr, cdrw, dvdr, dvdram, bdr);
+          xfburn_log_dump_device_hardware (addr, NULL);
         }
       }
     }
@@ -361,6 +449,7 @@ cb_gio_operation_timeout (gpointer callback_data)
 {
   XfburnUdevManagerGioOperation *operation = callback_data;
 
+  XFBURN_LOG_WARN ("UDEV", "Volume/Disc GIO unmount operation timed out after 15 seconds");
   g_warning ("Volume/Disc operation timed out");
 
   xfburn_udev_manager_gio_operation_end (operation);
@@ -428,6 +517,7 @@ xfburn_udev_manager_check_ask_umount (XfburnUdevManager *udevman, XfburnDevice *
 
     /* NOTE: we own a reference to mount
      * object so no need to ref it even more */
+    XFBURN_LOG_INFO ("UDEV", "Starting async GIO unmount for device=\"%s\"", device_file);
     g_mount_unmount_with_operation (mount,
                                     G_MOUNT_UNMOUNT_NONE,
                                     NULL,
@@ -456,6 +546,8 @@ xfburn_udev_manager_check_ask_umount (XfburnUdevManager *udevman, XfburnDevice *
     g_clear_handle_id (&op->timeout_id, g_source_remove);
 
     if (op->error) {
+      XFBURN_LOG_ERROR ("UDEV", "GIO unmount error for device=\"%s\": code=%d msg=\"%s\"",
+                        device_file, op->error->code, op->error->message);
       g_warning ("Medium op finished with an error: %s", op->error->message);
 
       if (op->error->code == G_IO_ERROR_FAILED_HANDLED) {
@@ -464,13 +556,16 @@ xfburn_udev_manager_check_ask_umount (XfburnUdevManager *udevman, XfburnDevice *
         /* means we shouldn't display any error message since
          * that was already done */
         g_clear_error (&op->error);
-      } else
+      } else {
         g_error_free (op->error);
+      }
 
       op->error = NULL;
     }
 
     unmounted = op->result;
+    XFBURN_LOG_INFO ("UDEV", "Finished async GIO unmount for device=\"%s\" unmounted=%d",
+                     device_file, unmounted);
 
     if (op->cancel) {
       g_cancellable_cancel (op->cancel);

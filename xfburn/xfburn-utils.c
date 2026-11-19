@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2005-2006 Jean-François Wauthy (pollux@xfce.org)
+ * Copyright (c) 2026      Dominik Klein
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -33,6 +34,7 @@
 #include "xfburn-device-list.h"
 #include "xfburn-main.h"
 #include "xfburn-main-window.h"
+#include "xfburn-log.h"
 
 /***********/
 /* cursors */
@@ -269,14 +271,17 @@ xfburn_capture_libburn_messages (void)
 {
   int ret;
 
+  xfburn_log_drain_backend_messages ("capture_libburn_messages", NULL, 0);
+
 #ifdef DEBUG_LIBBURN
-  ret = burn_msgs_set_severities ("NEVER", "DEBUG", libburn_msg_prefix);
+  ret = burn_msgs_set_severities ("ALL", "DEBUG", libburn_msg_prefix);
 #else
   ret = burn_msgs_set_severities ("ALL", "NEVER", libburn_msg_prefix);
 #endif
 
-  if (ret <= 0)
+  if (ret <= 0) {
     g_warning ("Failed to set libburn message severities, burn errors might not get detected");
+  }
 }
 
 void
@@ -284,15 +289,17 @@ xfburn_console_libburn_messages (void)
 {
   int ret;
 
+  xfburn_log_drain_backend_messages ("console_libburn_messages", NULL, 0);
+
 #ifdef DEBUG_LIBBURN
-  ret = burn_msgs_set_severities ("NEVER", "DEBUG", libburn_msg_prefix);
+  ret = burn_msgs_set_severities ("ALL", "DEBUG", libburn_msg_prefix);
 #else
-  ret = burn_msgs_set_severities ("NEVER", "FATAL", libburn_msg_prefix);
+  ret = burn_msgs_set_severities ("ALL", "FATAL", libburn_msg_prefix);
 #endif
 
-  if (ret <= 0)
+  if (ret <= 0) {
     g_warning ("Failed to set libburn message severities");
-
+  }
 }
 
 int

@@ -33,6 +33,7 @@
 #include "xfburn-global.h"
 #include "xfburn-main.h"
 #include "xfburn-utils.h"
+#include "xfburn-log.h"
 
 #define XFBURN_PROGRESS_DIALOG_GET_PRIVATE(obj) (xfburn_progress_dialog_get_instance_private (XFBURN_PROGRESS_DIALOG (obj)))
 
@@ -58,6 +59,7 @@ typedef struct _XfburnProgressDialogPrivate
   GtkWidget *fifo_bar;
   GtkWidget *buffer_bar;
 
+  GtkWidget *button_save_log;
   GtkWidget *button_stop;
   GtkWidget *button_close;
 } XfburnProgressDialogPrivate;
@@ -73,6 +75,7 @@ static void set_writing_speed (XfburnProgressDialog * dialog, gfloat speed);
 static void set_action_text (XfburnProgressDialog * dialog, XfburnProgressDialogStatus status, const gchar * text);
 static void stop (XfburnProgressDialog *dialog);
 
+static void cb_button_save_log_clicked (GtkWidget *button, XfburnProgressDialog * dialog);
 static void cb_button_stop_clicked (GtkWidget *button, XfburnProgressDialog * dialog);
 static void cb_button_close_clicked (GtkWidget *button, XfburnProgressDialog * dialog);
 static gboolean cb_dialog_delete (XfburnProgressDialog * dialog, GdkEvent * event, XfburnProgressDialogPrivate * priv);
@@ -211,6 +214,12 @@ xfburn_progress_dialog_init (XfburnProgressDialog * obj)
   gtk_widget_show (priv->buffer_bar);
 
   /* action buttons */
+  priv->button_save_log = gtk_button_new_with_mnemonic (_("Save _Log..."));
+  gtk_widget_set_tooltip_text (priv->button_save_log, _("Save diagnostic flight recorder log to a file for bug reporting"));
+  gtk_widget_show (priv->button_save_log);
+  gtk_dialog_add_action_widget (GTK_DIALOG (obj), priv->button_save_log, GTK_RESPONSE_NONE);
+  g_signal_connect (G_OBJECT (priv->button_save_log), "clicked", G_CALLBACK (cb_button_save_log_clicked), obj);
+
   priv->button_stop = gtk_button_new_with_mnemonic (_("_Stop"));
   gtk_widget_show (priv->button_stop);
   gtk_dialog_add_action_widget (GTK_DIALOG (obj), priv->button_stop, GTK_RESPONSE_CANCEL);
@@ -330,6 +339,53 @@ stop (XfburnProgressDialog *dialog)
 }
 
 /* callbacks */
+static void
+cb_button_save_log_clicked (GtkWidget *button, XfburnProgressDialog *dialog)
+{
+  GtkWidget *chooser;
+  const gchar *cur_log_path;
+  gchar *default_name = NULL;
+
+  chooser = gtk_file_chooser_dialog_new (_("Save Diagnostic Log"),
+                                         GTK_WINDOW (dialog),
+                                         GTK_FILE_CHOOSER_ACTION_SAVE,
+                                         _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                         _("_Save"), GTK_RESPONSE_ACCEPT,
+                                         NULL);
+  gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (chooser), TRUE);
+
+  cur_log_path = xfburn_log_get_file_path ();
+  if (cur_log_path != NULL && cur_log_path[0] != '\0') {
+    default_name = g_path_get_basename (cur_log_path);
+  } else {
+    default_name = g_strdup ("xfburn-diagnostic.log");
+  }
+  gtk_file_chooser_set_current_name (GTK_FILE_CHOOSER (chooser), default_name);
+  g_free (default_name);
+
+  if (gtk_dialog_run (GTK_DIALOG (chooser)) == GTK_RESPONSE_ACCEPT) {
+    gchar *dest_path = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (chooser));
+    if (dest_path != NULL) {
+      GError *err = NULL;
+      if (!xfburn_log_copy_to_file (dest_path, &err)) {
+        const gchar *err_msg = "Unknown error";
+        if (err != NULL && err->message != NULL) {
+          err_msg = err->message;
+        }
+        xfce_dialog_show_error (GTK_WINDOW (dialog), err, _("Failed to save diagnostic log to '%s': %s"), dest_path, err_msg);
+        if (err != NULL) {
+          g_error_free (err);
+        }
+      } else {
+        XFBURN_LOG_INFO ("UI", "Exported diagnostic log copy to \"%s\"", dest_path);
+      }
+      g_free (dest_path);
+    }
+  }
+
+  gtk_widget_destroy (chooser);
+}
+
 static void
 cb_button_stop_clicked (GtkWidget *button, XfburnProgressDialog *dialog)
 {
@@ -637,8 +693,15 @@ void
 xfburn_progress_dialog_burning_failed (XfburnProgressDialog * dialog, const gchar * msg_error)
 {
   GtkWidget *popup;
+  const gchar *log_path;
+
+  xfburn_log_drain_backend_messages ("burning_failed", NULL, 0);
+  XFBURN_LOG_ERROR ("UI_FAIL", "Burning failed dialog shown: msg=\"%s\"", msg_error);
+  xfburn_log_flush ();
 
   xfburn_progress_dialog_set_status_with_text (dialog, XFBURN_PROGRESS_DIALOG_STATUS_FAILED, _("Failure"));
+
+  log_path = xfburn_log_get_file_path ();
 
   gdk_threads_enter ();
   popup = gtk_message_dialog_new (GTK_WINDOW (dialog),
@@ -646,6 +709,11 @@ xfburn_progress_dialog_burning_failed (XfburnProgressDialog * dialog, const gcha
                                   GTK_MESSAGE_ERROR,
                                   GTK_BUTTONS_CLOSE,
                                   "%s", msg_error);
+  if (log_path != NULL && log_path[0] != '\0') {
+    gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (popup),
+                                              _("Diagnostic log saved to:\n%s"),
+                                              log_path);
+  }
   g_signal_connect (G_OBJECT (popup), "response", G_CALLBACK (gtk_widget_destroy), NULL);
   gtk_widget_show (popup);
   gdk_threads_leave ();

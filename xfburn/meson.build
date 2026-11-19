@@ -47,6 +47,8 @@ xfburn_sources = [
   'xfburn-fs-browser.c',
   'xfburn-fs-browser.h',
   'xfburn-global.h',
+  'xfburn-log.c',
+  'xfburn-log.h',
   'xfburn-main-window.c',
   'xfburn-main-window.h',
   'xfburn-main.c',

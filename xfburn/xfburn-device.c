@@ -23,6 +23,7 @@
 
 #include "xfburn-device.h"
 #include "xfburn-udev-manager.h"
+#include "xfburn-log.h"
 
 /*- globals -*/
 
@@ -348,20 +349,36 @@ refresh_disc (XfburnDevice * device, struct burn_drive_info *drive_info)
 {
   XfburnDevicePrivate *priv = GET_PRIVATE (device);
   int wait_ticks = 0;
+  int prof_ret;
+  gint64 t_call;
 
   /* check if there is a disc in the drive */
+  t_call = g_get_monotonic_time ();
+  XFBURN_LOG_CALL_ENTER ("burn_disc_get_status", "addr=\"%s\"", priv->addr);
   while ((priv->disc_status = burn_disc_get_status (drive_info->drive)) == BURN_DISC_UNREADY && wait_ticks < 50) {
     usleep(100001);
     wait_ticks++;
   }
+  XFBURN_LOG_CALL_EXIT ("burn_disc_get_status", t_call, "disc_status=%d wait_ticks=%d", priv->disc_status, wait_ticks);
 
   DBG ("disc_status = %d", priv->disc_status);
 
-  if (burn_disc_get_profile(drive_info->drive, &(priv->profile_no), priv->profile_name) != 1) {
+  t_call = g_get_monotonic_time ();
+  XFBURN_LOG_CALL_ENTER ("burn_disc_get_profile", "addr=\"%s\"", priv->addr);
+  prof_ret = burn_disc_get_profile (drive_info->drive, &(priv->profile_no), priv->profile_name);
+  XFBURN_LOG_CALL_EXIT ("burn_disc_get_profile", t_call, "ret=%d profile_no=0x%x profile_name=\"%s\"",
+                        prof_ret, priv->profile_no, priv->profile_name);
+
+  if (prof_ret != 1) {
     g_warning ("no profile could be retrieved");
   }
   priv->is_erasable = burn_disc_erasable (drive_info->drive);
-  DBG ("profile_no = 0x%x (%s), %s erasable", priv->profile_no, priv->profile_name, (priv->is_erasable ? "" : "NOT"));
+  xfburn_log_drain_backend_messages ("refresh_disc", NULL, 0);
+
+  XFBURN_LOG_INFO ("MEDIA",
+                   "addr=\"%s\" name=\"%s\" disc_status=%d profile_no=0x%x profile_name=\"%s\" erasable=%d wait_ticks=%d",
+                   priv->addr, priv->name, priv->disc_status, priv->profile_no, priv->profile_name,
+                   priv->is_erasable, wait_ticks);
 }
 
 static void
@@ -371,19 +388,26 @@ refresh_speed_list (XfburnDevice * device, struct burn_drive_info *drive_info)
 
   struct burn_speed_descriptor *speed_list = NULL;
   gint ret;
+  gint64 t_call;
 
   /* fill new list */
+  t_call = g_get_monotonic_time ();
+  XFBURN_LOG_CALL_ENTER ("burn_drive_get_speedlist", "addr=\"%s\"", priv->addr);
   ret = burn_drive_get_speedlist (drive_info->drive, &speed_list);
+  XFBURN_LOG_CALL_EXIT ("burn_drive_get_speedlist", t_call, "ret=%d speed_list=%p", ret, (void *) speed_list);
+  xfburn_log_drain_backend_messages ("refresh_speed_list", NULL, 0);
 
   if (ret > 0 && speed_list != NULL) {
     struct burn_speed_descriptor *el = speed_list;
+    GString *speeds_str = g_string_new (NULL);
+    GSList *it;
 
     while (el) {
       gint speed = el->write_speed;
 
       /* FIXME: why do we need no_speed_duplicate? */
       if (speed > 0 && no_speed_duplicate (priv->supported_speeds, speed)) {
-          priv->supported_speeds = g_slist_prepend (priv->supported_speeds, GINT_TO_POINTER (speed));
+        priv->supported_speeds = g_slist_prepend (priv->supported_speeds, GINT_TO_POINTER (speed));
       }
 
       el = el->next;
@@ -391,13 +415,27 @@ refresh_speed_list (XfburnDevice * device, struct burn_drive_info *drive_info)
 
     burn_drive_free_speedlist (&speed_list);
     priv->supported_speeds = g_slist_sort (priv->supported_speeds, &cmp_ints);
+
+    for (it = priv->supported_speeds; it != NULL; it = it->next) {
+      if (speeds_str->len > 0) {
+        g_string_append_c (speeds_str, ',');
+      }
+      g_string_append_printf (speeds_str, "%d", GPOINTER_TO_INT (it->data));
+    }
+    XFBURN_LOG_INFO ("MEDIA", "addr=\"%s\" supported_speeds_kbps=\"%s\"", priv->addr, speeds_str->str);
+    g_string_free (speeds_str, TRUE);
   } else if (ret == 0 || speed_list == NULL) {
+    XFBURN_LOG_WARN ("MEDIA", "addr=\"%s\" reported speed list is empty (ret=%d)", priv->addr, ret);
     g_warning ("reported speed list is empty for device:");
-    // FIXME
     g_warning ("%s can burn: %d [cdr: %d, cdrw: %d, dvdr: %d, dvdram: %d]", (priv)->name, ((priv)->cdr || (priv)->cdrw || (priv)->dvdr || (priv)->dvdram), (priv)->cdr, (priv)->cdrw, (priv)->dvdr, (priv)->dvdram);
   } else {
-    /* ret < 0 */
-    g_error ("severe error while retrieving speed list");
+    /* ret < 0: Log diagnostic details and continue gracefully without crashing via g_error */
+    XFBURN_LOG_ERROR ("MEDIA",
+                      "severe error while retrieving speed list for addr=\"%s\" name=\"%s\" (ret=%d)",
+                      priv->addr, priv->name, ret);
+    xfburn_log_drain_backend_messages ("refresh_speed_list_error", NULL, 0);
+    xfburn_log_dump_device_hardware (priv->addr, NULL);
+    g_warning ("severe error while retrieving speed list for '%s' (ret=%d)", priv->addr, ret);
   }
 }
 
@@ -448,18 +486,27 @@ xfburn_device_grab (XfburnDevice * device, struct burn_drive_info **drive_info)
   gchar drive_addr[BURN_DRIVE_ADR_LEN];
   int i;
   const int max_checks = 4;
+  gint64 t_call;
 #ifdef HAVE_GUDEV
   XfburnUdevManager *udevman = xfburn_udev_manager_get_global ();
 #endif
 
   if (g_atomic_int_get (&active_drive_grabs) > 0) {
     DBG ("Drive already grabbed, skipping concurrent grab attempt for '%s'", priv->addr);
+    XFBURN_LOG_DEBUG ("DEV", "Drive already grabbed, skipping concurrent grab attempt for addr=\"%s\"", priv->addr);
     return FALSE;
   }
 
+  t_call = g_get_monotonic_time ();
+  XFBURN_LOG_CALL_ENTER ("burn_drive_convert_fs_adr", "addr=\"%s\"", priv->addr);
   ret = burn_drive_convert_fs_adr (priv->addr, drive_addr);
+  XFBURN_LOG_CALL_EXIT ("burn_drive_convert_fs_adr", t_call, "ret=%d drive_addr=\"%s\"", ret, drive_addr);
+  xfburn_log_drain_backend_messages ("convert_fs_adr", NULL, 0);
+
   if (ret <= 0) {
-    g_error ("Device address does not lead to a burner '%s' (ret=%d).", priv->addr, ret);
+    XFBURN_LOG_ERROR ("DEV", "Device address does not lead to a burner addr=\"%s\" (ret=%d)", priv->addr, ret);
+    xfburn_log_dump_device_hardware (priv->addr, NULL);
+    g_warning ("Device address does not lead to a burner '%s' (ret=%d).", priv->addr, ret);
     return FALSE;
   }
 
@@ -467,23 +514,32 @@ xfburn_device_grab (XfburnDevice * device, struct burn_drive_info **drive_info)
 
   /* we need to try to grab several times, because
    * the drive might be busy detecting the disc */
-  for (i=1; i<=max_checks; i++) {
+  for (i = 1; i <= max_checks; i++) {
+    t_call = g_get_monotonic_time ();
+    XFBURN_LOG_CALL_ENTER ("burn_drive_scan_and_grab", "drive_addr=\"%s\" attempt=%d/%d", drive_addr, i, max_checks);
     ret = burn_drive_scan_and_grab (drive_info, drive_addr, 0);
-    if (ret > 0)
+    XFBURN_LOG_CALL_EXIT ("burn_drive_scan_and_grab", t_call, "ret=%d attempt=%d/%d", ret, i, max_checks);
+    xfburn_log_drain_backend_messages ("scan_and_grab", NULL, 0);
+
+    if (ret > 0) {
       break;
-    else if  (i < max_checks) {
+    } else if (i < max_checks) {
 #ifdef HAVE_GUDEV
       if (!g_main_context_is_owner (g_main_context_default ()) ||
-          !xfburn_udev_manager_check_ask_umount (udevman, device))
-        usleep(i*100001);
+          !xfburn_udev_manager_check_ask_umount (udevman, device)) {
+        usleep (i * 100001);
+      }
 #else
-      usleep(i*100001);
+      usleep (i * 100001);
 #endif
     }
   }
 
   if (ret <= 0) {
     g_atomic_int_add (&active_drive_grabs, -1);
+    XFBURN_LOG_ERROR ("DEV", "Unable to grab drive at addr=\"%s\" after %d attempts (ret=%d)",
+                      priv->addr, max_checks, ret);
+    xfburn_log_dump_device_hardware (priv->addr, NULL);
     g_warning ("Unable to grab the drive at path '%s' (ret=%d).", priv->addr, ret);
     return FALSE;
   }
@@ -540,11 +596,16 @@ gboolean
 xfburn_device_release (struct burn_drive_info *drive_info, gboolean eject)
 {
   int ret;
+  gint64 t_call;
 
+  t_call = g_get_monotonic_time ();
+  XFBURN_LOG_CALL_ENTER ("burn_drive_release", "eject=%d", eject);
   burn_drive_snooze (drive_info->drive, 0);
   burn_drive_release (drive_info->drive, eject);
-
   ret = burn_drive_info_forget (drive_info, 0);
+  XFBURN_LOG_CALL_EXIT ("burn_drive_release", t_call, "forget_ret=%d eject=%d", ret, eject);
+  xfburn_log_drain_backend_messages ("device_release", NULL, 0);
+
   g_atomic_int_add (&active_drive_grabs, -1);
 
   if (G_LIKELY (ret == 1))

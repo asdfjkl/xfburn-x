@@ -39,6 +39,7 @@
 
 #include "xfburn-burn-image-dialog.h"
 #include "xfburn-perform-burn.h"
+#include "xfburn-log.h"
 
 #define XFBURN_BURN_IMAGE_DIALOG_GET_PRIVATE(obj) (xfburn_burn_image_dialog_get_instance_private (XFBURN_BURN_IMAGE_DIALOG (obj)))
 
@@ -270,18 +271,38 @@ static gboolean
 prepare_params (ThreadBurnIsoParams *params, struct burn_drive *drive, gchar **failure_msg)
 {
   struct burn_write_opts * burn_options;
+  int simulate_flag = 0;
+  int burnfree_flag = 0;
+  int stream_rec_val = 0;
+
+  if (params->dummy) {
+    simulate_flag = 1;
+  }
+  if (params->burnfree) {
+    burnfree_flag = 1;
+  }
+  if (params->stream_recording) {
+    stream_rec_val = 32;
+  }
+
+  XFBURN_LOG_INFO ("JOB_OPTS",
+                   "job=\"burn_image\" iso_path=\"%s\" speed_kbps=%d write_mode=%d dummy=%d burnfree=%d stream_recording=%d eject=%d verify=%d fifo_kb=%d",
+                   params->iso_path, params->speed, params->write_mode,
+                   simulate_flag, burnfree_flag, stream_rec_val,
+                   params->eject, params->verify,
+                   xfburn_settings_get_int ("fifo-size", FIFO_DEFAULT_SIZE));
 
   burn_options = burn_write_opts_new (drive);
   burn_write_opts_set_perform_opc (burn_options, 0);
   burn_write_opts_set_multi (burn_options, 0);
-  burn_write_opts_set_simulate(burn_options, params->dummy ? 1 : 0);
-  burn_write_opts_set_underrun_proof (burn_options, params->burnfree ? 1 : 0);
+  burn_write_opts_set_simulate (burn_options, simulate_flag);
+  burn_write_opts_set_underrun_proof (burn_options, burnfree_flag);
   /*
    * 32 is the number of blocks to skip. This will increase reliability with BD disks that
    * are used for multisessions. xfburn doesn't support this, but other programs may be using
    * the disc that way, so we respect that here.
    */
-  burn_write_opts_set_stream_recording (burn_options, params->stream_recording ? 32 : 0);
+  burn_write_opts_set_stream_recording (burn_options, stream_rec_val);
 
   if (!xfburn_set_write_mode (burn_options, params->write_mode, params->disc, WRITE_MODE_TAO)) {
     burn_write_opts_free (burn_options);
@@ -395,6 +416,8 @@ thread_burn_iso (ThreadBurnIsoParams * params)
   struct burn_drive_info *drive_info = NULL;
   struct burn_source **fifos = NULL;
   int sectors[1];
+
+  xfburn_log_set_thread_name ("burn_image");
 
   if (xfburn_device_grab (params->device, &drive_info)) {
     drive = drive_info->drive;
