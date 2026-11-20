@@ -54,6 +54,16 @@ Xfburn-X uses completely isolated names and paths so both applications can be in
 
 ## Building, Testing & Installing
 
+Using the included `Makefile` wrapper (installs to `~/.local` by default):
+
+```bash
+make test      # configure, compile, and run unit tests
+make install   # compile and install to ~/.local (updates icon/desktop caches)
+make run       # build, install, and launch xfburn-x
+```
+
+Or install system-wide with `sudo make install PREFIX=/usr/local`, or invoke Meson directly:
+
 ```bash
 meson setup build --prefix="$HOME/.local"
 meson compile -C build
