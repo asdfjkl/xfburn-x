@@ -116,6 +116,46 @@ test_format_labels (void)
   assert_speed_label (26973, XFBURN_PROFILE_BD_RE, "6x (26973 kB/s)");
 }
 
+static void
+test_calc_speed_x (void)
+{
+  /* CD Mode 1 data (2048 B/sector): 750 sectors/sec must equal 10.0x, not 8.7x */
+  g_assert_cmpfloat_with_epsilon (
+    xfburn_calc_speed_x (750.0, 1.0, DATA_BYTES_PER_SECTOR, XFBURN_PROFILE_CDRW),
+    10.0, 0.01);
+  g_assert_cmpfloat_with_epsilon (
+    xfburn_calc_speed_x (300.0, 1.0, DATA_BYTES_PER_SECTOR, XFBURN_PROFILE_CDR),
+    4.0, 0.01);
+
+  /* CD Audio (2352 B/sector): 750 sectors/sec also equals 10.0x */
+  g_assert_cmpfloat_with_epsilon (
+    xfburn_calc_speed_x (750.0, 1.0, AUDIO_BYTES_PER_SECTOR, XFBURN_PROFILE_CDR),
+    10.0, 0.01);
+
+  /* DVD (1385.0 kB/s per 1x): 8x = 11080 kB/s = 11080000 / 2048 sectors/sec */
+  g_assert_cmpfloat_with_epsilon (
+    xfburn_calc_speed_x (11080000.0 / (gdouble) DATA_BYTES_PER_SECTOR, 1.0,
+                         DATA_BYTES_PER_SECTOR, XFBURN_PROFILE_DVD_MINUS_R),
+    8.0, 0.01);
+
+  /* BD (4495.5 kB/s per 1x): 4x = 17982 kB/s = 17982000 / 2048 sectors/sec */
+  g_assert_cmpfloat_with_epsilon (
+    xfburn_calc_speed_x (17982000.0 / (gdouble) DATA_BYTES_PER_SECTOR, 1.0,
+                         DATA_BYTES_PER_SECTOR, XFBURN_PROFILE_BD_R),
+    4.0, 0.01);
+
+  /* Edge cases */
+  g_assert_cmpfloat_with_epsilon (
+    xfburn_calc_speed_x (0.0, 1.0, DATA_BYTES_PER_SECTOR, XFBURN_PROFILE_CDRW),
+    0.0, 0.0001);
+  g_assert_cmpfloat_with_epsilon (
+    xfburn_calc_speed_x (750.0, 0.0, DATA_BYTES_PER_SECTOR, XFBURN_PROFILE_CDRW),
+    0.0, 0.0001);
+  g_assert_cmpfloat_with_epsilon (
+    xfburn_calc_speed_x (750.0, 1.0, 0, XFBURN_PROFILE_CDRW),
+    0.0, 0.0001);
+}
+
 int
 main (int argc, char **argv)
 {
@@ -123,6 +163,7 @@ main (int argc, char **argv)
 
   g_test_add_func ("/xfburn/speed/profile-to-kb", test_profile_to_kb);
   g_test_add_func ("/xfburn/speed/format-labels", test_format_labels);
+  g_test_add_func ("/xfburn/speed/calc-speed-x", test_calc_speed_x);
 
   return g_test_run ();
 }

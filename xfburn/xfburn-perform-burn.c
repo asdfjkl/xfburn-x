@@ -551,10 +551,39 @@ xfburn_format_failed_sectors (GArray *failed_sectors)
   return g_string_free (str, FALSE);
 }
 
+static void
+xfburn_verify_update_status_text (GtkWidget *dialog_progress,
+                                  guint track_num,
+                                  guint n_tracks,
+                                  guint failed_count)
+{
+  gchar *str;
+
+  if (n_tracks > 1) {
+    if (failed_count > 0) {
+      str = g_strdup_printf (_("Verifying track %2u/%u... (%u read/verify errors)"),
+                             track_num, n_tracks, failed_count);
+    } else {
+      str = g_strdup_printf (_("Verifying track %2u/%u..."), track_num, n_tracks);
+    }
+  } else {
+    if (failed_count > 0) {
+      str = g_strdup_printf (_("Verifying... (%u read/verify errors)"), failed_count);
+    } else {
+      str = g_strdup (_("Verifying..."));
+    }
+  }
+
+  xfburn_progress_dialog_set_status_with_text (XFBURN_PROGRESS_DIALOG (dialog_progress),
+                                               XFBURN_PROGRESS_DIALOG_STATUS_RUNNING,
+                                               str);
+  g_free (str);
+}
+
 static gboolean
 xfburn_perform_burn_verify (GtkWidget *dialog_progress,
                             struct burn_drive *drive,
-                            int factor,
+                            int media_no,
                             XfburnVerifyData *verify_data,
                             gboolean *stopped,
                             gchar **verify_failed_msg)
@@ -566,6 +595,10 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
   guchar *buf = NULL;
   GArray *failed_sectors = NULL;
   gint64 time_start_us;
+  gint64 speed_win_us;
+  guint speed_win_sectors = 0;
+  gint64 prev_win_us;
+  guint prev_win_sectors = 0;
   gint64 last_log_us;
   gint64 t_call;
   gint64 wait_start_us;
@@ -573,10 +606,12 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
   char drive_addr[BURN_DRIVE_ADR_LEN];
   gboolean stop = FALSE;
   gboolean success = TRUE;
-  /* bit1 (2): suppress libburn error message on read error
+  guint last_reported_failures = 0;
+  /* bit1 (2): suppress ERROR-level libburn message on read error
    * bit2 (4): do NOT retry on error with single-block steps inside libburn
-   * bit4 (16): do NOT retry on ILLEGAL MODE FOR THIS TRACK */
-  const int read_flags = (1 << 1) | (1 << 2) | (1 << 4);
+   * bit4 (16): do NOT retry on ILLEGAL MODE FOR THIS TRACK
+   * bit5 (32): still emit suppressed read-error SCSI sense details at DEBUG severity */
+  const int read_flags = (1 << 1) | (1 << 2) | (1 << 4) | (1 << 5);
 
   *stopped = FALSE;
   *verify_failed_msg = NULL;
@@ -607,17 +642,15 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
   }
 
   XFBURN_LOG_INFO ("VERIFY",
-                   "Starting post-burn verification addr=\"%s\" total_sectors=%u sector_size=%d chunk_max=%d",
-                   drive_addr, total_verify_sectors, sector_size, chunk_max_sectors);
+                   "Starting post-burn verification addr=\"%s\" media_no=0x%x total_sectors=%u sector_size=%d chunk_max=%d",
+                   drive_addr, media_no, total_verify_sectors, sector_size, chunk_max_sectors);
 
   xfburn_progress_dialog_reset (XFBURN_PROGRESS_DIALOG (dialog_progress));
   xfburn_progress_dialog_set_speed_label (XFBURN_PROGRESS_DIALOG (dialog_progress), _("Estimated reading speed:"));
   xfburn_progress_dialog_set_writing_speed (XFBURN_PROGRESS_DIALOG (dialog_progress), -1);
   xfburn_progress_dialog_set_fifo_bar_text (XFBURN_PROGRESS_DIALOG (dialog_progress), _("unused"));
   xfburn_progress_dialog_set_buffer_bar_fraction (XFBURN_PROGRESS_DIALOG (dialog_progress), -1);
-  xfburn_progress_dialog_set_status_with_text (XFBURN_PROGRESS_DIALOG (dialog_progress),
-                                               XFBURN_PROGRESS_DIALOG_STATUS_RUNNING,
-                                               _("Verifying..."));
+  xfburn_verify_update_status_text (dialog_progress, 0, 0, 0);
   xfburn_progress_dialog_set_progress_bar_fraction (XFBURN_PROGRESS_DIALOG (dialog_progress), 0.0);
 
   t_call = g_get_monotonic_time ();
@@ -649,6 +682,8 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
   buf = g_malloc ((gsize) chunk_max_sectors * (gsize) sector_size);
   failed_sectors = g_array_new (FALSE, FALSE, sizeof (guint));
   time_start_us = g_get_monotonic_time ();
+  speed_win_us = time_start_us;
+  prev_win_us = time_start_us;
   last_log_us = time_start_us;
 
   if (sector_size == DATA_BYTES_PER_SECTOR) {
@@ -711,24 +746,45 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
       }
 
       if (good_sectors < chunk_sectors) {
-        /* Sector at s + good_sectors failed on read: do not retry it, record and skip */
-        guint bad_k = good_sectors;
-        guint bad_lba = (guint) (start_lba + (int) (s + bad_k));
+        guint probe_start_k;
         XfburnDeviceIoCounters err_cnt;
 
         xfburn_log_drain_backend_messages ("verify_read_err", NULL, 0);
         xfburn_log_read_device_io_counters (drive_addr, NULL, &err_cnt);
-        XFBURN_LOG_ERROR ("VERIFY",
-                          "Read error at LBA %u: ret=%d data_count=%" G_GINT64_FORMAT "/%" G_GINT64_FORMAT " dev_state=\"%s\" ioerr_cnt=%" G_GINT64_FORMAT,
-                          bad_lba, ret, (gint64) data_count, (gint64) chunk_bytes,
-                          err_cnt.state, err_cnt.ioerr_cnt);
-        g_array_append_val (failed_sectors, bad_lba);
+
+        if (good_sectors > 0 || chunk_sectors == 1) {
+          /* Exact failing boundary is known: do not re-read it */
+          guint bad_k = good_sectors;
+          guint bad_lba = (guint) (start_lba + (int) (s + bad_k));
+
+          XFBURN_LOG_ERROR ("VERIFY",
+                            "Read error at LBA %u: ret=%d data_count=%" G_GINT64_FORMAT "/%" G_GINT64_FORMAT " dev_state=\"%s\" ioerr_cnt=%" G_GINT64_FORMAT,
+                            bad_lba, ret, (gint64) data_count, (gint64) chunk_bytes,
+                            err_cnt.state, err_cnt.ioerr_cnt);
+          g_array_append_val (failed_sectors, bad_lba);
+          probe_start_k = bad_k + 1;
+        } else {
+          /* Multi-sector read returned 0 bytes: probe from k = 0 so chunk-start LBA is not falsely blamed */
+          guint chunk_lba = (guint) (start_lba + (int) s);
+
+          XFBURN_LOG_WARN ("VERIFY",
+                           "Chunk read error at LBA %u (%u sectors): ret=%d data_count=0/%" G_GINT64_FORMAT " dev_state=\"%s\" ioerr_cnt=%" G_GINT64_FORMAT " - probing individual sectors",
+                           chunk_lba, chunk_sectors, ret, (gint64) chunk_bytes,
+                           err_cnt.state, err_cnt.ioerr_cnt);
+          probe_start_k = 0;
+        }
+
+        if (failed_sectors->len != last_reported_failures) {
+          last_reported_failures = failed_sectors->len;
+          xfburn_verify_update_status_text (dialog_progress, 0, 0, failed_sectors->len);
+        }
 
         /* Probe remaining sectors in this chunk one sector at a time (without retrying) */
-        for (k = bad_k + 1; k < chunk_sectors; k++) {
+        for (k = probe_start_k; k < chunk_sectors; k++) {
           off_t single_count = 0;
           int ret_single;
           guint cur_lba = (guint) (start_lba + (int) (s + k));
+          guint cur_verified;
 
           g_object_get (G_OBJECT (dialog_progress), "stop", &stop, NULL);
           if (stop) {
@@ -745,6 +801,7 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
                                        &single_count,
                                        read_flags);
           if (ret_single <= 0 || single_count != DATA_BYTES_PER_SECTOR) {
+            xfburn_log_drain_backend_messages ("verify_single_read_err", NULL, 0);
             XFBURN_LOG_ERROR ("VERIFY",
                               "Single-sector read error at LBA %u: ret=%d single_count=%" G_GINT64_FORMAT,
                               cur_lba, ret_single, (gint64) single_count);
@@ -759,6 +816,32 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
               g_array_append_val (failed_sectors, cur_lba);
             }
           }
+
+          cur_verified = s + k + 1;
+          percent = ((gdouble) cur_verified / (gdouble) total_verify_sectors) * 100.0;
+          if (percent >= 100.0) {
+            percent = 99.9;
+          }
+          xfburn_progress_dialog_set_progress_bar_fraction (XFBURN_PROGRESS_DIALOG (dialog_progress), percent);
+
+          if (failed_sectors->len != last_reported_failures) {
+            last_reported_failures = failed_sectors->len;
+            xfburn_verify_update_status_text (dialog_progress, 0, 0, failed_sectors->len);
+          }
+
+          now_us = g_get_monotonic_time ();
+          if (now_us - speed_win_us >= 4 * G_USEC_PER_SEC) {
+            prev_win_us = speed_win_us;
+            prev_win_sectors = speed_win_sectors;
+            speed_win_us = now_us;
+            speed_win_sectors = cur_verified;
+          }
+          elapsed_sec = (gdouble) (now_us - prev_win_us) / 1000000.0;
+          if (elapsed_sec >= 0.25 && cur_verified > prev_win_sectors) {
+            gdouble cur_speed = xfburn_calc_speed_x ((gdouble) (cur_verified - prev_win_sectors),
+                                                     elapsed_sec, DATA_BYTES_PER_SECTOR, media_no);
+            xfburn_progress_dialog_set_writing_speed (XFBURN_PROGRESS_DIALOG (dialog_progress), (gfloat) cur_speed);
+          }
         }
 
         if (*stopped) {
@@ -769,6 +852,11 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
       s += chunk_sectors;
       verified_sectors = s;
 
+      if (failed_sectors->len != last_reported_failures) {
+        last_reported_failures = failed_sectors->len;
+        xfburn_verify_update_status_text (dialog_progress, 0, 0, failed_sectors->len);
+      }
+
       percent = ((gdouble) verified_sectors / (gdouble) total_verify_sectors) * 100.0;
       if (percent >= 100.0) {
         percent = 99.9;
@@ -776,10 +864,16 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
       xfburn_progress_dialog_set_progress_bar_fraction (XFBURN_PROGRESS_DIALOG (dialog_progress), percent);
 
       now_us = g_get_monotonic_time ();
-      elapsed_sec = (gdouble) (now_us - time_start_us) / 1000000.0;
-      if (elapsed_sec >= 0.25 && verified_sectors > 0 && factor > 0) {
-        gdouble cur_speed = (((gdouble) verified_sectors * (gdouble) DATA_BYTES_PER_SECTOR) / elapsed_sec) /
-                            ((gdouble) (factor * 1000.0));
+      if (now_us - speed_win_us >= 4 * G_USEC_PER_SEC) {
+        prev_win_us = speed_win_us;
+        prev_win_sectors = speed_win_sectors;
+        speed_win_us = now_us;
+        speed_win_sectors = verified_sectors;
+      }
+      elapsed_sec = (gdouble) (now_us - prev_win_us) / 1000000.0;
+      if (elapsed_sec >= 0.25 && verified_sectors > prev_win_sectors) {
+        gdouble cur_speed = xfburn_calc_speed_x ((gdouble) (verified_sectors - prev_win_sectors),
+                                                 elapsed_sec, DATA_BYTES_PER_SECTOR, media_no);
         xfburn_progress_dialog_set_writing_speed (XFBURN_PROGRESS_DIALOG (dialog_progress), (gfloat) cur_speed);
       }
 
@@ -841,12 +935,7 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
                        "Audio track %u/%u start_lba=%d sectors=%u disc_sectors=%u",
                        t + 1, n_tracks, track_lba, t_sectors, disc_t_sectors);
 
-      if (n_tracks > 1) {
-        gchar *str = g_strdup_printf (_("Verifying track %2u/%u..."), t + 1, n_tracks);
-        xfburn_progress_dialog_set_status_with_text (XFBURN_PROGRESS_DIALOG (dialog_progress),
-                                                     XFBURN_PROGRESS_DIALOG_STATUS_RUNNING, str);
-        g_free (str);
-      }
+      xfburn_verify_update_status_text (dialog_progress, t + 1, n_tracks, failed_sectors->len);
 
       while (ts < disc_t_sectors) {
         guint chunk_sectors = MIN ((guint) chunk_max_sectors, disc_t_sectors - ts);
@@ -903,23 +992,43 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
         }
 
         if (good_sectors < chunk_sectors) {
-          guint bad_k = good_sectors;
-          guint bad_lba = (guint) MAX (0, track_lba + (int) (ts + bad_k));
+          guint probe_start_k;
           XfburnDeviceIoCounters err_cnt;
 
           xfburn_log_drain_backend_messages ("verify_audio_read_err", NULL, 0);
           xfburn_log_read_device_io_counters (drive_addr, NULL, &err_cnt);
-          XFBURN_LOG_ERROR ("VERIFY",
-                            "Audio read error at LBA %u: ret=%d data_count=%" G_GINT64_FORMAT "/%" G_GINT64_FORMAT " dev_state=\"%s\" ioerr_cnt=%" G_GINT64_FORMAT,
-                            bad_lba, ret, (gint64) data_count, (gint64) chunk_bytes,
-                            err_cnt.state, err_cnt.ioerr_cnt);
-          g_array_append_val (failed_sectors, bad_lba);
 
-          for (k = bad_k + 1; k < chunk_sectors; k++) {
+          if (good_sectors > 0 || chunk_sectors == 1) {
+            guint bad_k = good_sectors;
+            guint bad_lba = (guint) MAX (0, track_lba + (int) (ts + bad_k));
+
+            XFBURN_LOG_ERROR ("VERIFY",
+                              "Audio read error at LBA %u: ret=%d data_count=%" G_GINT64_FORMAT "/%" G_GINT64_FORMAT " dev_state=\"%s\" ioerr_cnt=%" G_GINT64_FORMAT,
+                              bad_lba, ret, (gint64) data_count, (gint64) chunk_bytes,
+                              err_cnt.state, err_cnt.ioerr_cnt);
+            g_array_append_val (failed_sectors, bad_lba);
+            probe_start_k = bad_k + 1;
+          } else {
+            guint chunk_lba = (guint) MAX (0, track_lba + (int) ts);
+
+            XFBURN_LOG_WARN ("VERIFY",
+                             "Audio chunk read error at LBA %u (%u sectors): ret=%d data_count=0/%" G_GINT64_FORMAT " dev_state=\"%s\" ioerr_cnt=%" G_GINT64_FORMAT " - probing individual sectors",
+                             chunk_lba, chunk_sectors, ret, (gint64) chunk_bytes,
+                             err_cnt.state, err_cnt.ioerr_cnt);
+            probe_start_k = 0;
+          }
+
+          if (failed_sectors->len != last_reported_failures) {
+            last_reported_failures = failed_sectors->len;
+            xfburn_verify_update_status_text (dialog_progress, t + 1, n_tracks, failed_sectors->len);
+          }
+
+          for (k = probe_start_k; k < chunk_sectors; k++) {
             off_t single_count = 0;
             int ret_single;
             int cur_lba_signed = track_lba + (int) (ts + k);
             guint cur_lba = (guint) MAX (0, cur_lba_signed);
+            guint cur_verified;
 
             g_object_get (G_OBJECT (dialog_progress), "stop", &stop, NULL);
             if (stop) {
@@ -936,6 +1045,7 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
                                           &single_count,
                                           read_flags);
             if (ret_single <= 0 || single_count != AUDIO_BYTES_PER_SECTOR) {
+              xfburn_log_drain_backend_messages ("verify_audio_single_read_err", NULL, 0);
               XFBURN_LOG_ERROR ("VERIFY",
                                 "Single audio sector read error at LBA %u: ret=%d single_count=%" G_GINT64_FORMAT,
                                 cur_lba, ret_single, (gint64) single_count);
@@ -957,6 +1067,32 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
                 g_array_append_val (failed_sectors, cur_lba);
               }
             }
+
+            cur_verified = global_s + MIN (ts + k + 1, t_sectors);
+            percent = ((gdouble) cur_verified / (gdouble) total_verify_sectors) * 100.0;
+            if (percent >= 100.0) {
+              percent = 99.9;
+            }
+            xfburn_progress_dialog_set_progress_bar_fraction (XFBURN_PROGRESS_DIALOG (dialog_progress), percent);
+
+            if (failed_sectors->len != last_reported_failures) {
+              last_reported_failures = failed_sectors->len;
+              xfburn_verify_update_status_text (dialog_progress, t + 1, n_tracks, failed_sectors->len);
+            }
+
+            now_us = g_get_monotonic_time ();
+            if (now_us - speed_win_us >= 4 * G_USEC_PER_SEC) {
+              prev_win_us = speed_win_us;
+              prev_win_sectors = speed_win_sectors;
+              speed_win_us = now_us;
+              speed_win_sectors = cur_verified;
+            }
+            elapsed_sec = (gdouble) (now_us - prev_win_us) / 1000000.0;
+            if (elapsed_sec >= 0.25 && cur_verified > prev_win_sectors) {
+              gdouble cur_speed = xfburn_calc_speed_x ((gdouble) (cur_verified - prev_win_sectors),
+                                                       elapsed_sec, AUDIO_BYTES_PER_SECTOR, media_no);
+              xfburn_progress_dialog_set_writing_speed (XFBURN_PROGRESS_DIALOG (dialog_progress), (gfloat) cur_speed);
+            }
           }
 
           if (*stopped) {
@@ -967,6 +1103,11 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
         ts += chunk_sectors;
         verified_sectors = global_s + MIN (ts, t_sectors);
 
+        if (failed_sectors->len != last_reported_failures) {
+          last_reported_failures = failed_sectors->len;
+          xfburn_verify_update_status_text (dialog_progress, t + 1, n_tracks, failed_sectors->len);
+        }
+
         percent = ((gdouble) verified_sectors / (gdouble) total_verify_sectors) * 100.0;
         if (percent >= 100.0) {
           percent = 99.9;
@@ -974,10 +1115,16 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
         xfburn_progress_dialog_set_progress_bar_fraction (XFBURN_PROGRESS_DIALOG (dialog_progress), percent);
 
         now_us = g_get_monotonic_time ();
-        elapsed_sec = (gdouble) (now_us - time_start_us) / 1000000.0;
-        if (elapsed_sec >= 0.25 && verified_sectors > 0 && factor > 0) {
-          gdouble cur_speed = (((gdouble) verified_sectors * (gdouble) AUDIO_BYTES_PER_SECTOR) / elapsed_sec) /
-                              ((gdouble) (factor * 1000.0));
+        if (now_us - speed_win_us >= 4 * G_USEC_PER_SEC) {
+          prev_win_us = speed_win_us;
+          prev_win_sectors = speed_win_sectors;
+          speed_win_us = now_us;
+          speed_win_sectors = verified_sectors;
+        }
+        elapsed_sec = (gdouble) (now_us - prev_win_us) / 1000000.0;
+        if (elapsed_sec >= 0.25 && verified_sectors > prev_win_sectors) {
+          gdouble cur_speed = xfburn_calc_speed_x ((gdouble) (verified_sectors - prev_win_sectors),
+                                                   elapsed_sec, AUDIO_BYTES_PER_SECTOR, media_no);
           xfburn_progress_dialog_set_writing_speed (XFBURN_PROGRESS_DIALOG (dialog_progress), (gfloat) cur_speed);
         }
 
@@ -1041,11 +1188,9 @@ xfburn_perform_burn_write (GtkWidget *dialog_progress,
   enum burn_drive_status status;
   enum burn_drive_status prev_status = BURN_DRIVE_IDLE;
   struct burn_progress progress;
-  time_t time_start;
   char media_name[80];
   char drive_addr[BURN_DRIVE_ADR_LEN];
   int media_no = 0;
-  int factor;
 
   int ret;
   int wrote_well;
@@ -1064,6 +1209,11 @@ xfburn_perform_burn_write (GtkWidget *dialog_progress,
   gint64 burn_start_us;
   gint64 last_heartbeat_us;
   gint64 last_sector_advance_us;
+  gint64 speed_win_us = 0;
+  int speed_win_sectors = 0;
+  gint64 prev_win_us = 0;
+  int prev_win_sectors = 0;
+  gdouble last_cur_speed = -1.0;
   int last_progress_sector = -1;
   gint64 prev_ioerr_cnt = -1;
   XfburnDeviceIoCounters io_counters;
@@ -1103,11 +1253,9 @@ xfburn_perform_burn_write (GtkWidget *dialog_progress,
   ret = burn_disc_get_profile (drive, &media_no, media_name);
   XFBURN_LOG_CALL_EXIT ("burn_disc_get_profile", t_call, "ret=%d media_no=0x%x media_name=\"%s\"",
                         ret, media_no, media_name);
-  if (ret == 1) {
-    factor = xfburn_media_profile_to_kb (media_no);
-  } else {
+  if (ret != 1) {
     g_warning ("no profile could be retrieved to calculate current burn speed");
-    factor = 1;
+    media_no = 0;
   }
 
   /* Evaluate drive and media */
@@ -1227,7 +1375,6 @@ xfburn_perform_burn_write (GtkWidget *dialog_progress,
     usleep(1002);
   }
 
-  time_start = time (NULL);
   burn_start_us = g_get_monotonic_time ();
   last_heartbeat_us = burn_start_us;
   last_sector_advance_us = burn_start_us;
@@ -1235,7 +1382,6 @@ xfburn_perform_burn_write (GtkWidget *dialog_progress,
   burned_sectors = 0;
 
   while ((status = burn_drive_get_status (drive, &progress)) != BURN_DRIVE_IDLE) {
-    time_t time_now = time (NULL);
     gint64 now_us = g_get_monotonic_time ();
     gboolean stop;
     gdouble cur_speed = 0.0;
@@ -1323,11 +1469,43 @@ xfburn_perform_burn_write (GtkWidget *dialog_progress,
 
         xfburn_progress_dialog_set_progress_bar_fraction (XFBURN_PROGRESS_DIALOG (dialog_progress), percent);
 
-        if (time_now > time_start && factor > 0) {
-          cur_speed = ((gdouble) ((gdouble)(glong)progress.sector * 2048L) / (gdouble) (time_now - time_start)) / ((gdouble) (factor * 1000.0));
+        {
+          int total_written_sectors = burned_sectors + progress.sector;
+
+          if (total_written_sectors > 0) {
+            if (speed_win_us == 0) {
+              speed_win_us = now_us;
+              speed_win_sectors = total_written_sectors;
+              prev_win_us = now_us;
+              prev_win_sectors = total_written_sectors;
+            } else {
+              gdouble elapsed_sec;
+              int delta_sectors;
+
+              if (now_us - speed_win_us >= 4 * G_USEC_PER_SEC) {
+                prev_win_us = speed_win_us;
+                prev_win_sectors = speed_win_sectors;
+                speed_win_us = now_us;
+                speed_win_sectors = total_written_sectors;
+              }
+              elapsed_sec = (gdouble) (now_us - prev_win_us) / 1000000.0;
+              delta_sectors = total_written_sectors - prev_win_sectors;
+              if (elapsed_sec >= 0.5 && delta_sectors >= 0) {
+                cur_speed = xfburn_calc_speed_x ((gdouble) delta_sectors, elapsed_sec, sector_size, media_no);
+                last_cur_speed = cur_speed;
+              } else if (last_cur_speed >= 0.0) {
+                cur_speed = last_cur_speed;
+              }
+            }
+          }
         }
-        xfburn_progress_dialog_set_writing_speed (XFBURN_PROGRESS_DIALOG (dialog_progress),
-                                                  cur_speed);
+        if (last_cur_speed >= 0.0) {
+          xfburn_progress_dialog_set_writing_speed (XFBURN_PROGRESS_DIALOG (dialog_progress),
+                                                    (gfloat) cur_speed);
+        } else {
+          xfburn_progress_dialog_set_writing_speed (XFBURN_PROGRESS_DIALOG (dialog_progress),
+                                                    -1.0);
+        }
 
         if (fifos != NULL) {
           fifo_status = burn_fifo_inquire_status (fifos[progress.track], &fifo_size, &fifo_free, &fifo_text);
@@ -1482,7 +1660,7 @@ xfburn_perform_burn_write (GtkWidget *dialog_progress,
       gchar *popup_msg = NULL;
       GtkMessageType popup_type = GTK_MESSAGE_INFO;
 
-      if (xfburn_perform_burn_verify (dialog_progress, drive, factor, verify_data,
+      if (xfburn_perform_burn_verify (dialog_progress, drive, media_no, verify_data,
                                       &verify_stopped, &verify_failed_msg)) {
         final_message = g_strdup (_("Done"));
         final_status = XFBURN_PROGRESS_DIALOG_STATUS_COMPLETED;

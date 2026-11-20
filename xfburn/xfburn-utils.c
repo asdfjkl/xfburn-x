@@ -378,6 +378,24 @@ xfburn_format_burn_speed (gint write_speed_kbps, gint profile_no)
   return g_strdup_printf ("%d.%dx (%d kB/s)", whole, frac, write_speed_kbps);
 }
 
+gdouble
+xfburn_calc_speed_x (gdouble sectors, gdouble elapsed_sec, gint sector_size, gint profile_no)
+{
+  gdouble factor_kb;
+
+  if (sectors <= 0.0 || elapsed_sec <= 0.0 || sector_size <= 0) {
+    return 0.0;
+  }
+
+  factor_kb = xfburn_media_profile_to_kb_exact (profile_no);
+  if (factor_kb == CDR_1X_SPEED_KB) {
+    /* On CD media, 1x is always 75 sectors/sec for both Mode 1 data (2048 B) and Audio (2352 B) */
+    return (sectors / elapsed_sec) / 75.0;
+  }
+
+  return ((sectors * (gdouble) sector_size) / elapsed_sec) / (factor_kb * 1000.0);
+}
+
 
 GSList *
 xfburn_make_abosulet_file_list (gint count, gchar *filenames[])
