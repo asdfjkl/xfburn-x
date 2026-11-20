@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2005-2006 Jean-François Wauthy (pollux@xfce.org)
+ * Copyright (c) 2026      Dominik Klein
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -59,10 +60,13 @@ enum XfburnDiscProfiles {
   XFBURN_PROFILE_DVD_MINUS_RW_OVERWRITE = 0x13,
   XFBURN_PROFILE_DVD_MINUS_RW_SEQUENTIAL = 0x14,
   XFBURN_PROFILE_DVD_MINUS_R_DL = 0x15,
+  XFBURN_PROFILE_DVD_MINUS_R_DL_JUMP = 0x16,
   XFBURN_PROFILE_DVD_PLUS_RW = 0x1a,
   XFBURN_PROFILE_DVD_PLUS_R = 0x1b,
+  XFBURN_PROFILE_DVD_PLUS_RW_DL = 0x2a,
   XFBURN_PROFILE_DVD_PLUS_R_DL = 0x2b,
   XFBURN_PROFILE_BD_R = 0x41,
+  XFBURN_PROFILE_BD_R_RRM = 0x42,
   XFBURN_PROFILE_BD_RE = 0x43,
   /* Read-only profiles */
   XFBURN_PROFILE_CDROM = 0x08,

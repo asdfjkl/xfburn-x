@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2005-2006 Jean-François Wauthy (pollux@xfce.org)
+ * Copyright (c) 2026      Dominik Klein
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,10 +32,14 @@
 #define CDRDAO_INSERT_AGAIN N_("Cannot determine disc status - hit enter to try again.")
 #define CDRDAO_DONE N_("CD copying finished successfully.")
 
-/* in reality CDR_1X_SPEED is 176.4 (see libburn.h:1577), but that shouldn't matter */
+/* 1x base transfer rates in kB/s (k = 1000 bytes/s, per libburn.h / MMC) */
 #define CDR_1X_SPEED 176
 #define DVD_1X_SPEED 1385
 #define BD_1X_SPEED  4496
+
+#define CDR_1X_SPEED_KB 176.4
+#define DVD_1X_SPEED_KB 1385.0
+#define BD_1X_SPEED_KB  4495.5
 
 #define DATA_COMPOSITION_DEFAULT_NAME N_("Data composition")
 

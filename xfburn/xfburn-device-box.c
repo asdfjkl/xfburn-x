@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2006 Jean-François Wauthy (pollux@xfce.org)
  * Copyright (c) 2008-2009 David Mohr <david@mcbf.net>
+ * Copyright (c) 2026 Dominik Klein
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -323,13 +324,13 @@ fill_combo_speed (XfburnDeviceBox *box, XfburnDevice *device)
   GtkTreeModel *model = gtk_combo_box_get_model (GTK_COMBO_BOX (priv->combo_speed));
   GSList *el = NULL;
   int profile_no = 0;
-  int factor;
   GtkTreeIter iter_max;
 
   gtk_list_store_clear (GTK_LIST_STORE (model));
 
-  if (device == NULL)
+  if (device == NULL) {
     return;
+  }
 
   g_object_get (G_OBJECT (device),
                 "profile-no", &profile_no,
@@ -337,30 +338,20 @@ fill_combo_speed (XfburnDeviceBox *box, XfburnDevice *device)
                 NULL);
 
   if (el == NULL) {
-    /* a valid disc is in the drive, but no speed list is present */
+    /* a valid disc is in the drive, but no speed list is present; -1 requests min speed in libburn */
     GtkTreeIter iter;
-    gchar *str;
+    const gchar *str = _("Min");
 
-    str = _("default");
     gtk_list_store_append (GTK_LIST_STORE (model), &iter);
     gtk_list_store_set (GTK_LIST_STORE (model), &iter, SPEED_TEXT_COLUMN, str, SPEED_VALUE_COLUMN, -1, -1);
   }
 
-  /* check profile, so we can convert from 'kb/s' into 'x' rating */
-  if (profile_no != 0) {
-    factor = xfburn_media_profile_to_kb (profile_no);
-  } else {
-    factor = 1;
-  }
-
-  while (el) {
+  while (el != NULL) {
     gint write_speed = GPOINTER_TO_INT (el->data);
     GtkTreeIter iter;
-    gchar *str = NULL;
-    gint speed;
+    gchar *str;
 
-    speed = write_speed / factor;
-    str = g_strdup_printf ("%d", speed);
+    str = xfburn_format_burn_speed (write_speed, profile_no);
 
     gtk_list_store_append (GTK_LIST_STORE (model), &iter);
     gtk_list_store_set (GTK_LIST_STORE (model), &iter, SPEED_TEXT_COLUMN, str, SPEED_VALUE_COLUMN, write_speed, -1);
@@ -457,10 +448,13 @@ check_disc_validity (XfburnDeviceBoxPrivate *priv)
       case XFBURN_PROFILE_DVD_MINUS_RW_OVERWRITE:
       case XFBURN_PROFILE_DVD_MINUS_RW_SEQUENTIAL:
       case XFBURN_PROFILE_DVD_MINUS_R_DL:
+      case XFBURN_PROFILE_DVD_MINUS_R_DL_JUMP:
       case XFBURN_PROFILE_DVD_PLUS_R:
       case XFBURN_PROFILE_DVD_PLUS_R_DL:
       case XFBURN_PROFILE_DVD_PLUS_RW:
+      case XFBURN_PROFILE_DVD_PLUS_RW_DL:
       case XFBURN_PROFILE_BD_R:
+      case XFBURN_PROFILE_BD_R_RRM:
       case XFBURN_PROFILE_BD_RE:
         priv->valid_disc = TRUE;
         break;

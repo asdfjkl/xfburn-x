@@ -18,10 +18,12 @@
  *
  */
 
+#include <gtk/gtk.h>
 #include <libxfce4util/libxfce4util.h>
 #include <unistd.h>
 
 #include "xfburn-device.h"
+#include "xfburn-device-list.h"
 #include "xfburn-udev-manager.h"
 #include "xfburn-log.h"
 
@@ -388,9 +390,21 @@ refresh_speed_list (XfburnDevice * device, struct burn_drive_info *drive_info)
 
   struct burn_speed_descriptor *speed_list = NULL;
   gint ret;
+  gint atip_ret = 0;
+  gint min_speed = 0;
+  gint max_speed = 0;
   gint64 t_call;
 
-  /* fill new list */
+  /* On CD-R / CD-RW media, read ATIP first so libburn populates ATIP min/max write speeds */
+  if (priv->profile_no == XFBURN_PROFILE_CDR || priv->profile_no == XFBURN_PROFILE_CDRW) {
+    t_call = g_get_monotonic_time ();
+    XFBURN_LOG_CALL_ENTER ("burn_disc_read_atip", "addr=\"%s\" profile_no=0x%x", priv->addr, priv->profile_no);
+    atip_ret = burn_disc_read_atip (drive_info->drive);
+    XFBURN_LOG_CALL_EXIT ("burn_disc_read_atip", t_call, "ret=%d", atip_ret);
+    xfburn_log_drain_backend_messages ("refresh_speed_list_atip", NULL, 0);
+  }
+
+  /* Query MMC speed descriptors (ACh GET PERFORMANCE / Mode Page 2Ah) */
   t_call = g_get_monotonic_time ();
   XFBURN_LOG_CALL_ENTER ("burn_drive_get_speedlist", "addr=\"%s\"", priv->addr);
   ret = burn_drive_get_speedlist (drive_info->drive, &speed_list);
@@ -399,13 +413,17 @@ refresh_speed_list (XfburnDevice * device, struct burn_drive_info *drive_info)
 
   if (ret > 0 && speed_list != NULL) {
     struct burn_speed_descriptor *el = speed_list;
-    GString *speeds_str = g_string_new (NULL);
-    GSList *it;
+    GString *raw_desc = g_string_new (NULL);
 
-    while (el) {
+    while (el != NULL) {
       gint speed = el->write_speed;
 
-      /* FIXME: why do we need no_speed_duplicate? */
+      if (raw_desc->len > 0) {
+        g_string_append (raw_desc, "; ");
+      }
+      g_string_append_printf (raw_desc, "src=%d w=%d r=%d end_lba=%d",
+                              el->source, el->write_speed, el->read_speed, el->end_lba);
+
       if (speed > 0 && no_speed_duplicate (priv->supported_speeds, speed)) {
         priv->supported_speeds = g_slist_prepend (priv->supported_speeds, GINT_TO_POINTER (speed));
       }
@@ -413,7 +431,34 @@ refresh_speed_list (XfburnDevice * device, struct burn_drive_info *drive_info)
       el = el->next;
     }
 
+    XFBURN_LOG_DEBUG ("MEDIA", "addr=\"%s\" raw_speed_descriptors=\"%s\"", priv->addr, raw_desc->str);
+    g_string_free (raw_desc, TRUE);
     burn_drive_free_speedlist (&speed_list);
+  } else if (ret < 0) {
+    /* ret < 0: Log diagnostic details and continue gracefully without crashing via g_error */
+    XFBURN_LOG_ERROR ("MEDIA",
+                      "severe error while retrieving speed list for addr=\"%s\" name=\"%s\" (ret=%d)",
+                      priv->addr, priv->name, ret);
+    xfburn_log_drain_backend_messages ("refresh_speed_list_error", NULL, 0);
+    xfburn_log_dump_device_hardware (priv->addr, NULL);
+    g_warning ("severe error while retrieving speed list for '%s' (ret=%d)", priv->addr, ret);
+  }
+
+  /* Supplement with libburn's min/max write speeds (populated from ATIP and drive capabilities) */
+  min_speed = burn_drive_get_min_write_speed (drive_info->drive);
+  max_speed = burn_drive_get_write_speed (drive_info->drive);
+
+  if (min_speed > 0 && no_speed_duplicate (priv->supported_speeds, min_speed)) {
+    priv->supported_speeds = g_slist_prepend (priv->supported_speeds, GINT_TO_POINTER (min_speed));
+  }
+  if (max_speed > 0 && no_speed_duplicate (priv->supported_speeds, max_speed)) {
+    priv->supported_speeds = g_slist_prepend (priv->supported_speeds, GINT_TO_POINTER (max_speed));
+  }
+
+  if (priv->supported_speeds != NULL) {
+    GString *speeds_str = g_string_new (NULL);
+    GSList *it;
+
     priv->supported_speeds = g_slist_sort (priv->supported_speeds, &cmp_ints);
 
     for (it = priv->supported_speeds; it != NULL; it = it->next) {
@@ -422,20 +467,16 @@ refresh_speed_list (XfburnDevice * device, struct burn_drive_info *drive_info)
       }
       g_string_append_printf (speeds_str, "%d", GPOINTER_TO_INT (it->data));
     }
-    XFBURN_LOG_INFO ("MEDIA", "addr=\"%s\" supported_speeds_kbps=\"%s\"", priv->addr, speeds_str->str);
+    XFBURN_LOG_INFO ("MEDIA",
+                     "addr=\"%s\" atip_ret=%d min_write_speed_kbps=%d max_write_speed_kbps=%d supported_speeds_kbps=\"%s\"",
+                     priv->addr, atip_ret, min_speed, max_speed, speeds_str->str);
     g_string_free (speeds_str, TRUE);
-  } else if (ret == 0 || speed_list == NULL) {
-    XFBURN_LOG_WARN ("MEDIA", "addr=\"%s\" reported speed list is empty (ret=%d)", priv->addr, ret);
+  } else if (ret >= 0) {
+    XFBURN_LOG_WARN ("MEDIA",
+                     "addr=\"%s\" reported speed list is empty (ret=%d atip_ret=%d min=%d max=%d)",
+                     priv->addr, ret, atip_ret, min_speed, max_speed);
     g_warning ("reported speed list is empty for device:");
     g_warning ("%s can burn: %d [cdr: %d, cdrw: %d, dvdr: %d, dvdram: %d]", (priv)->name, ((priv)->cdr || (priv)->cdrw || (priv)->dvdr || (priv)->dvdram), (priv)->cdr, (priv)->cdrw, (priv)->dvdr, (priv)->dvdram);
-  } else {
-    /* ret < 0: Log diagnostic details and continue gracefully without crashing via g_error */
-    XFBURN_LOG_ERROR ("MEDIA",
-                      "severe error while retrieving speed list for addr=\"%s\" name=\"%s\" (ret=%d)",
-                      priv->addr, priv->name, ret);
-    xfburn_log_drain_backend_messages ("refresh_speed_list_error", NULL, 0);
-    xfburn_log_dump_device_hardware (priv->addr, NULL);
-    g_warning ("severe error while retrieving speed list for '%s' (ret=%d)", priv->addr, ret);
   }
 }
 

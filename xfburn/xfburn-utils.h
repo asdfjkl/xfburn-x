@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2005-2006 Jean-François Wauthy (pollux@xfce.org)
+ * Copyright (c) 2026      Dominik Klein
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -39,6 +40,8 @@ GtkWidget * xfburn_gtk_button_new_mixed (const gchar *stock_id, const gchar *lab
 void xfburn_capture_libburn_messages (void);
 void xfburn_console_libburn_messages (void);
 int xfburn_media_profile_to_kb (int media_no);
+gdouble xfburn_media_profile_to_kb_exact (int media_no);
+gchar *xfburn_format_burn_speed (gint write_speed_kbps, gint profile_no);
 
 void xfburn_add_button_to_toolbar(GtkToolbar *toolbar, const gchar *stock, const gchar *text, const gchar *action, const gchar *tooltip);
 GtkWidget * xfburn_create_progress_bar(const gchar *);

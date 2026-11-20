@@ -26,6 +26,7 @@
 #include <libburn.h>
 
 #include <unistd.h>
+#include <math.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -302,21 +303,79 @@ xfburn_console_libburn_messages (void)
   }
 }
 
+gdouble
+xfburn_media_profile_to_kb_exact (int media_no)
+{
+  switch (media_no) {
+    case XFBURN_PROFILE_NONE:
+    case XFBURN_PROFILE_CDROM:
+    case XFBURN_PROFILE_CDR:
+    case XFBURN_PROFILE_CDRW:
+      return CDR_1X_SPEED_KB;
+
+    case XFBURN_PROFILE_DVDROM:
+    case XFBURN_PROFILE_DVD_MINUS_R:
+    case XFBURN_PROFILE_DVDRAM:
+    case XFBURN_PROFILE_DVD_MINUS_RW_OVERWRITE:
+    case XFBURN_PROFILE_DVD_MINUS_RW_SEQUENTIAL:
+    case XFBURN_PROFILE_DVD_MINUS_R_DL:
+    case XFBURN_PROFILE_DVD_MINUS_R_DL_JUMP:
+    case XFBURN_PROFILE_DVD_PLUS_RW:
+    case XFBURN_PROFILE_DVD_PLUS_R:
+    case XFBURN_PROFILE_DVD_PLUS_RW_DL:
+    case XFBURN_PROFILE_DVD_PLUS_R_DL:
+      return DVD_1X_SPEED_KB;
+
+    case XFBURN_PROFILE_BDROM:
+    case XFBURN_PROFILE_BD_R:
+    case XFBURN_PROFILE_BD_R_RRM:
+    case XFBURN_PROFILE_BD_RE:
+      return BD_1X_SPEED_KB;
+
+    default:
+      g_warning ("unknown profile 0x%x, assuming BD", media_no);
+      return BD_1X_SPEED_KB;
+  }
+}
+
 int
 xfburn_media_profile_to_kb (int media_no)
 {
-  int factor = 1;
-  if (media_no <= XFBURN_PROFILE_CDR)
-    factor = CDR_1X_SPEED;
-  else if (media_no >= XFBURN_PROFILE_DVD_MINUS_R && media_no <= XFBURN_PROFILE_DVD_PLUS_R_DL)
-    factor = DVD_1X_SPEED;
-  else if (media_no >= XFBURN_PROFILE_BD_R && media_no <= XFBURN_PROFILE_BD_RE)
-    factor = BD_1X_SPEED;
-  else {
-    g_warning ("unknown profile, assuming BD");
-    factor = BD_1X_SPEED;
+  gdouble factor = xfburn_media_profile_to_kb_exact (media_no);
+  if (factor == CDR_1X_SPEED_KB) {
+    return CDR_1X_SPEED;
+  } else if (factor == DVD_1X_SPEED_KB) {
+    return DVD_1X_SPEED;
   }
-  return factor;
+  return BD_1X_SPEED;
+}
+
+gchar *
+xfburn_format_burn_speed (gint write_speed_kbps, gint profile_no)
+{
+  gdouble factor;
+  gdouble x_speed;
+  gint tenths;
+  gint whole;
+  gint frac;
+
+  if (write_speed_kbps <= 0) {
+    return g_strdup ("0x (0 kB/s)");
+  }
+
+  factor = xfburn_media_profile_to_kb_exact (profile_no);
+  x_speed = (gdouble) write_speed_kbps / factor;
+  tenths = (gint) llround (x_speed * 10.0);
+  if (tenths < 1) {
+    tenths = 1;
+  }
+  whole = tenths / 10;
+  frac = tenths % 10;
+
+  if (frac == 0) {
+    return g_strdup_printf ("%dx (%d kB/s)", whole, write_speed_kbps);
+  }
+  return g_strdup_printf ("%d.%dx (%d kB/s)", whole, frac, write_speed_kbps);
 }
 
 
