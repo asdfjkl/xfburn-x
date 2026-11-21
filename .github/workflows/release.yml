@@ -114,7 +114,7 @@ jobs:
           docker run --rm -v "${PWD}/dist:/pkg:ro" "${{ matrix.distro }}" bash -euo pipefail -c '
             export DEBIAN_FRONTEND=noninteractive
             apt-get update
-            apt-get install -y --no-install-recommends "/pkg/${0}"
+            apt-get install -y --no-install-recommends "/pkg/${0}" xvfb xauth
 
             echo "==> Checking shared library resolution..."
             if ldd /usr/bin/xfburn-x | grep -q "not found"; then
@@ -130,9 +130,10 @@ jobs:
             test -f /usr/share/man/man1/xfburn-x.1.gz
             test -f /usr/share/locale/de/LC_MESSAGES/xfburn-x.mo
 
-            echo "==> Checking headless CLI execution..."
-            xfburn-x --version
-            xfburn-x --transcoder=list
+            echo "==> Checking CLI execution..."
+            xfburn-x --help >/dev/null
+            xvfb-run -a xfburn-x --version
+            xvfb-run -a xfburn-x --transcoder=list
 
             echo "==> Checking clean removal..."
             apt-get remove --purge -y xfburn-x
