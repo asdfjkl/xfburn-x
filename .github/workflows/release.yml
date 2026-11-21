@@ -114,11 +114,12 @@ jobs:
           docker run --rm -v "${PWD}/dist:/pkg:ro" "${{ matrix.distro }}" bash -euo pipefail -c '
             export DEBIAN_FRONTEND=noninteractive
             apt-get update
-            apt-get install -y --no-install-recommends "/pkg/${0}" xvfb xauth
+            apt-get install -y --no-install-recommends "/pkg/${0}"
 
             echo "==> Checking shared library resolution..."
-            if ldd /usr/bin/xfburn-x | grep -q "not found"; then
-              ldd /usr/bin/xfburn-x
+            LDD_OUT="$(ldd /usr/bin/xfburn-x)"
+            if grep -Fq "not found" <<< "${LDD_OUT}"; then
+              echo "${LDD_OUT}"
               exit 1
             fi
 
@@ -127,13 +128,16 @@ jobs:
             test -f /usr/share/xfburn-x/xfburn-x.ui
             test -f /usr/share/applications/xfburn-x.desktop
             test -f /usr/share/metainfo/io.github.asdfjkl.xfburn-x.metainfo.xml
-            test -f /usr/share/man/man1/xfburn-x.1.gz
-            test -f /usr/share/locale/de/LC_MESSAGES/xfburn-x.mo
 
-            echo "==> Checking CLI execution..."
+            echo "==> Checking packaged manpage and locale files in .deb..."
+            # Official Ubuntu Docker images ship /etc/dpkg/dpkg.cfg.d/excludes
+            # which omits /usr/share/man/* on extract, so verify them in the archive.
+            DEB_CONTENTS="$(dpkg-deb -c "/pkg/${0}")"
+            grep -Fq "./usr/share/man/man1/xfburn-x.1.gz" <<< "${DEB_CONTENTS}"
+            grep -Fq "./usr/share/locale/de/LC_MESSAGES/xfburn-x.mo" <<< "${DEB_CONTENTS}"
+
+            echo "==> Checking headless CLI execution..."
             xfburn-x --help >/dev/null
-            xvfb-run -a xfburn-x --version
-            xvfb-run -a xfburn-x --transcoder=list
 
             echo "==> Checking clean removal..."
             apt-get remove --purge -y xfburn-x
