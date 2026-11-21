@@ -19,6 +19,12 @@ foreach name : names
         filename,
         install_dir: get_option('prefix') / get_option('datadir') / 'icons' / 'hicolor' / '@0@x@0@'.format(size) / 'stock' / 'media',
       )
+      if name == 'stock_xfburn-x'
+        install_data(
+          filename,
+          install_dir: get_option('prefix') / get_option('datadir') / 'icons' / 'hicolor' / '@0@x@0@'.format(size) / 'apps',
+        )
+      endif
     endif
   endforeach
 
@@ -28,5 +34,11 @@ foreach name : names
       filename,
       install_dir: get_option('prefix') / get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'stock' / 'media',
     )
+    if name == 'stock_xfburn-x'
+      install_data(
+        filename,
+        install_dir: get_option('prefix') / get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'apps',
+      )
+    endif
   endif
 endforeach

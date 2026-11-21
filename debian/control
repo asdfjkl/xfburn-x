@@ -1,0 +1,50 @@
+Source: xfburn-x
+Section: misc
+Priority: optional
+Maintainer: Dominik Klein <33625-asdfjkl@users.noreply.gitlab.xfce.org>
+Rules-Requires-Root: no
+Build-Depends:
+ debhelper-compat (= 13),
+ docbook-xml,
+ docbook-xsl,
+ gettext,
+ libburn-dev (>= 0.4.2),
+ libexo-2-dev (>= 4.18.0),
+ libglib2.0-dev (>= 2.66.0),
+ libgstreamer-plugins-base1.0-dev (>= 1.0.0),
+ libgstreamer1.0-dev (>= 1.0.0),
+ libgtk-3-dev (>= 3.24.0),
+ libgudev-1.0-dev (>= 145),
+ libisofs-dev (>= 0.6.2),
+ libxfce4ui-2-dev (>= 4.18.0),
+ libxfce4util-dev (>= 4.18.0),
+ meson (>= 0.56.0),
+ ninja-build,
+ pkgconf | pkg-config,
+ xsltproc
+Standards-Version: 4.6.2
+Homepage: https://github.com/asdfjkl/xfburn-x
+Vcs-Browser: https://github.com/asdfjkl/xfburn-x
+Vcs-Git: https://github.com/asdfjkl/xfburn-x.git
+
+Package: xfburn-x
+Architecture: amd64
+Depends:
+ hicolor-icon-theme,
+ ${misc:Depends},
+ ${shlibs:Depends}
+Recommends:
+ gstreamer1.0-libav,
+ gstreamer1.0-plugins-base,
+ gstreamer1.0-plugins-good,
+ gstreamer1.0-plugins-ugly,
+ gvfs
+Description: CD, DVD, and Blu-ray burning GUI with post-burn verification
+ Xfburn-X is an enhanced fork of Xfce Xfburn based on the libburnia
+ libraries, designed to install cleanly side-by-side with upstream xfburn.
+ .
+ It can blank/format rewritable discs, burn and create ISO images, burn
+ audio CDs, and write data compositions to CD, DVD, and Blu-ray (including
+ M-DISC), with built-in per-sector post-burn verification, asynchronous
+ non-blocking drive probing and unmounting, a Disc Info inspector dialog,
+ and a diagnostic flight-recorder logger.

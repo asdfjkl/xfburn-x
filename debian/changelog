@@ -1,0 +1,15 @@
+xfburn-x (0.9.0-1) noble; urgency=medium
+
+  * Initial Xfburn-X binary release for Ubuntu 24.04 LTS and newer (amd64).
+  * Forked from Xfce Xfburn for parallel installation alongside upstream xfburn.
+  * Added automatic post-burn per-sector hash verification, Actions -> Disc Info
+    modal inspector dialog, user-mode diagnostic flight-recorder logging,
+    drive-disconnect and USB 3.0 LPM transport diagnostics, and asynchronous
+    non-blocking drive probing and GIO unmounting.
+  * Fixed Blu-ray/large-media Proceed to Burn and disc-usage dropdown bug,
+    CD-RW 0x burn speed calculation, windowed burn/verify speed accuracy,
+    runaway verify read-error cascade on drive disconnect, post-burn udev/GDK
+    deadlocks, and desktop icon cache resolution.
+  * Updated all 60 translation catalogs for all new Xfburn-X strings.
+
+ -- Dominik Klein <33625-asdfjkl@users.noreply.gitlab.xfce.org>  Sat, 21 Nov 2026 22:35:00 +0100

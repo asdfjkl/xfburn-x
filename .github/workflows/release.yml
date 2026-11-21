@@ -1,0 +1,161 @@
+name: Release x86_64 Debian Package
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Debian package version (e.g. 0.9.0-1; defaults to debian/changelog)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  build-deb:
+    name: Build amd64 .deb on Ubuntu 24.04 LTS
+    runs-on: ubuntu-24.04
+    outputs:
+      deb_filename: ${{ steps.meta.outputs.deb_filename }}
+      deb_version: ${{ steps.meta.outputs.deb_version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            debhelper \
+            devscripts \
+            docbook-xml \
+            docbook-xsl \
+            fakeroot \
+            gettext \
+            libburn-dev \
+            libexo-2-dev \
+            libglib2.0-dev \
+            libgstreamer-plugins-base1.0-dev \
+            libgstreamer1.0-dev \
+            libgtk-3-dev \
+            libgudev-1.0-dev \
+            libisofs-dev \
+            libxfce4ui-2-dev \
+            libxfce4util-dev \
+            lintian \
+            meson \
+            ninja-build \
+            pkg-config \
+            xsltproc
+
+      - name: Resolve version and sync debian/changelog
+        id: meta
+        run: |
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/tags/v* ]]; then
+            TAG_VER="${GITHUB_REF_NAME#v}"
+            DEB_VER="${TAG_VER}-1"
+          elif [[ -n "${{ inputs.version }}" ]]; then
+            DEB_VER="${{ inputs.version }}"
+          else
+            DEB_VER="$(dpkg-parsechangelog -S Version)"
+          fi
+
+          CUR_VER="$(dpkg-parsechangelog -S Version)"
+          if [[ "${DEB_VER}" != "${CUR_VER}" ]]; then
+            DEBFULLNAME="Dominik Klein" \
+            DEBEMAIL="33625-asdfjkl@users.noreply.gitlab.xfce.org" \
+            dch --newversion "${DEB_VER}" --distribution noble "Automated release build ${DEB_VER}."
+          fi
+
+          echo "deb_version=${DEB_VER}" >> "${GITHUB_OUTPUT}"
+          echo "deb_filename=xfburn-x_${DEB_VER}_amd64.deb" >> "${GITHUB_OUTPUT}"
+
+      - name: Build and verify .deb package
+        run: |
+          ./packaging/build-deb.sh --dh --output-dir dist
+
+      - name: Upload .deb artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: xfburn-x-deb-amd64
+          path: |
+            dist/*.deb
+            dist/SHA256SUMS
+          if-no-files-found: error
+
+  verify-deb:
+    name: Smoke-test .deb on ${{ matrix.distro }}
+    needs: build-deb
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        distro:
+          - ubuntu:24.04
+          - ubuntu:26.04
+
+    steps:
+      - name: Download .deb artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: xfburn-x-deb-amd64
+          path: dist
+
+      - name: Verify clean install, runtime links, and uninstall in ${{ matrix.distro }}
+        run: |
+          DEB_FILE="dist/${{ needs.build-deb.outputs.deb_filename }}"
+          docker run --rm -v "${PWD}/dist:/pkg:ro" "${{ matrix.distro }}" bash -euo pipefail -c '
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update
+            apt-get install -y --no-install-recommends "/pkg/${0}"
+
+            echo "==> Checking shared library resolution..."
+            if ldd /usr/bin/xfburn-x | grep -q "not found"; then
+              ldd /usr/bin/xfburn-x
+              exit 1
+            fi
+
+            echo "==> Checking installed assets..."
+            test -x /usr/bin/xfburn-x
+            test -f /usr/share/xfburn-x/xfburn-x.ui
+            test -f /usr/share/applications/xfburn-x.desktop
+            test -f /usr/share/metainfo/io.github.asdfjkl.xfburn-x.metainfo.xml
+            test -f /usr/share/man/man1/xfburn-x.1.gz
+            test -f /usr/share/locale/de/LC_MESSAGES/xfburn-x.mo
+
+            echo "==> Checking headless CLI execution..."
+            xfburn-x --version
+            xfburn-x --transcoder=list
+
+            echo "==> Checking clean removal..."
+            apt-get remove --purge -y xfburn-x
+            test ! -e /usr/bin/xfburn-x
+          ' "$(basename "${DEB_FILE}")"
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: [build-deb, verify-deb]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Download .deb artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: xfburn-x-deb-amd64
+          path: dist
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/*.deb
+            dist/SHA256SUMS

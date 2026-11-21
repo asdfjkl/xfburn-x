@@ -12,6 +12,7 @@ Terminal=false
 Categories=X-XFCE;GTK;DiscBurning;Archiving;AudioVideo;Utility;
 Keywords=Burn;CD;DVD;BD;Blu-ray;ISO;Disc;Write;Verify;Audio;Video;
 StartupNotify=true
+StartupWMClass=xfburn-x
 
 Actions=BurnImage;
 

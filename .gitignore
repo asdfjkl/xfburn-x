@@ -1,6 +1,20 @@
 # Meson build directories
 build/
+build-deb/
 builddir/
+
+# Packaging and release artifacts
+dist/
+debian/.debhelper/
+debian/debhelper-build-stamp
+debian/files
+debian/xfburn-x.substvars
+debian/xfburn-x/
+*.deb
+*.ddeb
+*.buildinfo
+*.changes
+*.AppImage
 
 # Local test fixtures and helper scripts
 test_data/
@@ -15,3 +29,4 @@ compile2.sh
 log_framework_plan.txt
 log_framework_pr_description.txt
 update.txt
+diagnostics.txt
