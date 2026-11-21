@@ -37,6 +37,8 @@ xfburn/xfburn-transcoder-basic.c
 xfburn/xfburn-transcoder-gst.c
 xfburn/xfburn-transcoder.c
 xfburn/xfburn-device.c
+xfburn/xfburn-disc-info.c
+xfburn/xfburn-disc-info-dialog.c
 xfburn-x.ui
 xfburn-x-popup-menus.ui
 

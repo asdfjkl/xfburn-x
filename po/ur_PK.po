@@ -1,1193 +1,1315 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 msgid ""
 msgstr ""
 "Project-Id-Version: Xfce Apps\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-03 20:34+0200\n"
+"POT-Creation-Date: 2026-11-21 22:16+0100\n"
 "PO-Revision-Date: 2013-07-03 18:35+0000\n"
 "Last-Translator: Nick <nick@xfce.org>\n"
-"Language-Team: Urdu (Pakistan) (http://www.transifex.com/projects/p/xfce/language/ur_PK/)\n"
+"Language-Team: Urdu (Pakistan) (http://www.transifex.com/projects/p/xfce/"
+"language/ur_PK/)\n"
+"Language: ur_PK\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ur_PK\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../xfburn/xfburn-global.h:28
+#: xfburn/xfburn-global.h:25
 msgid "Capacity:"
 msgstr ""
 
-#: ../xfburn/xfburn-global.h:29
+#: xfburn/xfburn-global.h:26
 msgid "addr:"
 msgstr ""
 
-#: ../xfburn/xfburn-global.h:30
+#: xfburn/xfburn-global.h:27
 msgid "Time total:"
 msgstr ""
 
-#: ../xfburn/xfburn-global.h:32
+#: xfburn/xfburn-global.h:29
 msgid "length"
 msgstr ""
 
-#: ../xfburn/xfburn-global.h:33 ../xfburn/xfburn-copy-cd-progress-dialog.c:93
+#: xfburn/xfburn-global.h:30 xfburn/xfburn-copy-cd-progress-dialog.c:69
 msgid "Flushing cache..."
 msgstr "کیشے اڑایا جارہا ہے..."
 
-#: ../xfburn/xfburn-global.h:34
+#: xfburn/xfburn-global.h:31
 msgid "Please insert a recordable disc and hit enter"
 msgstr ""
 
-#: ../xfburn/xfburn-global.h:35
+#: xfburn/xfburn-global.h:32
 msgid "Cannot determine disc status - hit enter to try again."
 msgstr ""
 
-#: ../xfburn/xfburn-global.h:36
+#: xfburn/xfburn-global.h:33
 msgid "CD copying finished successfully."
 msgstr ""
 
-#: ../xfburn/xfburn-global.h:42
+#: xfburn/xfburn-global.h:44
 msgid "Data composition"
 msgstr ""
 
-#: ../xfburn/xfburn-adding-progress.c:111
+#: xfburn/xfburn-adding-progress.c:71
 msgid "Adding files to the composition"
 msgstr "فائلیں کمپوزیشن میں شامل کی جارہی ہیں"
 
-#: ../xfburn/xfburn-blank-dialog.c:71
+#: xfburn/xfburn-adding-progress.c:85
+msgid "Cancel"
+msgstr ""
+
+#: xfburn/xfburn-blank-dialog.c:73
 msgid "Quick Blank"
 msgstr ""
 
-#: ../xfburn/xfburn-blank-dialog.c:72
+#: xfburn/xfburn-blank-dialog.c:74
 msgid "Full Blank (slow)"
 msgstr ""
 
-#: ../xfburn/xfburn-blank-dialog.c:73
+#: xfburn/xfburn-blank-dialog.c:75
 msgid "Quick Format"
 msgstr ""
 
-#: ../xfburn/xfburn-blank-dialog.c:74
+#: xfburn/xfburn-blank-dialog.c:76
 msgid "Full Format"
 msgstr ""
 
-#: ../xfburn/xfburn-blank-dialog.c:75
+#: xfburn/xfburn-blank-dialog.c:77
 msgid "Quick Deformat"
 msgstr ""
 
-#: ../xfburn/xfburn-blank-dialog.c:76
+#: xfburn/xfburn-blank-dialog.c:78
 msgid "Full Deformat (slow)"
 msgstr ""
 
-#: ../xfburn/xfburn-blank-dialog.c:149
+#: xfburn/xfburn-blank-dialog.c:118
 msgid "Eject the disc"
 msgstr ""
 
-#: ../xfburn/xfburn-blank-dialog.c:150
+#: xfburn/xfburn-blank-dialog.c:119
 msgid "Default value for eject checkbox"
 msgstr ""
 
-#: ../xfburn/xfburn-blank-dialog.c:197
+#: xfburn/xfburn-blank-dialog.c:165
 msgid "Blank Disc"
 msgstr ""
 
-#: ../xfburn/xfburn-blank-dialog.c:209
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:195
-#: ../xfburn/xfburn-burn-image-dialog.c:200
-#: ../xfburn/xfburn-copy-cd-dialog.c:131
-#: ../xfburn/xfburn-copy-dvd-dialog.c:131
-#: ../xfburn/xfburn-burn-audio-cd-composition-dialog.c:160
+#: xfburn/xfburn-blank-dialog.c:174
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:126
+#: xfburn/xfburn-burn-image-dialog.c:180 xfburn/xfburn-copy-cd-dialog.c:106
+#: xfburn/xfburn-copy-dvd-dialog.c:103
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:119
 msgid "Burning device"
 msgstr "برننگ ڈیوائس"
 
-#: ../xfburn/xfburn-blank-dialog.c:222 ../xfburn/xfburn-device-box.c:187
+#: xfburn/xfburn-blank-dialog.c:187 xfburn/xfburn-device-box.c:152
 msgid "Blank mode"
 msgstr ""
 
-#: ../xfburn/xfburn-blank-dialog.c:230
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:227
-#: ../xfburn/xfburn-burn-image-dialog.c:208
-#: ../xfburn/xfburn-copy-cd-dialog.c:139
-#: ../xfburn/xfburn-copy-dvd-dialog.c:139
-#: ../xfburn/xfburn-burn-audio-cd-composition-dialog.c:194
+#: xfburn/xfburn-blank-dialog.c:195
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:158
+#: xfburn/xfburn-burn-image-dialog.c:188 xfburn/xfburn-copy-cd-dialog.c:114
+#: xfburn/xfburn-copy-dvd-dialog.c:111
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:127
 msgid "Options"
 msgstr "اختیارات"
 
-#: ../xfburn/xfburn-blank-dialog.c:234
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:231
-#: ../xfburn/xfburn-burn-image-dialog.c:212
-#: ../xfburn/xfburn-copy-cd-dialog.c:143
-#: ../xfburn/xfburn-copy-dvd-dialog.c:143
-#: ../xfburn/xfburn-burn-audio-cd-composition-dialog.c:198
+#: xfburn/xfburn-blank-dialog.c:199
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:162
+#: xfburn/xfburn-burn-image-dialog.c:192 xfburn/xfburn-copy-cd-dialog.c:118
+#: xfburn/xfburn-copy-dvd-dialog.c:115
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:131
 msgid "E_ject disk"
 msgstr "ڈسک _نکالیں"
 
-#: ../xfburn/xfburn-blank-dialog.c:244
+#. action buttons
+#: xfburn/xfburn-blank-dialog.c:205
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:216
+#: xfburn/xfburn-burn-image-dialog.c:223 xfburn/xfburn-copy-cd-dialog.c:164
+#: xfburn/xfburn-copy-dvd-dialog.c:161 xfburn/xfburn-progress-dialog.c:352
+#: xfburn/xfburn-utils.c:131
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:152
+msgid "_Cancel"
+msgstr ""
+
+#: xfburn/xfburn-blank-dialog.c:209
 msgid "_Blank"
 msgstr "_خالی"
 
-#. blanking can only be performed on blank discs, format and deformat are
-#. allowed to be blank ones
-#: ../xfburn/xfburn-blank-dialog.c:356
+#. blanking can only be performed on blank discs, format and deformat are allowed to be blank ones
+#: xfburn/xfburn-blank-dialog.c:308
 msgid "The inserted disc is already blank."
 msgstr ""
 
 #. these ones we can blank
-#: ../xfburn/xfburn-blank-dialog.c:362
+#: xfburn/xfburn-blank-dialog.c:314
 msgid "Ready"
 msgstr "تیار"
 
-#: ../xfburn/xfburn-blank-dialog.c:365
+#: xfburn/xfburn-blank-dialog.c:317
 msgid "No disc detected in the drive."
 msgstr ""
 
-#: ../xfburn/xfburn-blank-dialog.c:374
+#: xfburn/xfburn-blank-dialog.c:324
 msgid "Disc is not erasable."
 msgstr ""
 
-#: ../xfburn/xfburn-blank-dialog.c:414
+#: xfburn/xfburn-blank-dialog.c:369
 msgid "Blanking disc..."
 msgstr "ڈسک خالی کی جارہی ہے..."
 
-#: ../xfburn/xfburn-blank-dialog.c:441
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:512
-#: ../xfburn/xfburn-perform-burn.c:366
+#: xfburn/xfburn-blank-dialog.c:391
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:401
+#: xfburn/xfburn-perform-burn.c:1893 xfburn/xfburn-perform-burn.c:1952
 #, c-format
 msgid "Done"
 msgstr "ہوگیا"
 
-#: ../xfburn/xfburn-blank-dialog.c:444 ../xfburn/xfburn-perform-burn.c:372
-#: ../xfburn/xfburn-progress-dialog.c:649
+#: xfburn/xfburn-blank-dialog.c:394 xfburn/xfburn-perform-burn.c:1916
+#: xfburn/xfburn-perform-burn.c:1970 xfburn/xfburn-progress-dialog.c:703
 msgid "Failure"
 msgstr "ناکامی"
 
-#: ../xfburn/xfburn-blank-dialog.c:461
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:610
-#: ../xfburn/xfburn-burn-image-dialog.c:402
-#: ../xfburn/xfburn-burn-image-dialog.c:578
-#: ../xfburn/xfburn-burn-audio-cd-composition-dialog.c:397
+#: xfburn/xfburn-blank-dialog.c:413
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:530
+#: xfburn/xfburn-burn-image-dialog.c:440
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:363
 msgid "Unable to grab the drive."
 msgstr ""
 
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:155
+#: xfburn/xfburn-blank-dialog.c:460
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:613
+#: xfburn/xfburn-burn-image-dialog.c:585
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:404
+msgid "No burner device selected."
+msgstr "کوئی برنر ڈیوائس منتخب نہیں ہے۔"
+
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:96
 msgid "Image"
 msgstr ""
 
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:157
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:98
 msgid "Show volume name"
 msgstr ""
 
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:157
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:98
 msgid "Show a text entry for the name of the volume"
 msgstr ""
 
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:183
-#: ../xfburn/xfburn-burn-audio-cd-composition-dialog.c:148
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:116
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:109
 msgid "Burn Composition"
 msgstr "کمپوزیشن برن کریں"
 
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:206
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:137
 msgid "Composition name"
 msgstr ""
 
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:211
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:142
 msgid "<small>Would you like to change the default composition name?</small>"
 msgstr ""
 
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:236
-#: ../xfburn/xfburn-burn-image-dialog.c:217
-#: ../xfburn/xfburn-copy-cd-dialog.c:148
-#: ../xfburn/xfburn-copy-dvd-dialog.c:148
-#: ../xfburn/xfburn-burn-audio-cd-composition-dialog.c:203
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:167
+#: xfburn/xfburn-burn-image-dialog.c:197 xfburn/xfburn-copy-cd-dialog.c:123
+#: xfburn/xfburn-copy-dvd-dialog.c:120
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:136
 msgid "_Dummy write"
 msgstr "_ڈمی لکھیں"
 
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:240
-#: ../xfburn/xfburn-burn-image-dialog.c:221
-#: ../xfburn/xfburn-burn-audio-cd-composition-dialog.c:207
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:172
+#: xfburn/xfburn-burn-image-dialog.c:201
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:141
 msgid "Burn_Free"
 msgstr "برن_فری"
 
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:177
+#: xfburn/xfburn-burn-image-dialog.c:206
+msgid "Stream _Recording"
+msgstr ""
+
 #. create ISO ?
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:246
-#: ../xfburn/xfburn-copy-cd-dialog.c:157
-#: ../xfburn/xfburn-copy-dvd-dialog.c:157
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:183
+#: xfburn/xfburn-copy-cd-dialog.c:132 xfburn/xfburn-copy-dvd-dialog.c:129
 msgid "Only create _ISO"
 msgstr "صرف ISO _بنائیں"
 
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:283
-#: ../xfburn/xfburn-burn-audio-cd-composition-dialog.c:222
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:210
+#: xfburn/xfburn-burn-image-dialog.c:216
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:146
+msgid "_Verify after burn"
+msgstr "برن کے بعد تصدیق کریں (_V)"
+
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:220
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:156
 msgid "_Burn Composition"
 msgstr "_کمپوزیشن برن کریں"
 
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:470
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:359
 #, c-format
 msgid "Could not create destination ISO file: %s"
 msgstr "سمت ISO فائل نہیں بنائی جاسکتی: %s"
 
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:477
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:366
 msgid "Writing ISO..."
 msgstr "آئی ایس او لکھا جارہا ہے"
 
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:494
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:383
 #, c-format
-msgid "An error occured while writing ISO: %s"
-msgstr "آئی ایس او لکھتے ہوئے غلطی سرزرد ہوئی ہے: %s"
+msgid "An error occurred while writing ISO: %s"
+msgstr ""
 
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:548
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:554
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:445
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:452
 msgid "An error occurred in the burn backend."
 msgstr ""
 
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:571
-#: ../xfburn/xfburn-burn-audio-cd-composition-dialog.c:328
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:490
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:280
 msgid "The write mode is not supported currently."
 msgstr ""
 
-#. could not create source
-#: ../xfburn/xfburn-burn-data-composition-base-dialog.c:653
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:575
 msgid "Could not create ISO source structure."
 msgstr ""
 
-#: ../xfburn/xfburn-burn-image-dialog.c:161
+#: xfburn/xfburn-burn-image-dialog.c:139
 msgid "Burn image"
 msgstr ""
 
 #. file
-#: ../xfburn/xfburn-burn-image-dialog.c:168
-#: ../xfburn/xfburn-burn-image-dialog.c:185
+#: xfburn/xfburn-burn-image-dialog.c:144 xfburn/xfburn-burn-image-dialog.c:167
 msgid "Image to burn"
 msgstr "امیج برائے برن"
 
-#: ../xfburn/xfburn-burn-image-dialog.c:172
+#: xfburn/xfburn-burn-image-dialog.c:148
 msgid "All files"
 msgstr "تمام فائلیں"
 
-#: ../xfburn/xfburn-burn-image-dialog.c:176
-msgid "ISO images"
-msgstr "ISO امیج"
+#: xfburn/xfburn-burn-image-dialog.c:152
+msgid "Disc images"
+msgstr ""
 
-#: ../xfburn/xfburn-burn-image-dialog.c:226
+#: xfburn/xfburn-burn-image-dialog.c:211
 msgid "_Quit after success"
 msgstr ""
 
-#: ../xfburn/xfburn-burn-image-dialog.c:236
+#: xfburn/xfburn-burn-image-dialog.c:227
 msgid "_Burn image"
 msgstr "_امیج برن کریں"
 
-#: ../xfburn/xfburn-burn-image-dialog.c:285
+#: xfburn/xfburn-burn-image-dialog.c:304
 msgid "Burn mode is not currently implemented."
 msgstr ""
 
-#: ../xfburn/xfburn-burn-image-dialog.c:336
-#: ../xfburn/xfburn-burn-image-dialog.c:365
+#: xfburn/xfburn-burn-image-dialog.c:351 xfburn/xfburn-burn-image-dialog.c:394
+#: xfburn/xfburn-burn-image-dialog.c:421
 msgid "An error occurred in the burn backend"
 msgstr ""
 
-#: ../xfburn/xfburn-burn-image-dialog.c:349
+#: xfburn/xfburn-burn-image-dialog.c:368 xfburn/xfburn-burn-image-dialog.c:577
 msgid "Unable to determine image size."
 msgstr ""
 
-#: ../xfburn/xfburn-burn-image-dialog.c:356
+#: xfburn/xfburn-burn-image-dialog.c:376
 msgid "Cannot open image."
 msgstr ""
 
-#: ../xfburn/xfburn-burn-image-dialog.c:393
+#: xfburn/xfburn-burn-image-dialog.c:430
 msgid "Burning image..."
 msgstr "امیج برن کیا جارہا ہے..."
 
-#: ../xfburn/xfburn-burn-image-dialog.c:465
+#: xfburn/xfburn-burn-image-dialog.c:518
 msgid ""
-"<span weight=\"bold\" foreground=\"darkred\" stretch=\"semiexpanded\">Please"
-" select an image to burn</span>"
+"<span weight=\"bold\" foreground=\"darkred\" stretch=\"semiexpanded\">Please "
+"select an image to burn</span>"
 msgstr ""
 
-#: ../xfburn/xfburn-burn-image-dialog.c:505
-msgid ""
-"Cannot append data to multisession disc in this write mode (use TAO instead)"
-msgstr "لکھنے کے اس موڈ میں متعدد نشست ڈسک میں ڈیٹا شامل نہیں کیا جاسکتا (اس کے بجائے TAO کا استعمال کریں)"
-
-#: ../xfburn/xfburn-burn-image-dialog.c:509
-msgid "Closed disc with data detected. Need blank or appendable disc"
-msgstr ""
-
-#: ../xfburn/xfburn-burn-image-dialog.c:511
-msgid "No disc detected in drive"
-msgstr ""
-
-#: ../xfburn/xfburn-burn-image-dialog.c:513
-msgid "Cannot recognize state of drive and disc"
-msgstr ""
-
-#: ../xfburn/xfburn-burn-image-dialog.c:525
-msgid "The selected image does not fit on the inserted disc"
-msgstr ""
-
-#: ../xfburn/xfburn-burn-image-dialog.c:529
-msgid "Failed to get image size"
-msgstr ""
-
-#: ../xfburn/xfburn-burn-image-dialog.c:558
+#: xfburn/xfburn-burn-image-dialog.c:564 xfburn/xfburn-burn-image-dialog.c:571
 msgid ""
 "Make sure you selected a valid file and you have the proper permissions to "
 "access it."
 msgstr ""
 
-#: ../xfburn/xfburn-compositions-notebook.c:174
+#: xfburn/xfburn-compositions-notebook.c:97
 msgid "Audio composition"
 msgstr ""
 
-#: ../xfburn/xfburn-compositions-notebook.c:235
+#: xfburn/xfburn-compositions-notebook.c:156
 msgid "Welcome"
 msgstr ""
 
-#: ../xfburn/xfburn-copy-cd-dialog.c:113
-#: ../xfburn/xfburn-copy-cd-progress-dialog.c:156
+#: xfburn/xfburn-copy-cd-dialog.c:87
+#: xfburn/xfburn-copy-cd-progress-dialog.c:132
 msgid "Copy data CD"
 msgstr "ڈیٹا سی ڈی کاپی کریں"
 
-#: ../xfburn/xfburn-copy-cd-dialog.c:123
+#: xfburn/xfburn-copy-cd-dialog.c:98
 msgid "CD Reader device"
 msgstr "سی ڈی ریڈر ڈیوائس"
 
-#: ../xfburn/xfburn-copy-cd-dialog.c:152
-#: ../xfburn/xfburn-copy-dvd-dialog.c:152
+#: xfburn/xfburn-copy-cd-dialog.c:127 xfburn/xfburn-copy-dvd-dialog.c:124
 msgid "On the _fly"
 msgstr "آن دی _فلائی"
 
-#: ../xfburn/xfburn-copy-cd-dialog.c:193
+#: xfburn/xfburn-copy-cd-dialog.c:168
 msgid "_Copy CD"
 msgstr "سی ڈی _کاپی کریں"
 
-#: ../xfburn/xfburn-copy-cd-progress-dialog.c:105
+#: xfburn/xfburn-copy-cd-progress-dialog.c:81
 msgid "Please insert a recordable disc."
 msgstr ""
 
-#: ../xfburn/xfburn-copy-cd-progress-dialog.c:127
+#: xfburn/xfburn-copy-cd-progress-dialog.c:103
 msgid "Writing CD..."
 msgstr "سی ڈی لکھی جارہی ہے..."
 
-#: ../xfburn/xfburn-copy-cd-progress-dialog.c:140
-#: ../xfburn/xfburn-create-iso-progress-dialog.c:102
+#: xfburn/xfburn-copy-cd-progress-dialog.c:116
+#: xfburn/xfburn-create-iso-progress-dialog.c:78
 msgid "Reading CD..."
 msgstr "سی ڈی پڑھی جارہی ہے..."
 
-#: ../xfburn/xfburn-copy-dvd-dialog.c:113
+#: xfburn/xfburn-copy-dvd-dialog.c:84
 msgid "Copy data DVD"
 msgstr "ڈیٹا سی ڈی کاپی کریں"
 
-#: ../xfburn/xfburn-copy-dvd-dialog.c:123
+#: xfburn/xfburn-copy-dvd-dialog.c:95
 msgid "DVD Reader device"
 msgstr "ڈی وی ڈی ریڈر ڈیوائس"
 
-#: ../xfburn/xfburn-copy-dvd-dialog.c:193
+#: xfburn/xfburn-copy-dvd-dialog.c:165
 msgid "_Copy DVD"
 msgstr "ڈی وی ڈی _کاپی کریں"
 
-#: ../xfburn/xfburn-create-iso-progress-dialog.c:117
+#: xfburn/xfburn-create-iso-progress-dialog.c:93
 msgid "Create ISO from CD"
 msgstr "سی ڈی سے آئی ایس او بنائیں"
 
-#: ../xfburn/xfburn-data-composition.c:189
-#: ../xfburn/xfburn-data-composition.c:955
-#: ../xfburn/xfburn-audio-composition.c:206
-#: ../xfburn/xfburn-audio-composition.c:979
+#: xfburn/xfburn-data-composition.c:280 xfburn/xfburn-utils.c:183
+#: xfburn/xfburn-utils.c:185 xfburn/xfburn-audio-composition.c:278
 msgid "Add"
 msgstr "شامل کریں"
 
-#: ../xfburn/xfburn-data-composition.c:189
-#: ../xfburn/xfburn-audio-composition.c:206
+#: xfburn/xfburn-data-composition.c:280 xfburn/xfburn-audio-composition.c:278
 msgid "Add the selected file(s) to the composition"
 msgstr "منتخب کردہ فائلیں کمپوزیشن میں شامل کریں"
 
-#: ../xfburn/xfburn-data-composition.c:191
+#: xfburn/xfburn-data-composition.c:282 xfburn-x-popup-menus.ui:7
 msgid "Create directory"
 msgstr "ڈائریکٹری بنائیں"
 
-#: ../xfburn/xfburn-data-composition.c:191
+#: xfburn/xfburn-data-composition.c:282
 msgid "Add a new directory to the composition"
 msgstr "کمپوزیشن میں نئی ڈائریکٹری بنائیں"
 
-#: ../xfburn/xfburn-data-composition.c:193
-#: ../xfburn/xfburn-audio-composition.c:208
+#: xfburn/xfburn-data-composition.c:287 xfburn/xfburn-audio-composition.c:283
+#: xfburn-x-popup-menus.ui:17 xfburn-x-popup-menus.ui:25
+#: xfburn-x-popup-menus.ui:43
 msgid "Remove"
 msgstr "حذف"
 
-#: ../xfburn/xfburn-data-composition.c:193
-#: ../xfburn/xfburn-audio-composition.c:208
+#: xfburn/xfburn-data-composition.c:287 xfburn/xfburn-audio-composition.c:283
 msgid "Remove the selected file(s) from the composition"
 msgstr "کمپوزیشن سے منتخب کردہ فائلیں حذف کریں"
 
-#: ../xfburn/xfburn-data-composition.c:195
-#: ../xfburn/xfburn-audio-composition.c:210
+#: xfburn/xfburn-data-composition.c:289 xfburn/xfburn-audio-composition.c:285
 msgid "Clear"
 msgstr "صاف"
 
-#: ../xfburn/xfburn-data-composition.c:195
-#: ../xfburn/xfburn-audio-composition.c:210
+#: xfburn/xfburn-data-composition.c:289 xfburn/xfburn-audio-composition.c:285
 msgid "Clear the content of the composition"
 msgstr "کمپوزیشن کا مواد صاف کریں"
 
-#. {"import-session", "xfburn-import-session", N_("Import"), NULL, N_("Import
-#. existing session"),},
-#: ../xfburn/xfburn-data-composition.c:198
-msgid "Rename"
-msgstr "نام بدلیں"
-
-#: ../xfburn/xfburn-data-composition.c:198
-msgid "Rename the selected file"
-msgstr "منتخب کردہ فائلوں کا نام بدلیں"
-
-#: ../xfburn/xfburn-data-composition.c:352
+#: xfburn/xfburn-data-composition.c:300
 msgid "Volume name :"
 msgstr "والیم کا نام:"
 
-#: ../xfburn/xfburn-data-composition.c:386
+#: xfburn/xfburn-data-composition.c:337 xfburn-x.ui:82
 msgid "Contents"
 msgstr "مواد"
 
-#: ../xfburn/xfburn-data-composition.c:401
-#: ../xfburn/xfburn-directory-browser.c:140
+#: xfburn/xfburn-data-composition.c:352 xfburn/xfburn-directory-browser.c:108
+#: xfburn/xfburn-disc-info.c:1519
 msgid "Size"
 msgstr "حجم"
 
-#: ../xfburn/xfburn-data-composition.c:404
+#: xfburn/xfburn-data-composition.c:355
 msgid "Local Path"
 msgstr "لوکل پاتھ"
 
-#: ../xfburn/xfburn-data-composition.c:679
+#: xfburn/xfburn-data-composition.c:615
 msgid "You must give a name to the file."
 msgstr ""
 
-#: ../xfburn/xfburn-data-composition.c:688
-#: ../xfburn/xfburn-data-composition.c:1198
-#: ../xfburn/xfburn-audio-composition.c:1176
+#: xfburn/xfburn-data-composition.c:624 xfburn/xfburn-data-composition.c:1057
+#: xfburn/xfburn-audio-composition.c:860
 msgid "A file with the same name is already present in the composition."
 msgstr ""
 
-#: ../xfburn/xfburn-data-composition.c:796
-#: ../xfburn/xfburn-data-composition.c:797
-#: ../xfburn/xfburn-data-composition.c:799
+#: xfburn/xfburn-data-composition.c:738 xfburn/xfburn-data-composition.c:739
+#: xfburn/xfburn-data-composition.c:741
 msgid "New directory"
 msgstr "نئی ڈائریکٹری"
 
-#: ../xfburn/xfburn-data-composition.c:941
-#: ../xfburn/xfburn-audio-composition.c:976
-msgid "File(s) to add to composition"
-msgstr ""
-
-#. Note to translators: first %s is the date in "i18n" format (year-month-
-#. day), %d is a running number of compositions
-#: ../xfburn/xfburn-data-composition.c:1041
+#. Note to translators: first %s is the date in "i18n" format (year-month-day), %d is a running number of compositions
+#: xfburn/xfburn-data-composition.c:913
 #, c-format
 msgid "Data %s~%d"
 msgstr ""
 
-#: ../xfburn/xfburn-data-composition.c:1277
+#: xfburn/xfburn-data-composition.c:1136
 #, c-format
 msgid ""
 "%s cannot be added to the composition, because it exceeds the maximum "
 "allowed file size for iso9660."
 msgstr ""
 
-#: ../xfburn/xfburn-data-composition.c:1362
-#: ../xfburn/xfburn-audio-composition.c:1351
+#: xfburn/xfburn-data-composition.c:1143
+#, c-format
+msgid ""
+"%s is larger than what iso9660 level 2 allows. This can be a problem for old "
+"systems or software."
+msgstr ""
+
+#: xfburn/xfburn-data-composition.c:1227 xfburn/xfburn-audio-composition.c:1032
 msgid "Adding home directory"
 msgstr ""
 
-#: ../xfburn/xfburn-data-composition.c:1363
-#: ../xfburn/xfburn-audio-composition.c:1352
+#: xfburn/xfburn-data-composition.c:1228 xfburn/xfburn-audio-composition.c:1033
 msgid ""
-"You are about to add your home directory to the composition. This is likely to take a very long time, and also to be too big to fit on one disc.\n"
+"You are about to add your home directory to the composition. This is likely "
+"to take a very long time, and also to be too big to fit on one disc.\n"
 "\n"
 "Are you sure you want to proceed?"
 msgstr ""
 
-#: ../xfburn/xfburn-data-composition.c:1530
+#: xfburn/xfburn-data-composition.c:1396
 #, c-format
 msgid ""
 "A file named \"%s\" already exists in this directory, the file hasn't been "
 "added."
 msgstr ""
 
+#: xfburn/xfburn-data-composition.c:1798
+#, c-format
+msgid "%s: null pointer"
+msgstr ""
+
+#: xfburn/xfburn-data-composition.c:1800
+#, c-format
+msgid "%s: out of memory"
+msgstr ""
+
+#: xfburn/xfburn-data-composition.c:1802
+#, c-format
+msgid "%s: node name not unique"
+msgstr ""
+
+#: xfburn/xfburn-data-composition.c:1804
+#, c-format
+msgid "%s: %s (code %X)"
+msgstr ""
+
 #. The first string is the renamed name, the second one the original name
-#: ../xfburn/xfburn-data-composition.c:1945
+#: xfburn/xfburn-data-composition.c:1824
 #, c-format
 msgid "Duplicate filename '%s' for '%s'"
 msgstr ""
 
-#: ../xfburn/xfburn-device-box.c:171 ../xfburn/xfburn-device-box.c:172
+#: xfburn/xfburn-data-composition.c:1889
+msgid "Error(s) occurred while adding files"
+msgstr ""
+
+#: xfburn/xfburn-data-composition.c:1893
+msgid "OK"
+msgstr ""
+
+#: xfburn/xfburn-device-box.c:136 xfburn/xfburn-device-box.c:137
 msgid "Show writers only"
 msgstr "صرف رائٹر دکھائیں"
 
-#: ../xfburn/xfburn-device-box.c:175
+#: xfburn/xfburn-device-box.c:140
 msgid "Show speed selection"
 msgstr "رفتار انتخاب دکھائیں"
 
-#: ../xfburn/xfburn-device-box.c:176
+#: xfburn/xfburn-device-box.c:141
 msgid "Show speed selection combo"
 msgstr "رفتار انتخاب کومبو دکھائیں"
 
-#: ../xfburn/xfburn-device-box.c:179
+#: xfburn/xfburn-device-box.c:144
 msgid "Show mode selection"
 msgstr "موڈ انتخاب دکھائیں"
 
-#: ../xfburn/xfburn-device-box.c:180
+#: xfburn/xfburn-device-box.c:145
 msgid "Show mode selection combo"
 msgstr "موڈ انتخاب کومبو دکھائیں"
 
-#: ../xfburn/xfburn-device-box.c:183
+#: xfburn/xfburn-device-box.c:148
 msgid "Is it a valid combination"
 msgstr ""
 
-#: ../xfburn/xfburn-device-box.c:184
+#: xfburn/xfburn-device-box.c:149
 msgid "Is the combination of hardware and disc valid to burn the composition?"
 msgstr ""
 
-#: ../xfburn/xfburn-device-box.c:188
+#: xfburn/xfburn-device-box.c:153
 msgid "The blank mode shows different disc status messages than regular mode"
 msgstr ""
 
-#: ../xfburn/xfburn-device-box.c:191 ../xfburn/xfburn-device-box.c:192
-msgid "Accept only CDs as valid discs"
-msgstr ""
-
-#: ../xfburn/xfburn-device-box.c:245
+#: xfburn/xfburn-device-box.c:227
 msgid "_Speed:"
 msgstr "_رفتار:"
 
-#: ../xfburn/xfburn-device-box.c:268
+#: xfburn/xfburn-device-box.c:246
 msgid "Write _mode:"
 msgstr "لکھنے کا _موڈ:"
 
-#: ../xfburn/xfburn-device-box.c:387
-msgid "Empty speed list"
-msgstr ""
+#: xfburn/xfburn-device-box.c:367
+msgid "Min"
+msgstr "کم از کم"
 
-#: ../xfburn/xfburn-device-box.c:396
-msgid ""
-"<b>Unable to retrieve the speed list for the drive.</b>\n"
-"\n"
-"This is a known bug for drives. If you're interested in fixing it, please have a look at the libburn library.\n"
-"\n"
-"Burning should still work, but if there are problems anyways, please let us know.\n"
-"\n"
-"<i>Thank you!</i>"
-msgstr ""
-
-#: ../xfburn/xfburn-device-box.c:407
-msgid "Continue to _show this notice"
-msgstr ""
-
-#: ../xfburn/xfburn-device-box.c:452
-msgid "default"
-msgstr ""
-
-#: ../xfburn/xfburn-device-box.c:488
+#: xfburn/xfburn-device-box.c:389
 msgid "Max"
 msgstr ""
 
-#: ../xfburn/xfburn-device-box.c:590
+#: xfburn/xfburn-device-box.c:422
+msgid "Checking drive..."
+msgstr "ڈرائیو چیک کی جا رہی ہے..."
+
+#: xfburn/xfburn-device-box.c:450
+msgid "A full, but erasable disc is in the drive"
+msgstr ""
+
+#: xfburn/xfburn-device-box.c:451
+msgid ""
+"Do you want to blank the disc, so that it can be used for the upcoming burn "
+"process?"
+msgstr ""
+
+#: xfburn/xfburn-device-box.c:476 xfburn/xfburn-disc-info.c:1040
+#: xfburn/xfburn-disc-info-dialog.c:262
+msgid "No burner detected"
+msgstr "کوئی برنر نہیں ملا"
+
+#: xfburn/xfburn-device-box.c:533
 msgid "Drive can't burn on the inserted disc"
 msgstr ""
 
-#: ../xfburn/xfburn-device-box.c:599 ../xfburn/xfburn-device-box.c:645
+#: xfburn/xfburn-device-box.c:539 xfburn/xfburn-device-box.c:589
 msgid "Drive is empty"
 msgstr ""
 
-#: ../xfburn/xfburn-device-box.c:602
+#: xfburn/xfburn-device-box.c:542
 msgid "Sorry, multisession is not yet supported"
 msgstr ""
 
-#: ../xfburn/xfburn-device-box.c:605
+#: xfburn/xfburn-device-box.c:545
 msgid "Inserted disc is full"
 msgstr ""
 
-#: ../xfburn/xfburn-device-box.c:608 ../xfburn/xfburn-device-box.c:651
+#: xfburn/xfburn-device-box.c:548 xfburn/xfburn-device-box.c:595
 msgid "Inserted disc is unsuitable"
 msgstr ""
 
-#: ../xfburn/xfburn-device-box.c:611 ../xfburn/xfburn-device-box.c:654
+#: xfburn/xfburn-device-box.c:552 xfburn/xfburn-device-box.c:599
+#: xfburn/xfburn-disc-info.c:390 xfburn/xfburn-disc-info.c:1049
+msgid "Cannot access drive (disc is mounted and in use)"
+msgstr "ڈرائیو تک رسائی ممکن نہیں (ڈسک ماؤنٹ ہے اور استعمال میں ہے)"
+
+#: xfburn/xfburn-device-box.c:554 xfburn/xfburn-device-box.c:601
+#: xfburn/xfburn-disc-info.c:392 xfburn/xfburn-disc-info.c:1051
 msgid "Cannot access drive (it might be in use)"
 msgstr ""
 
-#: ../xfburn/xfburn-device-box.c:616 ../xfburn/xfburn-device-box.c:657
+#: xfburn/xfburn-device-box.c:559 xfburn/xfburn-device-box.c:604
 msgid "Error determining disc"
 msgstr ""
 
-#: ../xfburn/xfburn-device-box.c:637
+#: xfburn/xfburn-device-box.c:581
 msgid "Write-once disc, no blanking possible"
 msgstr ""
 
-#: ../xfburn/xfburn-device-box.c:640
+#: xfburn/xfburn-device-box.c:584
 msgid "DVD+RW does not need blanking"
 msgstr ""
 
-#: ../xfburn/xfburn-device-box.c:648
+#: xfburn/xfburn-device-box.c:592
 msgid "Inserted disc is already blank"
 msgstr ""
 
-#: ../xfburn/xfburn-device-box.c:684
-msgid "Auto"
+#: xfburn/xfburn-device-box.c:631
+msgid "Automatic"
 msgstr ""
 
-#: ../xfburn/xfburn-device-list.c:206 ../xfburn/xfburn-device-list.c:207
+#: xfburn/xfburn-device-box.c:638
+msgid "With Track Gaps / Track-At-Once (TAO)"
+msgstr ""
+
+#: xfburn/xfburn-device-box.c:645
+msgid "Multi Session / Session-At-Once (SAO)"
+msgstr ""
+
+#: xfburn/xfburn-device-list.c:244 xfburn/xfburn-device-list.c:245
 msgid "Number of burners in the system"
 msgstr ""
 
-#: ../xfburn/xfburn-device-list.c:209
+#: xfburn/xfburn-device-list.c:247
 msgid "Number of drives in the system"
 msgstr ""
 
-#: ../xfburn/xfburn-device-list.c:210
+#: xfburn/xfburn-device-list.c:248
 msgid "Number of drives in the system (readers and writers)"
 msgstr ""
 
-#: ../xfburn/xfburn-device-list.c:212 ../xfburn/xfburn-device-list.c:213
+#: xfburn/xfburn-device-list.c:250 xfburn/xfburn-device-list.c:251
 msgid "List of devices"
 msgstr ""
 
-#: ../xfburn/xfburn-device-list.c:215 ../xfburn/xfburn-device-list.c:216
+#: xfburn/xfburn-device-list.c:253 xfburn/xfburn-device-list.c:254
 msgid "Currently selected device"
 msgstr ""
 
 #. globals
-#: ../xfburn/xfburn-directory-browser.c:54
+#: xfburn/xfburn-directory-browser.c:51
 msgid "Folder"
 msgstr "فولڈر"
 
-#: ../xfburn/xfburn-directory-browser.c:127
+#: xfburn/xfburn-directory-browser.c:95
 msgid "File"
 msgstr "فائل"
 
-#: ../xfburn/xfburn-directory-browser.c:142
+#: xfburn/xfburn-directory-browser.c:110 xfburn/xfburn-disc-info.c:1518
 msgid "Type"
 msgstr "نوعیت"
 
-#: ../xfburn/xfburn-fs-browser.c:94 ../xfburn/xfburn-fs-browser.c:283
+#: xfburn/xfburn-fs-browser.c:67 xfburn/xfburn-fs-browser.c:276
 msgid "Filesystem"
 msgstr "فائل سسٹم"
 
 #. load the user's home dir
-#: ../xfburn/xfburn-fs-browser.c:262
+#: xfburn/xfburn-fs-browser.c:255
 #, c-format
 msgid "%s's home"
 msgstr "%s کا گھر"
 
-#: ../xfburn/xfburn-main.c:202 ../xfburn.desktop.in.h:1
-msgid "Xfburn"
-msgstr "ایکس ایف برن"
+#: xfburn/xfburn-udev-manager.c:720
+msgid "Unmount operation timed out"
+msgstr "ان ماؤنٹ آپریشن کا وقت ختم ہو گیا"
 
-#: ../xfburn/xfburn-main.c:212
+#: xfburn/xfburn-udev-manager.c:862
+msgid "Mounted volume cannot be unmounted"
+msgstr "ماؤنٹ شدہ والیوم کو ان ماؤنٹ نہیں کیا جا سکتا"
+
+#. || G_OPTION_FLAG_FILENAME
+#: xfburn/xfburn-main.c:77
+msgid "Open the burn image dialog, optionally followed by the image filename"
+msgstr ""
+
+#: xfburn/xfburn-main.c:79
+msgid "Open the blank disc dialog"
+msgstr ""
+
+#: xfburn/xfburn-main.c:81
+msgid ""
+"Start a data composition, optionally followed by files/directories to be "
+"added to the composition"
+msgstr ""
+
+#: xfburn/xfburn-main.c:83
+msgid ""
+"Start an audio composition, optionally followed by files/directories to be "
+"added to the composition"
+msgstr ""
+
+#: xfburn/xfburn-main.c:85
+msgid ""
+"Select the transcoder, run with --transcoder=list to see the available ones"
+msgstr ""
+
+#: xfburn/xfburn-main.c:87
+msgid ""
+"Start the file browser in the specified directory, or the current directory "
+"if none is specified (the default is to start in your home directory)"
+msgstr ""
+
+#: xfburn/xfburn-main.c:89
+msgid "Write diagnostic session log to the specified file path"
+msgstr "تشخیصی سیشن لاگ کو متعین فائل پاتھ پر لکھیں"
+
+#: xfburn/xfburn-main.c:91
+msgid "Display program version and exit"
+msgstr ""
+
+#: xfburn/xfburn-main.c:93
+msgid ""
+"Show main program even when other action is specified on the command line."
+msgstr ""
+
+#: xfburn/xfburn-main.c:200 xfburn/xfburn-main-window.c:147
+#: xfburn-x.desktop.in:4 io.github.asdfjkl.xfburn-x.metainfo.xml.in:9
+msgid "Xfburn-X"
+msgstr "Xfburn-X"
+
+#: xfburn/xfburn-main.c:209
 #, c-format
 msgid ""
 "%s: %s\n"
 "Try %s --help to see a full list of available command line options.\n"
 msgstr ""
 
-#: ../xfburn/xfburn-main.c:220
+#: xfburn/xfburn-main.c:220
 msgid "Unable to initialize the burning backend."
 msgstr ""
 
-#: ../xfburn/xfburn-main.c:295
+#: xfburn/xfburn-main.c:304
 msgid "No burners are currently available"
 msgstr ""
 
-#: ../xfburn/xfburn-main.c:297
+#: xfburn/xfburn-main.c:306
 msgid ""
 "Possibly the disc(s) are in use, and cannot get accessed.\n"
 "\n"
-"Please unmount and restart the application.\n"
-"\n"
-"If no disc is in the drive, check that you have read and write access to the drive with the current user."
+"If no disc is in the drive, check that you have read and write access to the "
+"drive with the current user."
 msgstr ""
 
-#: ../xfburn/xfburn-main.c:331
+#: xfburn/xfburn-main.c:340
 #, c-format
 msgid ""
 "Failed to initialize %s transcoder: %s\n"
 "\t(falling back to basic implementation)"
 msgstr ""
 
-#: ../xfburn/xfburn-main.c:375
+#: xfburn/xfburn-main.c:383
 #, c-format
 msgid "Image file '%s' does not exist."
 msgstr ""
 
-#: ../xfburn/xfburn-main-window.c:100
-msgid "_File"
-msgstr "_فائل"
-
-#. {"new-composition", GTK_STOCK_NEW, N_("_New composition"), "", N_("Create a
-#. new composition"),},
-#. {"new-composition", GTK_STOCK_NEW, N_("_New composition"), NULL, N_("Create
-#. a new composition"),
-#. G_CALLBACK (action_new_data_composition),},
-#: ../xfburn/xfburn-main-window.c:104
+#: xfburn/xfburn-main-window.c:201
 msgid "New data composition"
 msgstr ""
 
-#: ../xfburn/xfburn-main-window.c:106
+#: xfburn/xfburn-main-window.c:204
 msgid "New audio composition"
 msgstr ""
 
-#. {"load-composition", GTK_STOCK_OPEN, N_("Load composition"), NULL, N_("Load
-#. composition"),
-#. G_CALLBACK (action_load),},
-#. {"save-composition", GTK_STOCK_SAVE, N_("Save composition"), NULL, N_("Save
-#. composition"),
-#. G_CALLBACK (action_save),},
-#. {"save-composition-as", GTK_STOCK_SAVE_AS, N_("Save composition as..."),
-#. NULL, N_("Save composition as"),
-#. G_CALLBACK (action_save_as),},
-#: ../xfburn/xfburn-main-window.c:114
-msgid "Close composition"
-msgstr "کمپوزیشن بند کریں"
-
-#: ../xfburn/xfburn-main-window.c:116
-msgid "_Quit"
-msgstr "_برخاست"
-
-#: ../xfburn/xfburn-main-window.c:116
-msgid "Quit Xfburn"
-msgstr "ایکس ایف برن کو بند کریں"
-
-#: ../xfburn/xfburn-main-window.c:117
-msgid "_Edit"
-msgstr "_تدوین"
-
-#: ../xfburn/xfburn-main-window.c:118
-msgid "Prefere_nces"
-msgstr "تر_جیحات"
-
-#: ../xfburn/xfburn-main-window.c:118
-msgid "Show preferences dialog"
-msgstr "ترجیحات کا ڈائیلاگ کھولیں"
-
-#: ../xfburn/xfburn-main-window.c:120
-msgid "_Actions"
-msgstr "_حرکات"
-
-#: ../xfburn/xfburn-main-window.c:121
-msgid "_View"
-msgstr "_منظر"
-
-#: ../xfburn/xfburn-main-window.c:122
-msgid "Refresh"
-msgstr "تازہ کریں"
-
-#: ../xfburn/xfburn-main-window.c:122
-msgid "Refresh file list"
-msgstr "فائل کی فہرست تازہ کریں"
-
-#: ../xfburn/xfburn-main-window.c:124
-msgid "_Help"
-msgstr "_ہدایات"
-
-#: ../xfburn/xfburn-main-window.c:125
-msgid "_About"
-msgstr "_بابت"
-
-#: ../xfburn/xfburn-main-window.c:125
-msgid "Display information about Xfburn"
-msgstr "ایکس ایف برن کے بارے میں معلومات دیکھیں"
-
-#: ../xfburn/xfburn-main-window.c:127
+#: xfburn/xfburn-main-window.c:209 xfburn-x.ui:42
 msgid "Blank CD-RW"
 msgstr "خالی CD-RW"
 
-#: ../xfburn/xfburn-main-window.c:129
-msgid "Copy Data CD"
-msgstr "ڈیٹا سی ڈی کاپی کریں"
-
-#. {"copy-audio", "xfburn-audio-copy", N_("Copy Audio CD"), NULL, N_("Copy
-#. Audio CD"),},
-#: ../xfburn/xfburn-main-window.c:132
+#: xfburn/xfburn-main-window.c:212 xfburn-x.ui:46
 msgid "Burn Image"
 msgstr ""
 
-#. {"copy-dvd", "xfburn-data-copy", N_("Copy DVD"), NULL, N_("Copy DVD"),
-#. G_CALLBACK (action_copy_dvd),},
-#: ../xfburn/xfburn-main-window.c:136
-msgid "Burn DVD Image"
-msgstr "ڈی وی ڈی امیج برن کریں"
+#: xfburn/xfburn-main-window.c:217 xfburn-x.ui:62
+msgid "Refresh"
+msgstr "تازہ کریں"
 
-#: ../xfburn/xfburn-main-window.c:141
-msgid "Show file browser"
-msgstr "فائل براؤزر دکھائیں"
+#: xfburn/xfburn-main-window.c:217
+msgid "Refresh file list"
+msgstr "فائل کی فہرست تازہ کریں"
 
-#: ../xfburn/xfburn-main-window.c:141
-msgid "Show/hide the file browser"
-msgstr "فائل براؤزر ظاہر/پوشیدہ کریں"
+#: xfburn/xfburn-main-window.c:388
+msgid ""
+"CD, DVD, and Blu-ray burning GUI (fork of Xfburn with post-burn verification "
+"and diagnostic logging)"
+msgstr "CD، DVD، اور Blu-ray برننگ GUI (برن کے بعد تصدیق اور تشخیصی لاگنگ کے ساتھ Xfburn کا فورک)"
 
-#: ../xfburn/xfburn-main-window.c:143
-msgid "Show toolbar"
-msgstr "اوزار پٹی دکھائیں"
-
-#: ../xfburn/xfburn-main-window.c:143
-msgid "Show/hide the toolbar"
-msgstr "اوزار پٹی ظاہر/پوشیدہ کریں"
-
-#: ../xfburn/xfburn-main-window.c:350
-msgid "Toolbar Editor"
-msgstr "اوزار پٹی مدون کار"
-
-#: ../xfburn/xfburn-main-window.c:538
-msgid "Another cd burning GUI"
-msgstr "دیگر سی ڈی برننگ مواجہ"
-
-#: ../xfburn/xfburn-notebook-tab.c:108
+#: xfburn/xfburn-notebook-tab.c:74
 msgid "Label"
 msgstr "لیبل"
 
-#: ../xfburn/xfburn-notebook-tab.c:108
+#: xfburn/xfburn-notebook-tab.c:74
 msgid "The text of the label"
 msgstr "لیبل کا متن"
 
-#: ../xfburn/xfburn-notebook-tab.c:111
+#: xfburn/xfburn-notebook-tab.c:77
 msgid "Show close button"
 msgstr ""
 
-#: ../xfburn/xfburn-notebook-tab.c:111
+#: xfburn/xfburn-notebook-tab.c:77
 msgid "Determine whether the close button is visible"
 msgstr ""
 
-#: ../xfburn/xfburn-perform-burn.c:158
-msgid ""
-"Cannot append data to multisession disc in this write mode (use TAO "
-"instead)."
+#: xfburn/xfburn-perform-burn.c:388 xfburn/xfburn-perform-burn.c:1804
+msgid "Formatting..."
 msgstr ""
 
-#: ../xfburn/xfburn-perform-burn.c:162
+#: xfburn/xfburn-perform-burn.c:549
+msgid "sectors total"
+msgstr "کل سیکٹرز"
+
+#: xfburn/xfburn-perform-burn.c:564
+#, c-format
+msgid "Verifying track %2u/%u... (%u read/verify errors)"
+msgstr "ٹریک %2u/%u کی تصدیق ہو رہی ہے... (%u پڑھنے/تصدیق کی غلطیاں)"
+
+#: xfburn/xfburn-perform-burn.c:567
+#, c-format
+msgid "Verifying track %2u/%u..."
+msgstr "ٹریک %2u/%u کی تصدیق ہو رہی ہے..."
+
+#: xfburn/xfburn-perform-burn.c:571
+#, c-format
+msgid "Verifying... (%u read/verify errors)"
+msgstr "تصدیق ہو رہی ہے... (%u پڑھنے/تصدیق کی غلطیاں)"
+
+#: xfburn/xfburn-perform-burn.c:573
+msgid "Verifying..."
+msgstr "تصدیق ہو رہی ہے..."
+
+#: xfburn/xfburn-perform-burn.c:695
+msgid "Estimated reading speed:"
+msgstr "پڑھنے کی متوقع رفتار:"
+
+#: xfburn/xfburn-perform-burn.c:697 xfburn/xfburn-perform-burn.c:1752
+msgid "unused"
+msgstr ""
+
+#: xfburn/xfburn-perform-burn.c:1331 xfburn/xfburn-perform-burn.c:1905
+msgid "Verification interrupted: drive disconnected"
+msgstr "تصدیق منقطع ہو گئی: ڈرائیو منقطع ہو گئی"
+
+#: xfburn/xfburn-perform-burn.c:1342
+#, c-format
+msgid ""
+"Lost connection to the drive at LBA %u after verifying %u of %u sectors. %u "
+"earlier disc read/verify error(s) were also detected (%s).\n"
+"\n"
+"Diagnostic log saved to:\n"
+"%s"
+msgstr ""
+"LBA %u پر ڈرائیو سے کنکشن منقطع ہو گیا جب %u از %u سیکٹرز کی تصدیق مکمل ہو چکی تھی۔ اس سے قبل ڈسک پڑھنے/تصدیق کی %u غلطیاں بھی پائی گئیں (%s)۔\n"
+"\n"
+"تشخیصی لاگ یہاں محفوظ کیا گیا:\n"
+"%s"
+
+#: xfburn/xfburn-perform-burn.c:1346
+#, c-format
+msgid ""
+"Lost connection to the drive at LBA %u after verifying %u of %u sectors. %u "
+"earlier disc read/verify error(s) were also detected (%s)."
+msgstr "LBA %u پر ڈرائیو سے کنکشن منقطع ہو گیا جب %u از %u سیکٹرز کی تصدیق مکمل ہو چکی تھی۔ اس سے قبل ڈسک پڑھنے/تصدیق کی %u غلطیاں بھی پائی گئیں (%s)۔"
+
+#: xfburn/xfburn-perform-burn.c:1358
+#, c-format
+msgid ""
+"Lost connection to the drive at LBA %u after verifying %u of %u sectors with "
+"no disc read errors. The burn completed, so the disc is likely intact — "
+"check USB cable, power supply, or USB 3.0 power-saving settings.\n"
+"\n"
+"Diagnostic log saved to:\n"
+"%s"
+msgstr ""
+"LBA %u پر ڈرائیو سے کنکشن منقطع ہو گیا جب بغیر کسی ڈسک پڑھنے کی غلطی کے %u از %u سیکٹرز کی تصدیق مکمل ہو چکی تھی۔ برن مکمل ہو چکا تھا، اس لیے ڈسک غالباً سلامت ہے — USB کیبل، پاور سپلائی، یا USB 3.0 پاور سیونگ سیٹنگز چیک کریں۔\n"
+"\n"
+"تشخیصی لاگ یہاں محفوظ کیا گیا:\n"
+"%s"
+
+#: xfburn/xfburn-perform-burn.c:1362
+#, c-format
+msgid ""
+"Lost connection to the drive at LBA %u after verifying %u of %u sectors with "
+"no disc read errors. The burn completed, so the disc is likely intact — "
+"check USB cable, power supply, or USB 3.0 power-saving settings."
+msgstr "LBA %u پر ڈرائیو سے کنکشن منقطع ہو گیا جب بغیر کسی ڈسک پڑھنے کی غلطی کے %u از %u سیکٹرز کی تصدیق مکمل ہو چکی تھی۔ برن مکمل ہو چکا تھا، اس لیے ڈسک غالباً سلامت ہے — USB کیبل، پاور سپلائی، یا USB 3.0 پاور سیونگ سیٹنگز چیک کریں۔"
+
+#: xfburn/xfburn-perform-burn.c:1381
+#, c-format
+msgid "Disc Read Error: %s"
+msgstr "ڈسک پڑھنے کی غلطی: %s"
+
+#: xfburn/xfburn-perform-burn.c:1507
+msgid ""
+"Cannot append data to multisession disc in this write mode (use TAO instead)."
+msgstr ""
+
+#: xfburn/xfburn-perform-burn.c:1512
 msgid "Closed disc with data detected, a blank or appendable disc is needed."
 msgstr ""
 
-#: ../xfburn/xfburn-perform-burn.c:164
+#: xfburn/xfburn-perform-burn.c:1514
 msgid "No disc detected in drive."
 msgstr ""
 
-#: ../xfburn/xfburn-perform-burn.c:167
+#: xfburn/xfburn-perform-burn.c:1517
 msgid "Cannot recognize the state of the drive and disc."
 msgstr ""
 
-#: ../xfburn/xfburn-perform-burn.c:180
+#: xfburn/xfburn-perform-burn.c:1525
+msgid "Formatting failed."
+msgstr ""
+
+#: xfburn/xfburn-perform-burn.c:1562
 msgid "There is not enough space available on the inserted disc."
 msgstr ""
 
-#: ../xfburn/xfburn-perform-burn.c:225
+#: xfburn/xfburn-perform-burn.c:1571
+msgid "see console"
+msgstr ""
+
+#: xfburn/xfburn-perform-burn.c:1667
 #, c-format
 msgid "Burning track %2d/%d..."
 msgstr ""
 
-#: ../xfburn/xfburn-perform-burn.c:229 ../xfburn/xfburn-perform-burn.c:294
+#: xfburn/xfburn-perform-burn.c:1671 xfburn/xfburn-perform-burn.c:1769
 msgid "Burning composition..."
 msgstr "کمپوزیشن برن کی جارہی ہے..."
 
-#: ../xfburn/xfburn-perform-burn.c:263
+#: xfburn/xfburn-perform-burn.c:1738
 msgid "standby"
 msgstr ""
 
-#: ../xfburn/xfburn-perform-burn.c:271
+#: xfburn/xfburn-perform-burn.c:1746
 msgid "ending"
 msgstr ""
 
-#: ../xfburn/xfburn-perform-burn.c:274
+#: xfburn/xfburn-perform-burn.c:1749
 msgid "failing"
 msgstr ""
 
-#: ../xfburn/xfburn-perform-burn.c:277
-msgid "unused"
-msgstr ""
-
-#: ../xfburn/xfburn-perform-burn.c:280
+#: xfburn/xfburn-perform-burn.c:1755
 msgid "abandoned"
 msgstr ""
 
-#: ../xfburn/xfburn-perform-burn.c:283
+#: xfburn/xfburn-perform-burn.c:1758
 msgid "ended"
 msgstr ""
 
-#: ../xfburn/xfburn-perform-burn.c:286
+#: xfburn/xfburn-perform-burn.c:1761
 msgid "aborted"
 msgstr ""
 
-#: ../xfburn/xfburn-perform-burn.c:289 ../xfburn/xfburn-progress-dialog.c:216
-#: ../xfburn/xfburn-progress-dialog.c:233
-#: ../xfburn/xfburn-progress-dialog.c:243
-#: ../xfburn/xfburn-progress-dialog.c:332
-#: ../xfburn/xfburn-progress-dialog.c:476
-#: ../xfburn/xfburn-progress-dialog.c:500
-#: ../xfburn/xfburn-progress-dialog.c:524
+#: xfburn/xfburn-perform-burn.c:1764
 msgid "no info"
 msgstr "کوئی معلومات نہیں"
 
-#: ../xfburn/xfburn-perform-burn.c:299
+#: xfburn/xfburn-perform-burn.c:1774
 msgid "Writing Lead-In..."
 msgstr "لیڈ-ان لکھا جارہا ہے..."
 
-#: ../xfburn/xfburn-perform-burn.c:305
+#: xfburn/xfburn-perform-burn.c:1780
 msgid "Writing Lead-Out..."
 msgstr "لیڈ-آؤٹ لکھا جارہا ہے..."
 
-#: ../xfburn/xfburn-perform-burn.c:311
+#: xfburn/xfburn-perform-burn.c:1786
 msgid "Writing pregap..."
 msgstr "پری گیب لکھا جارہا ہے..."
 
-#: ../xfburn/xfburn-perform-burn.c:317
+#: xfburn/xfburn-perform-burn.c:1792
 msgid "Closing track..."
 msgstr "ٹریک بند کیا جارہا ہے..."
 
-#: ../xfburn/xfburn-perform-burn.c:323
+#: xfburn/xfburn-perform-burn.c:1798
 msgid "Closing session..."
 msgstr "نشست بند کی جارہی ہے..."
 
-#: ../xfburn/xfburn-perform-burn.c:329
-msgid "Formatting..."
-msgstr ""
+#: xfburn/xfburn-perform-burn.c:1895
+msgid "Disc successfully verified"
+msgstr "ڈسک کی کامیابی سے تصدیق ہو گئی"
 
-#: ../xfburn/xfburn-perform-burn.c:342
-msgid "see console"
-msgstr ""
-
-#: ../xfburn/xfburn-perform-burn.c:370
+#: xfburn/xfburn-perform-burn.c:1899 xfburn/xfburn-perform-burn.c:1958
 msgid "User Aborted"
 msgstr ""
 
-#: ../xfburn/xfburn-preferences-dialog.c:143
+#: xfburn/xfburn-perform-burn.c:1908
+msgid "Drive disconnected during verification (communication error)"
+msgstr "تصدیق کے دوران ڈرائیو منقطع ہو گئی (رابطے کی غلطی)"
+
+#: xfburn/xfburn-perform-burn.c:1968
+msgid "Drive disconnected during burn (communication error)"
+msgstr "برن کے دوران ڈرائیو منقطع ہو گئی (رابطے کی غلطی)"
+
+#: xfburn/xfburn-preferences-dialog.c:107
 msgid "Preferences"
 msgstr "ترجیحات"
 
-#: ../xfburn/xfburn-preferences-dialog.c:144
-msgid "Tune how Xfburn behaves"
-msgstr "ایکس ایف برن کا سلوک مرتب کریں"
+#: xfburn/xfburn-preferences-dialog.c:108
+msgid "Tune how Xfburn-X behaves"
+msgstr "Xfburn-X کے برتاؤ کو ترتیب دیں"
 
-#: ../xfburn/xfburn-preferences-dialog.c:190
-#: ../xfburn/xfburn-preferences-dialog.c:194
+#: xfburn/xfburn-preferences-dialog.c:139
+#: xfburn/xfburn-preferences-dialog.c:143
 msgid "Temporary directory"
 msgstr "ٹمپریری ڈائریکٹری"
 
-#: ../xfburn/xfburn-preferences-dialog.c:198
+#: xfburn/xfburn-preferences-dialog.c:147
 msgid "_Clean temporary directory on exit"
 msgstr "برخاست کرنے پر ٹمپریری _ڈائریکٹری صاف کریں"
 
-#: ../xfburn/xfburn-preferences-dialog.c:205
+#: xfburn/xfburn-preferences-dialog.c:154
 msgid "File browser"
 msgstr "فائل براؤزر"
 
-#: ../xfburn/xfburn-preferences-dialog.c:209
+#: xfburn/xfburn-preferences-dialog.c:158
 msgid "Show _hidden files"
 msgstr "_پوشیدہ فائلیں ظاہر کریں"
 
-#: ../xfburn/xfburn-preferences-dialog.c:214
+#: xfburn/xfburn-preferences-dialog.c:163
 msgid "Show human_readable filesizes"
 msgstr "انسان کے _پڑھنے کے قابل فائل حجم دکھائیں"
 
-#: ../xfburn/xfburn-preferences-dialog.c:225
+#: xfburn/xfburn-preferences-dialog.c:173
+#: xfburn/xfburn-preferences-dialog.c:184
 msgid "General"
 msgstr "عام"
 
-#: ../xfburn/xfburn-preferences-dialog.c:236
-#: ../xfburn/xfburn-preferences-dialog.c:313
+#: xfburn/xfburn-preferences-dialog.c:188
+#: xfburn/xfburn-preferences-dialog.c:270
 msgid "Devices"
 msgstr "ڈیوائسیں"
 
-#: ../xfburn/xfburn-preferences-dialog.c:245
+#: xfburn/xfburn-preferences-dialog.c:197
 msgid "Detected devices"
 msgstr "دریافت شدہ ڈیواسیں"
 
-#: ../xfburn/xfburn-preferences-dialog.c:266
+#: xfburn/xfburn-preferences-dialog.c:218
 msgid "Name"
 msgstr "نام"
 
-#: ../xfburn/xfburn-preferences-dialog.c:279
+#: xfburn/xfburn-preferences-dialog.c:231
+msgid "Revision"
+msgstr ""
+
+#: xfburn/xfburn-preferences-dialog.c:233
 msgid "Node"
 msgstr "گرہ"
 
-#: ../xfburn/xfburn-preferences-dialog.c:281
+#: xfburn/xfburn-preferences-dialog.c:235
 msgid "Write CD-R"
 msgstr "CD-R لکھیں"
 
-#: ../xfburn/xfburn-preferences-dialog.c:283
+#: xfburn/xfburn-preferences-dialog.c:237
 msgid "Write CD-RW"
 msgstr "CD-RW لکھیں"
 
-#: ../xfburn/xfburn-preferences-dialog.c:286
+#: xfburn/xfburn-preferences-dialog.c:240
 msgid "Write DVD-R"
 msgstr "DVD-R لکھیں"
 
-#: ../xfburn/xfburn-preferences-dialog.c:289
+#: xfburn/xfburn-preferences-dialog.c:243
 msgid "Write DVD-RAM"
 msgstr "DVD-RAM لکھیں"
 
-#: ../xfburn/xfburn-preferences-dialog.c:297
+#: xfburn/xfburn-preferences-dialog.c:246
+msgid "Write Blu-ray"
+msgstr ""
+
+#: xfburn/xfburn-preferences-dialog.c:254
 msgid "Sc_an for devices"
 msgstr "ڈوائیسس کے لیے _سکین کریں"
 
-#: ../xfburn/xfburn-preferences-dialog.c:324
-msgid "Show warning on _empty speed list"
-msgstr ""
-
-#: ../xfburn/xfburn-preferences-dialog.c:333
+#: xfburn/xfburn-preferences-dialog.c:280
 msgid "FIFO buffer size (in kb)"
 msgstr ""
 
-#: ../xfburn/xfburn-preferences-dialog.c:471
+#: xfburn/xfburn-preferences-dialog.c:299 xfburn/xfburn-disc-info-dialog.c:602
+msgid "_Close"
+msgstr ""
+
+#: xfburn/xfburn-preferences-dialog.c:431
 msgid "Changing this setting only takes full effect after a program restart."
 msgstr ""
 
-#: ../xfburn/xfburn-progress-dialog.c:198
+#. label
+#: xfburn/xfburn-progress-dialog.c:165 xfburn/xfburn-progress-dialog.c:169
+#: xfburn/xfburn-progress-dialog.c:585
 msgid "Initializing..."
 msgstr "تیاری..."
 
-#: ../xfburn/xfburn-progress-dialog.c:213
+#: xfburn/xfburn-progress-dialog.c:184
 msgid "Estimated writing speed:"
 msgstr "اندازاً لکھنے کی رفتار:"
 
-#: ../xfburn/xfburn-progress-dialog.c:227
+#: xfburn/xfburn-progress-dialog.c:187 xfburn/xfburn-progress-dialog.c:203
+#: xfburn/xfburn-progress-dialog.c:212 xfburn/xfburn-progress-dialog.c:308
+#: xfburn/xfburn-progress-dialog.c:508 xfburn/xfburn-progress-dialog.c:532
+#: xfburn/xfburn-progress-dialog.c:556
+msgid "unknown"
+msgstr ""
+
+#: xfburn/xfburn-progress-dialog.c:198
 msgid "FIFO buffer:"
 msgstr "فیفو بفر:"
 
-#: ../xfburn/xfburn-progress-dialog.c:237
+#: xfburn/xfburn-progress-dialog.c:207
 msgid "Device buffer:"
 msgstr "ڈیوائس بفر:"
 
-#: ../xfburn/xfburn-progress-dialog.c:374
+#. action buttons
+#: xfburn/xfburn-progress-dialog.c:217
+msgid "Save _Log..."
+msgstr "لاگ محفوظ کریں (_L)..."
+
+#: xfburn/xfburn-progress-dialog.c:218
+msgid "Save diagnostic flight recorder log to a file for bug reporting"
+msgstr "بگ رپورٹنگ کے لیے تشخیصی فلائٹ ریکارڈر لاگ کو فائل میں محفوظ کریں"
+
+#: xfburn/xfburn-progress-dialog.c:223
+msgid "_Stop"
+msgstr ""
+
+#: xfburn/xfburn-progress-dialog.c:230
+msgid "Close"
+msgstr ""
+
+#: xfburn/xfburn-progress-dialog.c:349
+msgid "Save Diagnostic Log"
+msgstr "تشخیصی لاگ محفوظ کریں"
+
+#: xfburn/xfburn-progress-dialog.c:353 xfburn/xfburn-utils.c:132
+msgid "_Save"
+msgstr ""
+
+#: xfburn/xfburn-progress-dialog.c:375
+#, c-format
+msgid "Failed to save diagnostic log to '%s': %s"
+msgstr "تشخیصی لاگ '%s' میں محفوظ کرنے میں ناکام: %s"
+
+#: xfburn/xfburn-progress-dialog.c:396
 msgid "Are you sure you want to abort?"
 msgstr ""
 
-#: ../xfburn/xfburn-progress-dialog.c:502
+#: xfburn/xfburn-progress-dialog.c:534
 #, c-format
 msgid "Min. fill was %2d%%"
 msgstr ""
 
-#: ../xfburn/xfburn-progress-dialog.c:561
+#: xfburn/xfburn-progress-dialog.c:603
 msgid "Aborted"
 msgstr ""
 
-#: ../xfburn/xfburn-progress-dialog.c:570
+#: xfburn/xfburn-progress-dialog.c:606
+msgid "Formatted."
+msgstr ""
+
+#: xfburn/xfburn-progress-dialog.c:615
 msgid "Failed"
 msgstr "ناکام"
 
-#: ../xfburn/xfburn-progress-dialog.c:573
+#: xfburn/xfburn-progress-dialog.c:618
 msgid "Cancelled"
 msgstr "ملتوی شدہ"
 
-#: ../xfburn/xfburn-progress-dialog.c:576
+#: xfburn/xfburn-progress-dialog.c:621
 msgid "Completed"
 msgstr "مکمل شدہ"
 
-#: ../xfburn/xfburn-progress-dialog.c:613
+#: xfburn/xfburn-progress-dialog.c:659
 msgid "Aborting..."
 msgstr ""
 
-#: ../xfburn/xfburn-utils.c:129
+#: xfburn/xfburn-progress-dialog.c:715
+#, c-format
+msgid ""
+"Diagnostic log saved to:\n"
+"%s"
+msgstr ""
+"تشخیصی لاگ یہاں محفوظ کیا گیا:\n"
+"%s"
+
+#: xfburn/xfburn-utils.c:131
 msgid "Select command"
 msgstr "کمانڈ منتخب کریں"
 
-#: ../xfburn/xfburn-welcome-tab.c:129
-msgid "Welcome to xfburn!"
+#: xfburn/xfburn-utils.c:171
+msgid "File(s) to add to composition"
 msgstr ""
 
+#: xfburn/xfburn-welcome-tab.c:99
+msgid "Welcome to Xfburn-X!"
+msgstr "Xfburn-X میں خوش آمدید!"
+
 #. buttons
-#: ../xfburn/xfburn-welcome-tab.c:140
+#: xfburn/xfburn-welcome-tab.c:119
 msgid "<big>Burn _Image</big>"
 msgstr ""
 
-#: ../xfburn/xfburn-welcome-tab.c:140
-msgid "Burn a prepared compilation, i.e. an .ISO file"
+#: xfburn/xfburn-welcome-tab.c:119
+msgid "Burn a prepared composition, i.e. an .ISO file"
 msgstr ""
 
-#: ../xfburn/xfburn-welcome-tab.c:145
+#: xfburn/xfburn-welcome-tab.c:124
 msgid "<big>New _Data Composition</big>"
 msgstr ""
 
-#: ../xfburn/xfburn-welcome-tab.c:145
+#: xfburn/xfburn-welcome-tab.c:124
 msgid "Create a new data disc with the files of your choosing"
 msgstr ""
 
-#: ../xfburn/xfburn-welcome-tab.c:150
+#: xfburn/xfburn-welcome-tab.c:129
 msgid "<big>_Blank Disc</big>"
 msgstr ""
 
-#: ../xfburn/xfburn-welcome-tab.c:150
+#: xfburn/xfburn-welcome-tab.c:129
 msgid "Prepare the rewriteable disc for a new burn"
 msgstr ""
 
-#: ../xfburn/xfburn-welcome-tab.c:155
+#: xfburn/xfburn-welcome-tab.c:134
 msgid "<big>_Audio CD</big>"
 msgstr ""
 
-#: ../xfburn/xfburn-welcome-tab.c:155
+#: xfburn/xfburn-welcome-tab.c:134
 msgid "Audio CD playable in regular stereos"
 msgstr ""
 
-#: ../xfburn/xfburn-audio-composition.c:212
+#. Note to translators: you can probably keep this as gstreamer,
+#. * unless you have a good reason to call it by another name that
+#. * the user would understand better
+#: xfburn/xfburn-audio-composition.c:291 xfburn/xfburn-transcoder-gst.c:584
+msgid "gstreamer"
+msgstr ""
+
+#: xfburn/xfburn-audio-composition.c:291
 msgid "What files can get burned to an audio CD?"
 msgstr ""
 
-#: ../xfburn/xfburn-audio-composition.c:216
-msgid "Rename Artist"
-msgstr ""
-
-#: ../xfburn/xfburn-audio-composition.c:216
-msgid "Rename the artist of the selected file"
-msgstr ""
-
-#: ../xfburn/xfburn-audio-composition.c:218
-msgid "Rename Title"
-msgstr ""
-
-#: ../xfburn/xfburn-audio-composition.c:218
-msgid "Rename the title of the selected file"
-msgstr ""
-
-#: ../xfburn/xfburn-audio-composition.c:402
+#: xfburn/xfburn-audio-composition.c:320
 msgid "Pos"
 msgstr ""
 
-#: ../xfburn/xfburn-audio-composition.c:404
+#: xfburn/xfburn-audio-composition.c:322
 msgid "Length"
 msgstr ""
 
-#: ../xfburn/xfburn-audio-composition.c:410
-msgid "Artist"
-msgstr ""
-
-#: ../xfburn/xfburn-audio-composition.c:423
-msgid "Title"
-msgstr ""
-
-#: ../xfburn/xfburn-audio-composition.c:434
+#: xfburn/xfburn-audio-composition.c:324
 msgid "Filename"
 msgstr ""
 
-#: ../xfburn/xfburn-audio-composition.c:581
+#: xfburn/xfburn-audio-composition.c:448
 msgid "Cannot burn audio onto a DVD."
 msgstr ""
 
-#: ../xfburn/xfburn-audio-composition.c:1260
+#: xfburn/xfburn-audio-composition.c:942
 msgid "You can only have a maximum of 99 tracks."
 msgstr ""
 
-#: ../xfburn/xfburn-burn-audio-cd-composition-dialog.c:311
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:253
 msgid "A problem with the burn backend occurred."
 msgstr ""
 
-#: ../xfburn/xfburn-disc-usage.c:163
+#: xfburn/xfburn-disc-usage.c:113
 msgid "Proceed to Burn"
 msgstr ""
 
-#: ../xfburn/xfburn-disc-usage.c:203
+#: xfburn/xfburn-disc-usage.c:169
 msgid "You are trying to burn more onto the disc than it can hold."
 msgstr ""
 
-#: ../xfburn/xfburn-transcoder-basic.c:166
+#. globals
+#: xfburn/xfburn-transcoder-basic.c:66 xfburn/xfburn-transcoder-gst.c:148
+msgid "An error occurred while setting the burning backend up"
+msgstr ""
+
+#: xfburn/xfburn-transcoder-basic.c:120
 msgid "basic"
 msgstr ""
 
-#: ../xfburn/xfburn-transcoder-basic.c:172
+#: xfburn/xfburn-transcoder-basic.c:126
 msgid ""
 "The basic transcoder is built in,\n"
 "and does not require any library.\n"
@@ -1199,32 +1321,36 @@ msgid ""
 "gstreamer support."
 msgstr ""
 
-#: ../xfburn/xfburn-transcoder-basic.c:196
+#: xfburn/xfburn-transcoder-basic.c:150
 #, c-format
 msgid "File %s does not have a .wav extension"
 msgstr ""
 
-#: ../xfburn/xfburn-transcoder-basic.c:201
+#: xfburn/xfburn-transcoder-basic.c:155
 #, c-format
 msgid "File %s does not contain uncompressed PCM wave audio"
 msgstr ""
 
-#: ../xfburn/xfburn-transcoder-basic.c:207
+#: xfburn/xfburn-transcoder-basic.c:161
 #, c-format
 msgid "Could not stat %s: %s"
 msgstr ""
 
-#: ../xfburn/xfburn-transcoder-basic.c:238
+#: xfburn/xfburn-transcoder-basic.c:193
 #, c-format
 msgid "Could not open %s."
 msgstr ""
 
-#: ../xfburn/xfburn-transcoder-basic.c:319
+#: xfburn/xfburn-transcoder-basic.c:272
 #, c-format
 msgid "Could not open %s: %s"
 msgstr ""
 
-#: ../xfburn/xfburn-transcoder-gst.c:631
+#: xfburn/xfburn-transcoder-gst.c:147
+msgid "An error occurred setting gstreamer up for transcoding"
+msgstr ""
+
+#: xfburn/xfburn-transcoder-gst.c:149
 #, c-format
 msgid ""
 "%s is missing.\n"
@@ -1234,14 +1360,11 @@ msgid ""
 "for the necessary plugins.\n"
 msgstr ""
 
-#. Note to translators: you can probably keep this as gstreamer,
-#. * unless you have a good reason to call it by another name that
-#. * the user would understand better
-#: ../xfburn/xfburn-transcoder-gst.c:720
-msgid "gstreamer"
+#: xfburn/xfburn-transcoder-gst.c:547
+msgid "File content has a decoder but is not audio."
 msgstr ""
 
-#: ../xfburn/xfburn-transcoder-gst.c:726
+#: xfburn/xfburn-transcoder-gst.c:590
 msgid ""
 "The gstreamer transcoder uses the gstreamer\n"
 "library for creating audio compositions.\n"
@@ -1253,109 +1376,766 @@ msgid ""
 "gstreamer plugin packages installed."
 msgstr ""
 
-#: ../xfburn/xfburn-transcoder-gst.c:791
-#, c-format
-msgid "Gstreamer did not like this file (detection timed out)"
+#: xfburn/xfburn-transcoder-gst.c:630
+msgid "No information available on which plugin is required."
 msgstr ""
 
-#: ../xfburn/xfburn-transcoder-gst.c:800
-#, c-format
-msgid ""
-"%s\n"
-"\n"
-"is not an audio file:\n"
-"\n"
-"%s"
+#: xfburn/xfburn-transcoder-gst.c:632
+msgid "Required plugins: "
 msgstr ""
 
-#: ../xfburn/xfburn-transcoder-gst.c:915
+#: xfburn/xfburn-transcoder-gst.c:667 xfburn/xfburn-transcoder-gst.c:692
+#, c-format
+msgid "An error occurred while identifying '%s' with gstreamer"
+msgstr ""
+
+#: xfburn/xfburn-transcoder-gst.c:680
+msgid "A plugin"
+msgstr ""
+
+#: xfburn/xfburn-transcoder-gst.c:809
 #, c-format
 msgid "Gstreamer did not want to start transcoding (timed out)"
 msgstr ""
 
-#: ../xfburn/xfburn-transcoder-gst.c:950
+#: xfburn/xfburn-transcoder-gst.c:844
 #, c-format
 msgid "Failed to change songs while transcoding"
 msgstr ""
 
-#: ../xfburn/xfburn-transcoder.c:124 ../xfburn/xfburn-transcoder.c:151
-#: ../xfburn/xfburn-transcoder.c:163
+#: xfburn/xfburn-transcoder.c:55 xfburn/xfburn-transcoder.c:65
+msgid "none"
+msgstr ""
+
+#: xfburn/xfburn-transcoder.c:76 xfburn/xfburn-transcoder.c:103
+#: xfburn/xfburn-transcoder.c:115
 #, c-format
 msgid "not implemented"
 msgstr ""
 
-#: ../xfburn/xfburn-device.c:242 ../xfburn/xfburn-device.c:243
+#: xfburn/xfburn-device.c:265 xfburn/xfburn-device.c:266
 msgid "Display name"
 msgstr ""
 
-#: ../xfburn/xfburn-device.c:245 ../xfburn/xfburn-device.c:246
+#: xfburn/xfburn-device.c:268 xfburn/xfburn-device.c:269
 msgid "Device address"
 msgstr ""
 
-#: ../xfburn/xfburn-device.c:248 ../xfburn/xfburn-device.c:249
+#: xfburn/xfburn-device.c:271
+msgid "Device revision"
+msgstr ""
+
+#: xfburn/xfburn-device.c:272
+msgid "Device Revision"
+msgstr ""
+
+#: xfburn/xfburn-device.c:274 xfburn/xfburn-device.c:275
 msgid "Burn speeds supported by the device"
 msgstr ""
 
-#: ../xfburn/xfburn-device.c:251 ../xfburn/xfburn-device.c:252
+#: xfburn/xfburn-device.c:277 xfburn/xfburn-device.c:278
 msgid "Disc status"
 msgstr ""
 
-#: ../xfburn/xfburn-device.c:254 ../xfburn/xfburn-device.c:255
+#: xfburn/xfburn-device.c:280 xfburn/xfburn-device.c:281
 msgid "Profile no. as reported by libburn"
 msgstr ""
 
-#: ../xfburn/xfburn-device.c:257 ../xfburn/xfburn-device.c:258
+#: xfburn/xfburn-device.c:283 xfburn/xfburn-device.c:284
 msgid "Profile name as reported by libburn"
 msgstr ""
 
-#: ../xfburn/xfburn-device.c:260 ../xfburn/xfburn-device.c:261
+#: xfburn/xfburn-device.c:286 xfburn/xfburn-device.c:287
 msgid "Is the disc erasable"
 msgstr ""
 
-#: ../xfburn/xfburn-device.c:263 ../xfburn/xfburn-device.c:264
+#: xfburn/xfburn-device.c:289 xfburn/xfburn-device.c:290
 msgid "Can burn CDR"
 msgstr ""
 
-#: ../xfburn/xfburn-device.c:266 ../xfburn/xfburn-device.c:267
+#: xfburn/xfburn-device.c:292 xfburn/xfburn-device.c:293
 msgid "Can burn CDRW"
 msgstr ""
 
-#: ../xfburn/xfburn-device.c:269 ../xfburn/xfburn-device.c:270
+#: xfburn/xfburn-device.c:295 xfburn/xfburn-device.c:296
 msgid "Can burn DVDR"
 msgstr ""
 
-#: ../xfburn/xfburn-device.c:272 ../xfburn/xfburn-device.c:273
+#: xfburn/xfburn-device.c:298 xfburn/xfburn-device.c:299
 msgid "Can burn DVDPLUSR"
 msgstr ""
 
-#: ../xfburn/xfburn-device.c:275 ../xfburn/xfburn-device.c:276
+#: xfburn/xfburn-device.c:301 xfburn/xfburn-device.c:302
 msgid "Can burn DVDRAM"
 msgstr ""
 
-#: ../xfburn/xfburn-device.c:278 ../xfburn/xfburn-device.c:279
+#: xfburn/xfburn-device.c:304 xfburn/xfburn-device.c:305
+msgid "Can burn Blu-ray"
+msgstr ""
+
+#: xfburn/xfburn-device.c:307 xfburn/xfburn-device.c:308
 msgid "libburn TAO block types"
 msgstr ""
 
-#: ../xfburn/xfburn-device.c:281 ../xfburn/xfburn-device.c:282
+#: xfburn/xfburn-device.c:310 xfburn/xfburn-device.c:311
 msgid "libburn SAO block types"
 msgstr ""
 
-#: ../xfburn/xfburn-device.c:284 ../xfburn/xfburn-device.c:285
+#: xfburn/xfburn-device.c:313 xfburn/xfburn-device.c:314
 msgid "libburn RAW block types"
 msgstr ""
 
-#: ../xfburn/xfburn-device.c:287 ../xfburn/xfburn-device.c:288
+#: xfburn/xfburn-device.c:316 xfburn/xfburn-device.c:317
 msgid "libburn PACKET block types"
 msgstr ""
 
-#: ../desktop-integration/thunar-sendto-xfburn.desktop.in.h:1
-msgid "Data Composition"
+#: xfburn/xfburn-disc-info.c:313
+msgid "Full format"
+msgstr "مکمل فارمیٹ"
+
+#: xfburn/xfburn-disc-info.c:315
+msgid "CD-RW/DVD-RW full"
+msgstr "CD-RW/DVD-RW مکمل"
+
+#: xfburn/xfburn-disc-info.c:317
+msgid "CD-RW/DVD-RW grow"
+msgstr "CD-RW/DVD-RW توسیع"
+
+#: xfburn/xfburn-disc-info.c:319
+msgid "DVD-RW quick grow"
+msgstr "DVD-RW فوری توسیع"
+
+#: xfburn/xfburn-disc-info.c:321
+msgid "DVD-RW quick"
+msgstr "DVD-RW فوری"
+
+#: xfburn/xfburn-disc-info.c:323
+msgid "DVD+RW background"
+msgstr "DVD+RW پس منظر"
+
+#: xfburn/xfburn-disc-info.c:325
+msgid "BD-RE with spare areas"
+msgstr "BD-RE اضافی حصوں کے ساتھ"
+
+#: xfburn/xfburn-disc-info.c:327
+msgid "BD-RE without spare areas"
+msgstr "BD-RE اضافی حصوں کے بغیر"
+
+#: xfburn/xfburn-disc-info.c:329
+msgid "BD-R with spare areas"
+msgstr "BD-R اضافی حصوں کے ساتھ"
+
+#: xfburn/xfburn-disc-info.c:349
+msgid "None"
+msgstr "کوئی نہیں"
+
+#: xfburn/xfburn-disc-info.c:357
+msgid "Busy"
+msgstr "مصروف"
+
+#: xfburn/xfburn-disc-info.c:360 xfburn/xfburn-disc-info.c:378
+msgid "Unavailable"
+msgstr "دستیاب نہیں"
+
+#: xfburn/xfburn-disc-info.c:365
+msgid "Blank / Overwritable"
+msgstr "خالی / دوبارہ قابلِ تحریر"
+
+#: xfburn/xfburn-disc-info.c:365 xfburn/xfburn-disc-info.c:1540
+msgid "Blank"
+msgstr "خالی"
+
+#: xfburn/xfburn-disc-info.c:367
+msgid "Empty"
+msgstr "بغیر ڈسک"
+
+#: xfburn/xfburn-disc-info.c:369
+msgid "Appendable"
+msgstr "مزید قابلِ اضافہ"
+
+#: xfburn/xfburn-disc-info.c:371
+msgid "Full / Closed"
+msgstr "پُر / بند"
+
+#: xfburn/xfburn-disc-info.c:373
+msgid "Unsuitable"
+msgstr "ناموزوں"
+
+#: xfburn/xfburn-disc-info.c:375
+msgid "Not Ready"
+msgstr "تیار نہیں"
+
+#: xfburn/xfburn-disc-info.c:386 xfburn/xfburn-disc-info.c:1044
+msgid "Drive is busy (burn or blank operation in progress)"
+msgstr "ڈرائیو مصروف ہے (برن یا خالی کرنے کا عمل جاری ہے)"
+
+#: xfburn/xfburn-disc-info.c:398
+msgid "Blank / Overwritable (ready to write)"
+msgstr "خالی / دوبارہ قابلِ تحریر (لکھنے کے لیے تیار)"
+
+#: xfburn/xfburn-disc-info.c:400
+msgid "Blank (ready to write)"
+msgstr "خالی (لکھنے کے لیے تیار)"
+
+#: xfburn/xfburn-disc-info.c:402
+msgid "Empty (no disc in drive)"
+msgstr "خالی (ڈرائیو میں کوئی ڈسک نہیں)"
+
+#: xfburn/xfburn-disc-info.c:404
+msgid "Appendable (incomplete / multisession)"
+msgstr "مزید قابلِ اضافہ (نامکمل / ملٹی سیشن)"
+
+#: xfburn/xfburn-disc-info.c:406
+msgid "Full / Closed (read-only)"
+msgstr "پُر / بند (صرف پڑھنے کے لیے)"
+
+#: xfburn/xfburn-disc-info.c:408
+msgid "Unsuitable media"
+msgstr "ناموزوں میڈیا"
+
+#: xfburn/xfburn-disc-info.c:410
+msgid "Drive not ready"
+msgstr "ڈرائیو تیار نہیں"
+
+#: xfburn/xfburn-disc-info.c:413 xfburn/xfburn-disc-info.c:462
+#: xfburn/xfburn-disc-info.c:1377
+msgid "Unknown"
+msgstr "نامعلوم"
+
+#: xfburn/xfburn-disc-info.c:1057
+msgid "No disc in drive"
+msgstr "ڈرائیو میں کوئی ڈسک نہیں"
+
+#: xfburn/xfburn-disc-info.c:1117
+msgid "Supported Media"
+msgstr "معاونت یافتہ میڈیا"
+
+#: xfburn/xfburn-disc-info.c:1132 xfburn/xfburn-disc-info-dialog.c:263
+msgid "No optical burner detected.\n"
+msgstr ""
+"کوئی آپٹیکل برنر نہیں ملا۔\n"
+
+#. Section 1: Drive
+#: xfburn/xfburn-disc-info.c:1138
+msgid "Drive"
+msgstr "ڈرائیو"
+
+#: xfburn/xfburn-disc-info.c:1140
+msgid "Device"
+msgstr "ڈیوائس"
+
+#: xfburn/xfburn-disc-info.c:1145 xfburn/xfburn-disc-info.c:1148
+msgid "Model"
+msgstr "ماڈل"
+
+#: xfburn/xfburn-disc-info.c:1152
+msgid "Serial Number"
+msgstr "سیریل نمبر"
+
+#: xfburn/xfburn-disc-info.c:1156
+msgid "Buffer Size"
+msgstr "بفر کا سائز"
+
+#. Section 2: Disc & Media Identity
+#: xfburn/xfburn-disc-info.c:1162
+msgid "Disc & Media Identity"
+msgstr "ڈسک اور میڈیا کی شناخت"
+
+#: xfburn/xfburn-disc-info.c:1163
+msgid "Status"
+msgstr "حالت"
+
+#: xfburn/xfburn-disc-info.c:1167
+msgid "Details"
+msgstr "تفصیلات"
+
+#: xfburn/xfburn-disc-info.c:1171
+msgid "Close any files open on the disc or unmount it, then click Refresh."
+msgstr "ڈسک پر کھلی کوئی بھی فائل بند کریں یا اسے ان ماؤنٹ کریں، پھر تازہ کریں پر کلک کریں۔"
+
+#. Section 4: Speeds & Write Modes
+#: xfburn/xfburn-disc-info.c:1179 xfburn/xfburn-disc-info.c:1423
+msgid "Speeds & Write Modes"
+msgstr "رفتار اور لکھنے کے طریقے"
+
+#: xfburn/xfburn-disc-info.c:1180 xfburn/xfburn-disc-info.c:1445
+msgid "Max Read Speed"
+msgstr "پڑھنے کی زیادہ سے زیادہ رفتار"
+
+#: xfburn/xfburn-disc-info.c:1190
+msgid "Media Type"
+msgstr "میڈیا کی قسم"
+
+#: xfburn/xfburn-disc-info.c:1195 xfburn/xfburn-disc-info.c:1197
+#: xfburn/xfburn-disc-info.c:1199 xfburn/xfburn-disc-info.c:1201
+msgid "Rewritable"
+msgstr "دوبارہ قابلِ تحریر"
+
+#: xfburn/xfburn-disc-info.c:1195
+msgid "No (read-only)"
+msgstr "نہیں (صرف پڑھنے کے لیے)"
+
+#: xfburn/xfburn-disc-info.c:1197
+msgid "Yes (overwritable)"
+msgstr "ہاں (دوبارہ تحریر کے قابل)"
+
+#: xfburn/xfburn-disc-info.c:1199
+msgid "Yes (erasable)"
+msgstr "ہاں (مٹانے کے قابل)"
+
+#: xfburn/xfburn-disc-info.c:1201
+msgid "No (write-once)"
+msgstr "نہیں (صرف ایک بار تحریر)"
+
+#: xfburn/xfburn-disc-info.c:1205
+msgid "Manufacturer"
+msgstr "تیار کنندہ"
+
+#: xfburn/xfburn-disc-info.c:1215
+msgid "Media ID (ASCII)"
+msgstr "میڈیا ID (ASCII)"
+
+#: xfburn/xfburn-disc-info.c:1219
+msgid "Media ID (Hex)"
+msgstr "میڈیا ID (Hex)"
+
+#: xfburn/xfburn-disc-info.c:1225
+msgid "Product ID"
+msgstr "پروڈکٹ ID"
+
+#: xfburn/xfburn-disc-info.c:1239
+msgid "Media Code 1"
+msgstr "میڈیا کوڈ 1"
+
+#: xfburn/xfburn-disc-info.c:1243
+msgid "Media Code 2"
+msgstr "میڈیا کوڈ 2"
+
+#: xfburn/xfburn-disc-info.c:1249 xfburn/xfburn-disc-info.c:1251
+msgid "Book Type"
+msgstr "بُک ٹائپ"
+
+#: xfburn/xfburn-disc-info.c:1257
+msgid "multi-layer"
+msgstr "ملٹی لیئر"
+
+#: xfburn/xfburn-disc-info.c:1257
+msgid "single-layer"
+msgstr "سنگل لیئر"
+
+#: xfburn/xfburn-disc-info.c:1258
+msgid "part version"
+msgstr "پارٹ ورژن"
+
+#: xfburn/xfburn-disc-info.c:1260
+msgid "Physical Format"
+msgstr "طبیعی فارمیٹ"
+
+#: xfburn/xfburn-disc-info.c:1265
+msgid "blocks"
+msgstr "بلاکس"
+
+#: xfburn/xfburn-disc-info.c:1266
+msgid "Physical Capacity"
+msgstr "طبیعی گنجائش"
+
+#: xfburn/xfburn-disc-info.c:1282
+msgid "ATIP Lead-In"
+msgstr "ATIP لیڈ اِن"
+
+#: xfburn/xfburn-disc-info.c:1283
+msgid "ATIP Lead-Out"
+msgstr "ATIP لیڈ آؤٹ"
+
+#: xfburn/xfburn-disc-info.c:1290
+msgid "CD Disc Type"
+msgstr "CD ڈسک کی قسم"
+
+#: xfburn/xfburn-disc-info.c:1294
+msgid "CD Disc ID"
+msgstr "CD ڈسک ID"
+
+#: xfburn/xfburn-disc-info.c:1298
+msgid "Bar Code"
+msgstr "بار کوڈ"
+
+#: xfburn/xfburn-disc-info.c:1308
+#, c-format
+msgid "%'d / %'d blocks free (%.1f%%)"
+msgstr "%'d / %'d بلاکس خالی (%.1f%%)"
+
+#: xfburn/xfburn-disc-info.c:1312
+msgid "BD Spare Area"
+msgstr "BD اضافی جگہ"
+
+#: xfburn/xfburn-disc-info.c:1317
+msgid "BD-R POW"
+msgstr "BD-R POW"
+
+#: xfburn/xfburn-disc-info.c:1317
+msgid "Yes (Pseudo Overwrite formatted; sequential multisession disabled)"
+msgstr "ہاں (Pseudo Overwrite فارمیٹ شدہ؛ ترتیبی ملٹی سیشن غیر فعال)"
+
+#. Section 3: Capacity & Format
+#: xfburn/xfburn-disc-info.c:1321
+msgid "Capacity & Format"
+msgstr "گنجائش اور فارمیٹ"
+
+#: xfburn/xfburn-disc-info.c:1331 xfburn/xfburn-disc-info.c:1335
+#: xfburn/xfburn-disc-info.c:1352 xfburn/xfburn-disc-info.c:1356
+msgid "sectors"
+msgstr "سیکٹرز"
+
+#: xfburn/xfburn-disc-info.c:1337 xfburn/xfburn-disc-info.c:1341
+msgid "Available Space"
+msgstr "دستیاب جگہ"
+
+#: xfburn/xfburn-disc-info.c:1341
+msgid "0 B (none)"
+msgstr "0 B (کوئی نہیں)"
+
+#: xfburn/xfburn-disc-info.c:1358
+msgid "Recorded Size"
+msgstr "ریکارڈ شدہ سائز"
+
+#: xfburn/xfburn-disc-info.c:1370
+msgid "Unformatted"
+msgstr "غیر فارمیٹ شدہ"
+
+#: xfburn/xfburn-disc-info.c:1373
+msgid "Formatted"
+msgstr "فارمیٹ شدہ"
+
+#: xfburn/xfburn-disc-info.c:1386
+msgid "Format Status"
+msgstr "فارمیٹ کی حالت"
+
+#: xfburn/xfburn-disc-info.c:1403
+msgid "Available Formats"
+msgstr "دستیاب فارمیٹس"
+
+#: xfburn/xfburn-disc-info.c:1411
+msgid "track start"
+msgstr "ٹریک کا آغاز"
+
+#: xfburn/xfburn-disc-info.c:1412
+msgid "Next Writable"
+msgstr "اگلا قابلِ تحریر"
+
+#: xfburn/xfburn-disc-info.c:1417 xfburn/xfburn-disc-info.c:1419
+msgid "Track Health"
+msgstr "ٹریک کی صحت"
+
+#: xfburn/xfburn-disc-info.c:1417
+msgid "Warning: last track marked damaged (theoretically writable)"
+msgstr "انتباہ: آخری ٹریک خراب قرار دیا گیا ہے (نظریاتی طور پر قابلِ تحریر)"
+
+#: xfburn/xfburn-disc-info.c:1419
+msgid "Warning: last track marked damaged and not writable"
+msgstr "انتباہ: آخری ٹریک خراب قرار دیا گیا ہے اور قابلِ تحریر نہیں"
+
+#: xfburn/xfburn-disc-info.c:1437 xfburn/xfburn-disc-info.c:1440
+msgid "Write Speeds"
+msgstr "لکھنے کی رفتاریں"
+
+#: xfburn/xfburn-disc-info.c:1440
+msgid "None reported"
+msgstr "کوئی رپورٹ نہیں"
+
+#: xfburn/xfburn-disc-info.c:1470
+msgid "advised"
+msgstr "تجویز کردہ"
+
+#: xfburn/xfburn-disc-info.c:1472
+msgid "Write Modes"
+msgstr "لکھنے کے طریقے"
+
+#: xfburn/xfburn-disc-info.c:1477
+msgid "Multi-session"
+msgstr "ملٹی سیشن"
+
+#: xfburn/xfburn-disc-info.c:1483
+msgid "Multi-track"
+msgstr "ملٹی ٹریک"
+
+#: xfburn/xfburn-disc-info.c:1489
+msgid "Simulation (dummy write)"
+msgstr "سیمولیشن (ڈمی تحریر)"
+
+#: xfburn/xfburn-disc-info.c:1492
+msgid "Capabilities"
+msgstr "صلاحیتیں"
+
+#: xfburn/xfburn-disc-info.c:1502
+msgid "Sessions & Tracks"
+msgstr "سیشنز اور ٹریکس"
+
+#: xfburn/xfburn-disc-info.c:1504
+#, c-format
+msgid "%d complete, %d incomplete"
+msgstr "%d مکمل، %d نامکمل"
+
+#: xfburn/xfburn-disc-info.c:1508
+#, c-format
+msgid "%d complete"
+msgstr "%d مکمل"
+
+#: xfburn/xfburn-disc-info.c:1510
+msgid "Sessions"
+msgstr "سیشنز"
+
+#: xfburn/xfburn-disc-info.c:1518
+msgid "Sess"
+msgstr "سیشن"
+
+#: xfburn/xfburn-disc-info.c:1518
+msgid "Track"
+msgstr "ٹریک"
+
+#: xfburn/xfburn-disc-info.c:1518
+msgid "Start LBA"
+msgstr "ابتدائی LBA"
+
+#: xfburn/xfburn-disc-info.c:1519
+msgid "Sectors"
+msgstr "سیکٹرز"
+
+#: xfburn/xfburn-disc-info.c:1519
+msgid "Flags"
+msgstr "فلیگز"
+
+#: xfburn/xfburn-disc-info.c:1524
+msgid "Data"
+msgstr "ڈیٹا"
+
+#: xfburn/xfburn-disc-info.c:1524
+msgid "Audio"
+msgstr "آڈیو"
+
+#: xfburn/xfburn-disc-info.c:1546
+msgid "Damaged"
+msgstr "خراب"
+
+#: xfburn/xfburn-disc-info.c:1552
+msgid "Packet"
+msgstr "پیکٹ"
+
+#: xfburn/xfburn-disc-info-dialog.c:182
+msgid "Reading disc information..."
+msgstr "ڈسک کی معلومات پڑھی جا رہی ہیں..."
+
+#: xfburn/xfburn-disc-info-dialog.c:345
+msgid "Unknown drive"
+msgstr "نامعلوم ڈرائیو"
+
+#: xfburn/xfburn-disc-info-dialog.c:428
+msgid "Copied to clipboard"
+msgstr "کلپ بورڈ پر کاپی ہو گیا"
+
+#: xfburn/xfburn-disc-info-dialog.c:509 xfburn-x.ui:53
+msgid "Disc Info"
+msgstr "ڈسک کی معلومات"
+
+#: xfburn/xfburn-disc-info-dialog.c:511
+msgid "Inspect inserted optical media and drive capabilities"
+msgstr "ڈالی گئی آپٹیکل میڈیا اور ڈرائیو کی صلاحیتوں کا معائنہ کریں"
+
+#: xfburn/xfburn-disc-info-dialog.c:529
+msgid "_Drive:"
+msgstr "ڈرائیو (_D):"
+
+#: xfburn/xfburn-disc-info-dialog.c:548
+msgid "Refresh disc information"
+msgstr "ڈسک کی معلومات تازہ کریں"
+
+#. Action buttons
+#: xfburn/xfburn-disc-info-dialog.c:596
+msgid "_Copy"
+msgstr "کاپی کریں (_C)"
+
+#: xfburn/xfburn-disc-info-dialog.c:597
+msgid "Copy full disc report to clipboard"
+msgstr "مکمل ڈسک رپورٹ کلپ بورڈ پر کاپی کریں"
+
+#: xfburn-x.ui:5
+msgid "_Files"
 msgstr ""
 
-#: ../xfburn.desktop.in.h:2
-msgid "CD and DVD burning application"
-msgstr "سی ڈی اور ڈی وی ڈی برننگ اطلاقیہ"
-
-#: ../xfburn.desktop.in.h:3
-msgid "Burn Image (xfburn)"
+#: xfburn-x.ui:8
+msgid "New _data composition"
 msgstr ""
+
+#: xfburn-x.ui:12
+msgid "New _audio composition"
+msgstr ""
+
+#: xfburn-x.ui:18
+msgid "_Close composition"
+msgstr ""
+
+#: xfburn-x.ui:24
+msgid "_Quit"
+msgstr "_برخاست"
+
+#: xfburn-x.ui:30
+msgid "_Edit"
+msgstr "_تدوین"
+
+#: xfburn-x.ui:33
+msgid "Prefere_nce"
+msgstr ""
+
+#: xfburn-x.ui:39
+msgid "_Action"
+msgstr ""
+
+#: xfburn-x.ui:59
+msgid "_View"
+msgstr "_منظر"
+
+#: xfburn-x.ui:68
+msgid "Show Toolbars"
+msgstr ""
+
+#: xfburn-x.ui:72
+msgid "Show Filebrowser"
+msgstr ""
+
+#: xfburn-x.ui:79
+msgid "_Help"
+msgstr "_ہدایات"
+
+#: xfburn-x.ui:87
+msgid "About"
+msgstr ""
+
+#: xfburn-x-popup-menus.ui:13
+msgid "Rename"
+msgstr "نام بدلیں"
+
+#: xfburn-x-popup-menus.ui:33
+msgid "Rename Artist"
+msgstr ""
+
+#: xfburn-x-popup-menus.ui:37
+msgid "Rename Title"
+msgstr ""
+
+#: desktop-integration/thunar-sendto-xfburn-x.desktop.in:4
+msgid "Data Composition (Xfburn-X)"
+msgstr "ڈیٹا کمپوزیشن (Xfburn-X)"
+
+#: xfburn-x.desktop.in:5
+msgid "Disk Burning"
+msgstr ""
+
+#: xfburn-x.desktop.in:6
+msgid "CD, DVD, and Blu-ray burning application with post-burn verification"
+msgstr "برن کے بعد تصدیق کے ساتھ CD، DVD، اور Blu-ray برننگ ایپلیکیشن"
+
+#: xfburn-x.desktop.in:13
+msgid "Burn;CD;DVD;BD;Blu-ray;ISO;Disc;Write;Verify;Audio;Video;"
+msgstr "برن;سی ڈی;ڈی وی ڈی;بلو رے;آئی ایس او;ڈسک;لکھیں;تصدیق;آڈیو;ویڈیو;Burn;CD;DVD;BD;Blu-ray;ISO;Disc;Write;Verify;Audio;Video;"
+
+#: xfburn-x.desktop.in:22
+msgid "Burn Image (Xfburn-X)"
+msgstr "امیج برن کریں (Xfburn-X)"
+
+#: io.github.asdfjkl.xfburn-x.metainfo.xml.in:10
+msgid ""
+"CD, DVD, and Blu-ray burning tool with verification and diagnostic logging"
+msgstr "تصدیق اور تشخیصی لاگنگ کے ساتھ CD، DVD، اور Blu-ray برننگ ٹول"
+
+#: io.github.asdfjkl.xfburn-x.metainfo.xml.in:13
+msgid "Dominik Klein"
+msgstr "Dominik Klein"
+
+#: io.github.asdfjkl.xfburn-x.metainfo.xml.in:17
+msgid ""
+"Xfburn-X is an enhanced fork of Xfburn based on the libburnia libraries, "
+"designed to install side-by-side with upstream Xfburn without conflicts. It "
+"can blank rewritable discs, burn and create ISO images, create audio CDs, "
+"and burn data compositions to CD, DVD, or Blu-ray (including M-DISC), with "
+"built-in post-burn per-sector hash verification and a user-mode diagnostic "
+"flight-recorder logger."
+msgstr "Xfburn-X، libburnia لائبریریوں پر مبنی Xfburn کا ایک بہتر فورک ہے، جسے بغیر کسی تصادم کے مرکزی Xfburn کے ساتھ نصب کرنے کے لیے ڈیزائن کیا گیا ہے۔ یہ دوبارہ قابلِ تحریر ڈسکس کو خالی کر سکتا ہے، ISO امیجز بنا اور برن کر سکتا ہے، آڈیو CDs بنا سکتا ہے، اور CD، DVD، یا Blu-ray (بشمول M-DISC) پر ڈیٹا کمپوزیشنز برن کر سکتا ہے، جس میں بلٹ ان پوسٹ برن فی سیکٹر ہیش تصدیق اور صارف موڈ تشخیصی فلائٹ ریکارڈر لاگر شامل ہے۔"
+
+#: io.github.asdfjkl.xfburn-x.metainfo.xml.in:37
+msgid ""
+"Initial Xfburn-X release forked from Xfburn with post-burn verification, GDK/"
+"udev threading deadlock fixes, and user-mode diagnostic logging."
+msgstr "Xfburn سے فورک کی گئی Xfburn-X کی ابتدائی ریلیز، جس میں برن کے بعد تصدیق، GDK/udev تھریڈنگ ڈیڈ لاک کی اصلاحات، اور صارف موڈ تشخیصی لاگنگ شامل ہے۔"
+
+#, c-format
+#~ msgid "An error occured while writing ISO: %s"
+#~ msgstr "آئی ایس او لکھتے ہوئے غلطی سرزرد ہوئی ہے: %s"
+
+#~ msgid "ISO images"
+#~ msgstr "ISO امیج"
+
+#~ msgid ""
+#~ "Cannot append data to multisession disc in this write mode (use TAO "
+#~ "instead)"
+#~ msgstr ""
+#~ "لکھنے کے اس موڈ میں متعدد نشست ڈسک میں ڈیٹا شامل نہیں کیا جاسکتا (اس کے "
+#~ "بجائے TAO کا استعمال کریں)"
+
+#~ msgid "Rename the selected file"
+#~ msgstr "منتخب کردہ فائلوں کا نام بدلیں"
+
+#~ msgid "Xfburn"
+#~ msgstr "ایکس ایف برن"
+
+#~ msgid "_File"
+#~ msgstr "_فائل"
+
+#~ msgid "Close composition"
+#~ msgstr "کمپوزیشن بند کریں"
+
+#~ msgid "Quit Xfburn"
+#~ msgstr "ایکس ایف برن کو بند کریں"
+
+#~ msgid "Prefere_nces"
+#~ msgstr "تر_جیحات"
+
+#~ msgid "Show preferences dialog"
+#~ msgstr "ترجیحات کا ڈائیلاگ کھولیں"
+
+#~ msgid "_Actions"
+#~ msgstr "_حرکات"
+
+#~ msgid "_About"
+#~ msgstr "_بابت"
+
+#~ msgid "Display information about Xfburn"
+#~ msgstr "ایکس ایف برن کے بارے میں معلومات دیکھیں"
+
+#~ msgid "Copy Data CD"
+#~ msgstr "ڈیٹا سی ڈی کاپی کریں"
+
+#~ msgid "Burn DVD Image"
+#~ msgstr "ڈی وی ڈی امیج برن کریں"
+
+#~ msgid "Show file browser"
+#~ msgstr "فائل براؤزر دکھائیں"
+
+#~ msgid "Show/hide the file browser"
+#~ msgstr "فائل براؤزر ظاہر/پوشیدہ کریں"
+
+#~ msgid "Show toolbar"
+#~ msgstr "اوزار پٹی دکھائیں"
+
+#~ msgid "Show/hide the toolbar"
+#~ msgstr "اوزار پٹی ظاہر/پوشیدہ کریں"
+
+#~ msgid "Toolbar Editor"
+#~ msgstr "اوزار پٹی مدون کار"
+
+#~ msgid "Another cd burning GUI"
+#~ msgstr "دیگر سی ڈی برننگ مواجہ"
+
+#~ msgid "Tune how Xfburn behaves"
+#~ msgstr "ایکس ایف برن کا سلوک مرتب کریں"
+
+#~ msgid "CD and DVD burning application"
+#~ msgstr "سی ڈی اور ڈی وی ڈی برننگ اطلاقیہ"

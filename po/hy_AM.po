@@ -1,57 +1,58 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR Xfce
 # This file is distributed under the same license as the xfce-apps.xfburn package.
-# 
+#
 # Translators:
 # E-Hayq LLC <www.ehayq.am>, 2018
 # Hayk Andreasyan <hayk.andreasyan@realschool.am>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: Xfce Apps\n"
-"Report-Msgid-Bugs-To: https://gitlab.xfce.org/\n"
-"POT-Creation-Date: 2026-09-27 01:10+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-21 22:16+0100\n"
 "PO-Revision-Date: 2013-07-03 18:34+0000\n"
 "Last-Translator: Hayk Andreasyan <hayk.andreasyan@realschool.am>, 2019\n"
-"Language-Team: Armenian (Armenia) (http://app.transifex.com/xfce/xfce-apps/language/hy_AM/)\n"
+"Language-Team: Armenian (Armenia) (http://app.transifex.com/xfce/xfce-apps/"
+"language/hy_AM/)\n"
+"Language: hy_AM\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: hy_AM\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: xfburn/xfburn-global.h:24
+#: xfburn/xfburn-global.h:25
 msgid "Capacity:"
 msgstr "Տարողութիւն․"
 
-#: xfburn/xfburn-global.h:25
+#: xfburn/xfburn-global.h:26
 msgid "addr:"
 msgstr "հասցէ․"
 
-#: xfburn/xfburn-global.h:26
+#: xfburn/xfburn-global.h:27
 msgid "Time total:"
 msgstr "Լրիւ ժամը․"
 
-#: xfburn/xfburn-global.h:28
+#: xfburn/xfburn-global.h:29
 msgid "length"
 msgstr "երկարութիւն"
 
-#: xfburn/xfburn-global.h:29 xfburn/xfburn-copy-cd-progress-dialog.c:69
+#: xfburn/xfburn-global.h:30 xfburn/xfburn-copy-cd-progress-dialog.c:69
 msgid "Flushing cache..."
 msgstr "Շտեմի մաքրում..."
 
-#: xfburn/xfburn-global.h:30
+#: xfburn/xfburn-global.h:31
 msgid "Please insert a recordable disc and hit enter"
 msgstr "Ներդրէք գրառելի սկաւառակ եւ հաստատէք"
 
-#: xfburn/xfburn-global.h:31
+#: xfburn/xfburn-global.h:32
 msgid "Cannot determine disc status - hit enter to try again."
 msgstr "Անհնար է որոշել սկաւառակի վիճակը ֊ հաստատէք կրկին փորձելու համար"
 
-#: xfburn/xfburn-global.h:32
+#: xfburn/xfburn-global.h:33
 msgid "CD copying finished successfully."
 msgstr "CD֊ի պատճէնումն աւարտուած է:"
 
-#: xfburn/xfburn-global.h:39
+#: xfburn/xfburn-global.h:44
 msgid "Data composition"
 msgstr "Տուեալների համադրութիւն"
 
@@ -63,221 +64,234 @@ msgstr "Նիշերի յաւելում համադրութեան մէջ"
 msgid "Cancel"
 msgstr "Չեղարկել"
 
-#: xfburn/xfburn-blank-dialog.c:71
+#: xfburn/xfburn-blank-dialog.c:73
 msgid "Quick Blank"
 msgstr "Արագ մաքրում"
 
-#: xfburn/xfburn-blank-dialog.c:72
+#: xfburn/xfburn-blank-dialog.c:74
 msgid "Full Blank (slow)"
 msgstr "Ամբողջական մաքրում (դանդաղ)"
 
-#: xfburn/xfburn-blank-dialog.c:73
+#: xfburn/xfburn-blank-dialog.c:75
 msgid "Quick Format"
 msgstr "Արագ ձեւաչափում"
 
-#: xfburn/xfburn-blank-dialog.c:74
+#: xfburn/xfburn-blank-dialog.c:76
 msgid "Full Format"
 msgstr "Ամբողջական ձեւաչափում"
 
-#: xfburn/xfburn-blank-dialog.c:75
+#: xfburn/xfburn-blank-dialog.c:77
 msgid "Quick Deformat"
 msgstr "Արագ ապաձեւում"
 
-#: xfburn/xfburn-blank-dialog.c:76
+#: xfburn/xfburn-blank-dialog.c:78
 msgid "Full Deformat (slow)"
 msgstr "Ամբողջական ապաձեւում (դանդաղ)"
 
-#: xfburn/xfburn-blank-dialog.c:116
+#: xfburn/xfburn-blank-dialog.c:118
 msgid "Eject the disc"
 msgstr "Անջատել սկաւառակը"
 
-#: xfburn/xfburn-blank-dialog.c:117
+#: xfburn/xfburn-blank-dialog.c:119
 msgid "Default value for eject checkbox"
 msgstr "Լռելեայն արժէք ստուգավանդակի համար"
 
-#: xfburn/xfburn-blank-dialog.c:163
+#: xfburn/xfburn-blank-dialog.c:165
 msgid "Blank Disc"
 msgstr "Դատարկ սկաւառակ"
 
-#: xfburn/xfburn-blank-dialog.c:172
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:122
+#: xfburn/xfburn-blank-dialog.c:174
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:126
 #: xfburn/xfburn-burn-image-dialog.c:180 xfburn/xfburn-copy-cd-dialog.c:106
 #: xfburn/xfburn-copy-dvd-dialog.c:103
-#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:115
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:119
 msgid "Burning device"
 msgstr "Այրող սարք"
 
-#: xfburn/xfburn-blank-dialog.c:185 xfburn/xfburn-device-box.c:146
+#: xfburn/xfburn-blank-dialog.c:187 xfburn/xfburn-device-box.c:152
 msgid "Blank mode"
 msgstr "Մաքրման եղանակ"
 
-#: xfburn/xfburn-blank-dialog.c:193
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:154
+#: xfburn/xfburn-blank-dialog.c:195
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:158
 #: xfburn/xfburn-burn-image-dialog.c:188 xfburn/xfburn-copy-cd-dialog.c:114
 #: xfburn/xfburn-copy-dvd-dialog.c:111
-#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:123
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:127
 msgid "Options"
 msgstr "Ընտրանքներ"
 
-#: xfburn/xfburn-blank-dialog.c:197
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:158
+#: xfburn/xfburn-blank-dialog.c:199
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:162
 #: xfburn/xfburn-burn-image-dialog.c:192 xfburn/xfburn-copy-cd-dialog.c:118
 #: xfburn/xfburn-copy-dvd-dialog.c:115
-#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:127
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:131
 msgid "E_ject disk"
 msgstr "Ա_նջատել սկաւառակը"
 
 #. action buttons
-#: xfburn/xfburn-blank-dialog.c:203
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:206
-#: xfburn/xfburn-burn-image-dialog.c:217 xfburn/xfburn-copy-cd-dialog.c:164
-#: xfburn/xfburn-copy-dvd-dialog.c:161 xfburn/xfburn-utils.c:128
-#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:142
+#: xfburn/xfburn-blank-dialog.c:205
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:216
+#: xfburn/xfburn-burn-image-dialog.c:223 xfburn/xfburn-copy-cd-dialog.c:164
+#: xfburn/xfburn-copy-dvd-dialog.c:161 xfburn/xfburn-progress-dialog.c:352
+#: xfburn/xfburn-utils.c:131
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:152
 msgid "_Cancel"
 msgstr "_Չեղարկել"
 
-#: xfburn/xfburn-blank-dialog.c:207
+#: xfburn/xfburn-blank-dialog.c:209
 msgid "_Blank"
 msgstr "_Մաքրել"
 
-#. blanking can only be performed on blank discs, format and deformat are
-#. allowed to be blank ones
-#: xfburn/xfburn-blank-dialog.c:306
+#. blanking can only be performed on blank discs, format and deformat are allowed to be blank ones
+#: xfburn/xfburn-blank-dialog.c:308
 msgid "The inserted disc is already blank."
 msgstr "Ներդրուած սկաւառակն արդէն դատարկ է։"
 
 #. these ones we can blank
-#: xfburn/xfburn-blank-dialog.c:312
+#: xfburn/xfburn-blank-dialog.c:314
 msgid "Ready"
 msgstr "Պատրաստ է"
 
-#: xfburn/xfburn-blank-dialog.c:315
+#: xfburn/xfburn-blank-dialog.c:317
 msgid "No disc detected in the drive."
 msgstr "Յիշասարքում սկաւառակ չի յայտնաբերուել։"
 
-#: xfburn/xfburn-blank-dialog.c:322
+#: xfburn/xfburn-blank-dialog.c:324
 msgid "Disc is not erasable."
 msgstr "Անհնար է մաքրել սկաւառակը։"
 
-#: xfburn/xfburn-blank-dialog.c:356
+#: xfburn/xfburn-blank-dialog.c:369
 msgid "Blanking disc..."
 msgstr "Սկաւառակի մաքրում..."
 
-#: xfburn/xfburn-blank-dialog.c:383
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:377
-#: xfburn/xfburn-perform-burn.c:463
+#: xfburn/xfburn-blank-dialog.c:391
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:401
+#: xfburn/xfburn-perform-burn.c:1893 xfburn/xfburn-perform-burn.c:1952
+#, c-format
 msgid "Done"
 msgstr "Կատարուած է"
 
-#: xfburn/xfburn-blank-dialog.c:386 xfburn/xfburn-perform-burn.c:470
-#: xfburn/xfburn-progress-dialog.c:627
+#: xfburn/xfburn-blank-dialog.c:394 xfburn/xfburn-perform-burn.c:1916
+#: xfburn/xfburn-perform-burn.c:1970 xfburn/xfburn-progress-dialog.c:703
 msgid "Failure"
 msgstr "Ձախողում"
 
-#: xfburn/xfburn-blank-dialog.c:403
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:479
-#: xfburn/xfburn-burn-image-dialog.c:394 xfburn/xfburn-burn-image-dialog.c:571
-#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:314
+#: xfburn/xfburn-blank-dialog.c:413
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:530
+#: xfburn/xfburn-burn-image-dialog.c:440
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:363
 msgid "Unable to grab the drive."
 msgstr "Հնարաւոր չէ կպցնել յիշասարքը։"
 
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:92
+#: xfburn/xfburn-blank-dialog.c:460
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:613
+#: xfburn/xfburn-burn-image-dialog.c:585
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:404
+msgid "No burner device selected."
+msgstr "Այրող սարք ընտրուած չէ։"
+
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:96
 msgid "Image"
 msgstr "Պատկեր"
 
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:94
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:98
 msgid "Show volume name"
 msgstr "Ցուցադրել ծաւալի անունը"
 
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:94
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:98
 msgid "Show a text entry for the name of the volume"
 msgstr "Ցուցադրել գրոյթը, ծաւալի անուան համար"
 
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:112
-#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:105
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:116
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:109
 msgid "Burn Composition"
 msgstr "Գրանցել համադրութիւնը"
 
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:133
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:137
 msgid "Composition name"
 msgstr "Համադրութեան անուն"
 
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:138
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:142
 msgid "<small>Would you like to change the default composition name?</small>"
 msgstr "<small>Փոխե՞լ համադրութեան սկզբնադիր անունը։</small>"
 
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:163
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:167
 #: xfburn/xfburn-burn-image-dialog.c:197 xfburn/xfburn-copy-cd-dialog.c:123
 #: xfburn/xfburn-copy-dvd-dialog.c:120
-#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:132
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:136
 msgid "_Dummy write"
 msgstr "_Կեղծել գրանցումը"
 
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:167
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:172
 #: xfburn/xfburn-burn-image-dialog.c:201
-#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:136
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:141
 msgid "Burn_Free"
 msgstr "Ազատ_գրանցում"
 
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:172
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:177
 #: xfburn/xfburn-burn-image-dialog.c:206
 msgid "Stream _Recording"
 msgstr "Հոսքային _գրառում"
 
 #. create ISO ?
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:178
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:183
 #: xfburn/xfburn-copy-cd-dialog.c:132 xfburn/xfburn-copy-dvd-dialog.c:129
 msgid "Only create _ISO"
 msgstr "Ստեղծել միայն _ISO"
 
 #: xfburn/xfburn-burn-data-composition-base-dialog.c:210
+#: xfburn/xfburn-burn-image-dialog.c:216
 #: xfburn/xfburn-burn-audio-cd-composition-dialog.c:146
+msgid "_Verify after burn"
+msgstr "Ստուգել գրանցումից յետոյ (_V)"
+
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:220
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:156
 msgid "_Burn Composition"
 msgstr "_Գրանցել համադրութիւնը"
 
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:335
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:359
 #, c-format
 msgid "Could not create destination ISO file: %s"
 msgstr "ISO թիրախային նիշը չի ստեղծուել․ %s"
 
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:342
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:366
 msgid "Writing ISO..."
 msgstr "ISO֊ի գրանցում..."
 
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:359
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:383
 #, c-format
 msgid "An error occurred while writing ISO: %s"
 msgstr ""
 
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:415
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:421
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:445
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:452
 msgid "An error occurred in the burn backend."
 msgstr "Սխալ՝ գրանցման յետներեսում։"
 
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:440
-#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:245
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:490
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:280
 msgid "The write mode is not supported currently."
 msgstr "Գրանցման եղանակը ներկաումս չի սատարուում։"
 
-#. could not create source
-#: xfburn/xfburn-burn-data-composition-base-dialog.c:520
+#: xfburn/xfburn-burn-data-composition-base-dialog.c:575
 msgid "Could not create ISO source structure."
 msgstr "ISO սկզբնական կառուցուածքը չի ստեղծուել։"
 
-#: xfburn/xfburn-burn-image-dialog.c:137
+#: xfburn/xfburn-burn-image-dialog.c:139
 msgid "Burn image"
 msgstr "Գրանցել պատկերը"
 
 #. file
-#: xfburn/xfburn-burn-image-dialog.c:142 xfburn/xfburn-burn-image-dialog.c:165
+#: xfburn/xfburn-burn-image-dialog.c:144 xfburn/xfburn-burn-image-dialog.c:167
 msgid "Image to burn"
 msgstr "Պատկեր՝ այրման համար"
 
-#: xfburn/xfburn-burn-image-dialog.c:146
+#: xfburn/xfburn-burn-image-dialog.c:148
 msgid "All files"
 msgstr "Բոլոր նիշերը"
 
-#: xfburn/xfburn-burn-image-dialog.c:150
+#: xfburn/xfburn-burn-image-dialog.c:152
 msgid "Disc images"
 msgstr ""
 
@@ -285,66 +299,46 @@ msgstr ""
 msgid "_Quit after success"
 msgstr "_Դուրս գալ աւարտելուց յետոյ"
 
-#: xfburn/xfburn-burn-image-dialog.c:221
+#: xfburn/xfburn-burn-image-dialog.c:227
 msgid "_Burn image"
 msgstr "_Գրանցել պատկերը"
 
-#: xfburn/xfburn-burn-image-dialog.c:277
+#: xfburn/xfburn-burn-image-dialog.c:304
 msgid "Burn mode is not currently implemented."
 msgstr "Գրանցման եղանակը ներկայումս չի իրագործվում։"
 
-#: xfburn/xfburn-burn-image-dialog.c:328 xfburn/xfburn-burn-image-dialog.c:357
+#: xfburn/xfburn-burn-image-dialog.c:351 xfburn/xfburn-burn-image-dialog.c:394
+#: xfburn/xfburn-burn-image-dialog.c:421
 msgid "An error occurred in the burn backend"
 msgstr "Սխալ՝ գրանցման ետներեսում։"
 
-#: xfburn/xfburn-burn-image-dialog.c:341
+#: xfburn/xfburn-burn-image-dialog.c:368 xfburn/xfburn-burn-image-dialog.c:577
 msgid "Unable to determine image size."
 msgstr "Հնարավոր չէ սահմանել պատկերի չափը։"
 
-#: xfburn/xfburn-burn-image-dialog.c:348
+#: xfburn/xfburn-burn-image-dialog.c:376
 msgid "Cannot open image."
 msgstr "Հնարավոր չէ բացել պատկերը։"
 
-#: xfburn/xfburn-burn-image-dialog.c:385
+#: xfburn/xfburn-burn-image-dialog.c:430
 msgid "Burning image..."
 msgstr "Պատկերի գրանցում..."
 
-#: xfburn/xfburn-burn-image-dialog.c:458
+#: xfburn/xfburn-burn-image-dialog.c:518
 msgid ""
-"<span weight=\"bold\" foreground=\"darkred\" stretch=\"semiexpanded\">Please"
-" select an image to burn</span>"
-msgstr "<span weight=\"bold\" foreground=\"darkred\" stretch=\"semiexpanded\">ընտրել պատկեր գրանցման համար</span>"
+"<span weight=\"bold\" foreground=\"darkred\" stretch=\"semiexpanded\">Please "
+"select an image to burn</span>"
+msgstr ""
+"<span weight=\"bold\" foreground=\"darkred\" stretch=\"semiexpanded\">ընտրել "
+"պատկեր գրանցման համար</span>"
 
-#: xfburn/xfburn-burn-image-dialog.c:497
-msgid ""
-"Cannot append data to multisession disc in this write mode (use TAO instead)"
-msgstr "Անհնար է յաւելել տուեալներ, բազմանիստ սկաւառակում (գործածէք TAO), այս եղանակում"
-
-#: xfburn/xfburn-burn-image-dialog.c:501
-msgid "Closed disc with data detected. Need blank or appendable disc"
-msgstr "Հայտնաբերվել է փակված սկաւառակ՝ տվյալներով։ Պահանջվում է դատարկ կամ գրանցելի սկաւառակ։"
-
-#: xfburn/xfburn-burn-image-dialog.c:503
-msgid "No disc detected in drive"
-msgstr "Յիշասարքում սկաւառակ չի յայտնաբերուել"
-
-#: xfburn/xfburn-burn-image-dialog.c:505
-msgid "Cannot recognize state of drive and disc"
-msgstr "Անհնար է պարզել յիշասարքի եւ սկաւառակի վիճակը"
-
-#: xfburn/xfburn-burn-image-dialog.c:517
-msgid "The selected image does not fit on the inserted disc"
-msgstr "Ընտրուած պատկերները չեն համապատասխանում ներդրուած սկաւառակին"
-
-#: xfburn/xfburn-burn-image-dialog.c:521
-msgid "Failed to get image size"
-msgstr "Անհնար է ստանալ պատկերի չափը"
-
-#: xfburn/xfburn-burn-image-dialog.c:550
+#: xfburn/xfburn-burn-image-dialog.c:564 xfburn/xfburn-burn-image-dialog.c:571
 msgid ""
 "Make sure you selected a valid file and you have the proper permissions to "
 "access it."
-msgstr "Համոզվեք, որ ընտրել եք վավեր նիշ և որ ունեք հատուկ արտոնություններ դրա հասանելիութեան համար։"
+msgstr ""
+"Համոզվեք, որ ընտրել եք վավեր նիշ և որ ունեք հատուկ արտոնություններ դրա "
+"հասանելիութեան համար։"
 
 #: xfburn/xfburn-compositions-notebook.c:97
 msgid "Audio composition"
@@ -400,272 +394,298 @@ msgstr "_Պատճէնել DVD֊ին"
 msgid "Create ISO from CD"
 msgstr "Ստեղծել ISO՝ CD֊ից"
 
-#: xfburn/xfburn-data-composition.c:278 xfburn/xfburn-utils.c:180
-#: xfburn/xfburn-utils.c:182 xfburn/xfburn-audio-composition.c:277
+#: xfburn/xfburn-data-composition.c:280 xfburn/xfburn-utils.c:183
+#: xfburn/xfburn-utils.c:185 xfburn/xfburn-audio-composition.c:278
 msgid "Add"
 msgstr "Յաւելել"
 
-#: xfburn/xfburn-data-composition.c:278 xfburn/xfburn-audio-composition.c:277
+#: xfburn/xfburn-data-composition.c:280 xfburn/xfburn-audio-composition.c:278
 msgid "Add the selected file(s) to the composition"
 msgstr "Յաւելել նշուած նիշը(երը) համադրութեան մէջ"
 
-#: xfburn/xfburn-data-composition.c:280 xfburn-popup-menus.ui:7
+#: xfburn/xfburn-data-composition.c:282 xfburn-x-popup-menus.ui:7
 msgid "Create directory"
 msgstr "Ստեղծել նշարան"
 
-#: xfburn/xfburn-data-composition.c:280
+#: xfburn/xfburn-data-composition.c:282
 msgid "Add a new directory to the composition"
 msgstr "Յաւելել նոր նշարան համադրութեան մէջ"
 
-#: xfburn/xfburn-data-composition.c:285 xfburn/xfburn-audio-composition.c:282
-#: xfburn-popup-menus.ui:17 xfburn-popup-menus.ui:25 xfburn-popup-menus.ui:43
+#: xfburn/xfburn-data-composition.c:287 xfburn/xfburn-audio-composition.c:283
+#: xfburn-x-popup-menus.ui:17 xfburn-x-popup-menus.ui:25
+#: xfburn-x-popup-menus.ui:43
 msgid "Remove"
 msgstr "Հեռացնել"
 
-#: xfburn/xfburn-data-composition.c:285 xfburn/xfburn-audio-composition.c:282
+#: xfburn/xfburn-data-composition.c:287 xfburn/xfburn-audio-composition.c:283
 msgid "Remove the selected file(s) from the composition"
 msgstr "Հեռացնել նշուած նիշը(երը) համադրութեան միջից"
 
-#: xfburn/xfburn-data-composition.c:287 xfburn/xfburn-audio-composition.c:284
+#: xfburn/xfburn-data-composition.c:289 xfburn/xfburn-audio-composition.c:285
 msgid "Clear"
 msgstr "Մաքրել"
 
-#: xfburn/xfburn-data-composition.c:287 xfburn/xfburn-audio-composition.c:284
+#: xfburn/xfburn-data-composition.c:289 xfburn/xfburn-audio-composition.c:285
 msgid "Clear the content of the composition"
 msgstr "Մաքրել համադրութեան բովանդակութիւնը"
 
-#: xfburn/xfburn-data-composition.c:298
+#: xfburn/xfburn-data-composition.c:300
 msgid "Volume name :"
 msgstr "Ծաւալի անուն ․"
 
-#: xfburn/xfburn-data-composition.c:335 xfburn.ui:76
+#: xfburn/xfburn-data-composition.c:337 xfburn-x.ui:82
 msgid "Contents"
 msgstr "Ձեռնարկ"
 
-#: xfburn/xfburn-data-composition.c:350 xfburn/xfburn-directory-browser.c:108
+#: xfburn/xfburn-data-composition.c:352 xfburn/xfburn-directory-browser.c:108
+#: xfburn/xfburn-disc-info.c:1519
 msgid "Size"
 msgstr "Չափ"
 
-#: xfburn/xfburn-data-composition.c:353
+#: xfburn/xfburn-data-composition.c:355
 msgid "Local Path"
 msgstr "Տեղային ուղի"
 
-#: xfburn/xfburn-data-composition.c:610
+#: xfburn/xfburn-data-composition.c:615
 msgid "You must give a name to the file."
 msgstr "Հարկաւոր է անուն տալ նիշին։"
 
-#: xfburn/xfburn-data-composition.c:619 xfburn/xfburn-data-composition.c:1052
-#: xfburn/xfburn-audio-composition.c:859
+#: xfburn/xfburn-data-composition.c:624 xfburn/xfburn-data-composition.c:1057
+#: xfburn/xfburn-audio-composition.c:860
 msgid "A file with the same name is already present in the composition."
 msgstr "Նոյն անունով նիշ, արդեն առկայ է համադրութեան մէջ։"
 
-#: xfburn/xfburn-data-composition.c:733 xfburn/xfburn-data-composition.c:734
-#: xfburn/xfburn-data-composition.c:736
+#: xfburn/xfburn-data-composition.c:738 xfburn/xfburn-data-composition.c:739
+#: xfburn/xfburn-data-composition.c:741
 msgid "New directory"
 msgstr "Նոր նշարան"
 
-#. Note to translators: first %s is the date in "i18n" format (year-month-
-#. day), %d is a running number of compositions
-#: xfburn/xfburn-data-composition.c:908
+#. Note to translators: first %s is the date in "i18n" format (year-month-day), %d is a running number of compositions
+#: xfburn/xfburn-data-composition.c:913
 #, c-format
 msgid "Data %s~%d"
 msgstr "Տուեալներ %s~%d"
 
-#: xfburn/xfburn-data-composition.c:1131
+#: xfburn/xfburn-data-composition.c:1136
 #, c-format
 msgid ""
 "%s cannot be added to the composition, because it exceeds the maximum "
 "allowed file size for iso9660."
-msgstr "%s֊ը չի կարող աւելացուել համադրութեան մէջ, քանի որ այն գերազանցում է նիշի թոյլատրուած առաւելագոյն iso9660 չափը։"
+msgstr ""
+"%s֊ը չի կարող աւելացուել համադրութեան մէջ, քանի որ այն գերազանցում է նիշի "
+"թոյլատրուած առաւելագոյն iso9660 չափը։"
 
-#: xfburn/xfburn-data-composition.c:1138
+#: xfburn/xfburn-data-composition.c:1143
 #, c-format
 msgid ""
-"%s is larger than what iso9660 level 2 allows. This can be a problem for old"
-" systems or software."
-msgstr "%s֊ը ավելի մեծ է ISO9660֊ի երկրորդ աստիճանի կողմից թույլատրված չափից։ Սակարող է առաջացնել խնդիր ավելի հին համակարգերում կամ ծրագրաշարերում։"
+"%s is larger than what iso9660 level 2 allows. This can be a problem for old "
+"systems or software."
+msgstr ""
+"%s֊ը ավելի մեծ է ISO9660֊ի երկրորդ աստիճանի կողմից թույլատրված չափից։ "
+"Սակարող է առաջացնել խնդիր ավելի հին համակարգերում կամ ծրագրաշարերում։"
 
-#: xfburn/xfburn-data-composition.c:1222
-#: xfburn/xfburn-audio-composition.c:1031
+#: xfburn/xfburn-data-composition.c:1227 xfburn/xfburn-audio-composition.c:1032
 msgid "Adding home directory"
 msgstr "Տնային նշարանի յաւելում"
 
-#: xfburn/xfburn-data-composition.c:1223
-#: xfburn/xfburn-audio-composition.c:1032
+#: xfburn/xfburn-data-composition.c:1228 xfburn/xfburn-audio-composition.c:1033
 msgid ""
-"You are about to add your home directory to the composition. This is likely to take a very long time, and also to be too big to fit on one disc.\n"
+"You are about to add your home directory to the composition. This is likely "
+"to take a very long time, and also to be too big to fit on one disc.\n"
 "\n"
 "Are you sure you want to proceed?"
-msgstr "Դուք պատրաստվում եք ավելացնել տնային նշարանը համադրության մեջ։ Սա կարող է շատ երկար ժամանակ տևել և լինել շատ ծավալուն՝ մեկ սկաւառակում տեղավորվելու համար։ \n\nՇարունակե՞լ։"
+msgstr ""
+"Դուք պատրաստվում եք ավելացնել տնային նշարանը համադրության մեջ։ Սա կարող է "
+"շատ երկար ժամանակ տևել և լինել շատ ծավալուն՝ մեկ սկաւառակում տեղավորվելու "
+"համար։ \n"
+"\n"
+"Շարունակե՞լ։"
 
-#: xfburn/xfburn-data-composition.c:1391
+#: xfburn/xfburn-data-composition.c:1396
 #, c-format
 msgid ""
 "A file named \"%s\" already exists in this directory, the file hasn't been "
 "added."
 msgstr "«%s» անունով նիշն արդեն առկա է նշարանում, նիշը չի հավելվել։"
 
-#: xfburn/xfburn-data-composition.c:1793
+#: xfburn/xfburn-data-composition.c:1798
 #, c-format
 msgid "%s: null pointer"
 msgstr "%s․ null-նշիչ"
 
-#: xfburn/xfburn-data-composition.c:1795
+#: xfburn/xfburn-data-composition.c:1800
 #, c-format
 msgid "%s: out of memory"
 msgstr "%s․ ոչ բավարար յիշողութիւն"
 
-#: xfburn/xfburn-data-composition.c:1797
+#: xfburn/xfburn-data-composition.c:1802
 #, c-format
 msgid "%s: node name not unique"
 msgstr "%s․ հանգոյցի անունը յատուկ չէ"
 
-#: xfburn/xfburn-data-composition.c:1799
+#: xfburn/xfburn-data-composition.c:1804
 #, c-format
 msgid "%s: %s (code %X)"
 msgstr "%s: %s (այլագիր %X)"
 
 #. The first string is the renamed name, the second one the original name
-#: xfburn/xfburn-data-composition.c:1819
+#: xfburn/xfburn-data-composition.c:1824
 #, c-format
 msgid "Duplicate filename '%s' for '%s'"
 msgstr "Կրկնօրինակել «%s» նիշի անունը «%s»֊ի համար"
 
-#: xfburn/xfburn-data-composition.c:1884
+#: xfburn/xfburn-data-composition.c:1889
 msgid "Error(s) occurred while adding files"
 msgstr ""
 
-#: xfburn/xfburn-data-composition.c:1888
+#: xfburn/xfburn-data-composition.c:1893
 msgid "OK"
 msgstr "OK"
 
-#: xfburn/xfburn-device-box.c:130 xfburn/xfburn-device-box.c:131
+#: xfburn/xfburn-device-box.c:136 xfburn/xfburn-device-box.c:137
 msgid "Show writers only"
 msgstr "Ցուցադրել միայն գրառիչները"
 
-#: xfburn/xfburn-device-box.c:134
+#: xfburn/xfburn-device-box.c:140
 msgid "Show speed selection"
 msgstr "Ցուցադրել արագութեան ընտրութիւնը"
 
-#: xfburn/xfburn-device-box.c:135
+#: xfburn/xfburn-device-box.c:141
 msgid "Show speed selection combo"
 msgstr "Ցուցադրել արագութեան ընտրութեան ցուցակը"
 
-#: xfburn/xfburn-device-box.c:138
+#: xfburn/xfburn-device-box.c:144
 msgid "Show mode selection"
 msgstr "Ցուցադրել եղանակի ընտրութիւնը"
 
-#: xfburn/xfburn-device-box.c:139
+#: xfburn/xfburn-device-box.c:145
 msgid "Show mode selection combo"
 msgstr "Ցուցադրել եղանակի ընտրութեան ցուցակը"
 
-#: xfburn/xfburn-device-box.c:142
+#: xfburn/xfburn-device-box.c:148
 msgid "Is it a valid combination"
 msgstr "Սա վավե՞ր կազմվածք է։"
 
-#: xfburn/xfburn-device-box.c:143
+#: xfburn/xfburn-device-box.c:149
 msgid "Is the combination of hardware and disc valid to burn the composition?"
 msgstr "Արդյո՞ք սարքաշարի եւ սկաւառակի զուգորդումը վավեր է գրանցման համար։"
 
-#: xfburn/xfburn-device-box.c:147
+#: xfburn/xfburn-device-box.c:153
 msgid "The blank mode shows different disc status messages than regular mode"
-msgstr "Մաքրման ռեժիմը ցույց է տալիս սկավառկի վիճակի այլ հաղորդգադրություններ, քան՝ կանոնավոր ռեժիմը։"
+msgstr ""
+"Մաքրման ռեժիմը ցույց է տալիս սկավառկի վիճակի այլ հաղորդգադրություններ, քան՝ "
+"կանոնավոր ռեժիմը։"
 
-#: xfburn/xfburn-device-box.c:198
+#: xfburn/xfburn-device-box.c:227
 msgid "_Speed:"
 msgstr "_Արագություն․"
 
-#: xfburn/xfburn-device-box.c:221
+#: xfburn/xfburn-device-box.c:246
 msgid "Write _mode:"
 msgstr "Գրանցման _ռեժիմ․"
 
-#: xfburn/xfburn-device-box.c:344
-msgid "default"
-msgstr "լռելեայն"
+#: xfburn/xfburn-device-box.c:367
+msgid "Min"
+msgstr "Նուազագոյն"
 
-#: xfburn/xfburn-device-box.c:374
+#: xfburn/xfburn-device-box.c:389
 msgid "Max"
 msgstr "Առաւելագոյն"
 
-#: xfburn/xfburn-device-box.c:407
+#: xfburn/xfburn-device-box.c:422
+msgid "Checking drive..."
+msgstr "Սկաւառակակրի ստուգում..."
+
+#: xfburn/xfburn-device-box.c:450
 msgid "A full, but erasable disc is in the drive"
 msgstr "Լիքն է, սակայն ջնջուող սկաւառակը յիշասարքում է"
 
-#: xfburn/xfburn-device-box.c:408
+#: xfburn/xfburn-device-box.c:451
 msgid ""
 "Do you want to blank the disc, so that it can be used for the upcoming burn "
 "process?"
 msgstr "Մաքրե՞լ սկաւառակը։ Այն կարող է օգտագործվել հետագա գրանցման համար։"
 
-#: xfburn/xfburn-device-box.c:480
+#: xfburn/xfburn-device-box.c:476 xfburn/xfburn-disc-info.c:1040
+#: xfburn/xfburn-disc-info-dialog.c:262
+msgid "No burner detected"
+msgstr "Այրող սարք չի յայտնաբերուել"
+
+#: xfburn/xfburn-device-box.c:533
 msgid "Drive can't burn on the inserted disc"
 msgstr "Յիշասարքը չի կարող գրանցել ներդրուած սկաւառակում"
 
-#: xfburn/xfburn-device-box.c:486 xfburn/xfburn-device-box.c:532
+#: xfburn/xfburn-device-box.c:539 xfburn/xfburn-device-box.c:589
 msgid "Drive is empty"
 msgstr "Յիշասարքը դատարկ է"
 
-#: xfburn/xfburn-device-box.c:489
+#: xfburn/xfburn-device-box.c:542
 msgid "Sorry, multisession is not yet supported"
 msgstr "Բազմանիստը դեռ չի սատարուում"
 
-#: xfburn/xfburn-device-box.c:492
+#: xfburn/xfburn-device-box.c:545
 msgid "Inserted disc is full"
 msgstr "Ներդրուած սկաւառակը լիքն է"
 
-#: xfburn/xfburn-device-box.c:495 xfburn/xfburn-device-box.c:538
+#: xfburn/xfburn-device-box.c:548 xfburn/xfburn-device-box.c:595
 msgid "Inserted disc is unsuitable"
 msgstr "Ներդրուած սկաւառակը չի համապատասխանում"
 
-#: xfburn/xfburn-device-box.c:498 xfburn/xfburn-device-box.c:541
+#: xfburn/xfburn-device-box.c:552 xfburn/xfburn-device-box.c:599
+#: xfburn/xfburn-disc-info.c:390 xfburn/xfburn-disc-info.c:1049
+msgid "Cannot access drive (disc is mounted and in use)"
+msgstr "Հնարաւոր չէ մուտք գործել սկաւառակակիր (սկաւառակը միացուած է եւ օգտագործուում է)"
+
+#: xfburn/xfburn-device-box.c:554 xfburn/xfburn-device-box.c:601
+#: xfburn/xfburn-disc-info.c:392 xfburn/xfburn-disc-info.c:1051
 msgid "Cannot access drive (it might be in use)"
 msgstr "Սկաւառակը անմատչելի է (կարող է լինել գործածութեան մէջ)"
 
-#: xfburn/xfburn-device-box.c:503 xfburn/xfburn-device-box.c:544
+#: xfburn/xfburn-device-box.c:559 xfburn/xfburn-device-box.c:604
 msgid "Error determining disc"
 msgstr "Սկաւառակի որոշման սխալ"
 
-#: xfburn/xfburn-device-box.c:524
+#: xfburn/xfburn-device-box.c:581
 msgid "Write-once disc, no blanking possible"
 msgstr "Մեկանգամեայ գրանցման սկաւառակ՝ մաքրումն անհնար է"
 
-#: xfburn/xfburn-device-box.c:527
+#: xfburn/xfburn-device-box.c:584
 msgid "DVD+RW does not need blanking"
 msgstr "DVD+RW֊ին չի պահանջում մաքրում"
 
-#: xfburn/xfburn-device-box.c:535
+#: xfburn/xfburn-device-box.c:592
 msgid "Inserted disc is already blank"
 msgstr "Ներդրուած սկաւառակն արդէն դատարկ է"
 
-#: xfburn/xfburn-device-box.c:571
+#: xfburn/xfburn-device-box.c:631
 msgid "Automatic"
 msgstr "Ինքնուրոյն"
 
-#: xfburn/xfburn-device-box.c:578
+#: xfburn/xfburn-device-box.c:638
 msgid "With Track Gaps / Track-At-Once (TAO)"
 msgstr ""
 
-#: xfburn/xfburn-device-box.c:585
+#: xfburn/xfburn-device-box.c:645
 msgid "Multi Session / Session-At-Once (SAO)"
 msgstr ""
 
-#: xfburn/xfburn-device-list.c:195 xfburn/xfburn-device-list.c:196
+#: xfburn/xfburn-device-list.c:244 xfburn/xfburn-device-list.c:245
 msgid "Number of burners in the system"
 msgstr "Գրանցիչների քանակը համակարգում"
 
-#: xfburn/xfburn-device-list.c:198
+#: xfburn/xfburn-device-list.c:247
 msgid "Number of drives in the system"
 msgstr "Յիշասարքերի քանակը համակարգում"
 
-#: xfburn/xfburn-device-list.c:199
+#: xfburn/xfburn-device-list.c:248
 msgid "Number of drives in the system (readers and writers)"
 msgstr "Յիշասարքերի քանակը համակարգում՝ (ընթերցիչներ եւ գրանցիչներ)"
 
-#: xfburn/xfburn-device-list.c:201 xfburn/xfburn-device-list.c:202
+#: xfburn/xfburn-device-list.c:250 xfburn/xfburn-device-list.c:251
 msgid "List of devices"
 msgstr "_Սարքերի ցուցակ"
 
-#: xfburn/xfburn-device-list.c:204 xfburn/xfburn-device-list.c:205
+#: xfburn/xfburn-device-list.c:253 xfburn/xfburn-device-list.c:254
 msgid "Currently selected device"
 msgstr "Ներկաումս ընտրուած սարքը"
 
@@ -678,7 +698,7 @@ msgstr "Պանակ"
 msgid "File"
 msgstr "Նիշ"
 
-#: xfburn/xfburn-directory-browser.c:110
+#: xfburn/xfburn-directory-browser.c:110 xfburn/xfburn-disc-info.c:1518
 msgid "Type"
 msgstr "Տիպ"
 
@@ -692,118 +712,132 @@ msgstr "Արմատ"
 msgid "%s's home"
 msgstr "%s֊ի տուն"
 
-#: xfburn/xfburn-udev-manager.c:475
-#, c-format
-msgid "Failed to unmount '%s'. Drive cannot be used for burning."
-msgstr ""
+#: xfburn/xfburn-udev-manager.c:720
+msgid "Unmount operation timed out"
+msgstr "Ապամիացման գործողութեան ժամանակը սպառուեց"
+
+#: xfburn/xfburn-udev-manager.c:862
+msgid "Mounted volume cannot be unmounted"
+msgstr "Միացուած հատորը հնարաւոր չէ ապամիացնել"
 
 #. || G_OPTION_FLAG_FILENAME
-#: xfburn/xfburn-main.c:74
+#: xfburn/xfburn-main.c:77
 msgid "Open the burn image dialog, optionally followed by the image filename"
 msgstr ""
 
-#: xfburn/xfburn-main.c:76
+#: xfburn/xfburn-main.c:79
 msgid "Open the blank disc dialog"
 msgstr ""
 
-#: xfburn/xfburn-main.c:78
+#: xfburn/xfburn-main.c:81
 msgid ""
 "Start a data composition, optionally followed by files/directories to be "
 "added to the composition"
 msgstr ""
 
-#: xfburn/xfburn-main.c:80
+#: xfburn/xfburn-main.c:83
 msgid ""
 "Start an audio composition, optionally followed by files/directories to be "
 "added to the composition"
 msgstr ""
 
-#: xfburn/xfburn-main.c:82
+#: xfburn/xfburn-main.c:85
 msgid ""
 "Select the transcoder, run with --transcoder=list to see the available ones"
 msgstr ""
 
-#: xfburn/xfburn-main.c:84
+#: xfburn/xfburn-main.c:87
 msgid ""
 "Start the file browser in the specified directory, or the current directory "
 "if none is specified (the default is to start in your home directory)"
 msgstr ""
 
-#: xfburn/xfburn-main.c:86
+#: xfburn/xfburn-main.c:89
+msgid "Write diagnostic session log to the specified file path"
+msgstr "Գրանցել ախտորոշիչ նստաշրջանի մատեանը նշուած նիշքի ուղիում"
+
+#: xfburn/xfburn-main.c:91
 msgid "Display program version and exit"
 msgstr ""
 
-#: xfburn/xfburn-main.c:88
+#: xfburn/xfburn-main.c:93
 msgid ""
 "Show main program even when other action is specified on the command line."
 msgstr ""
 
-#: xfburn/xfburn-main.c:194 xfburn/xfburn-main-window.c:143
-#: xfburn.desktop.in:5 org.xfce.xfburn.appdata.xml.in:8
-msgid "Xfburn"
-msgstr "Xfburn"
+#: xfburn/xfburn-main.c:200 xfburn/xfburn-main-window.c:147
+#: xfburn-x.desktop.in:4 io.github.asdfjkl.xfburn-x.metainfo.xml.in:9
+msgid "Xfburn-X"
+msgstr "Xfburn-X"
 
-#: xfburn/xfburn-main.c:203
+#: xfburn/xfburn-main.c:209
 #, c-format
 msgid ""
 "%s: %s\n"
 "Try %s --help to see a full list of available command line options.\n"
-msgstr "%s: %s\nՏե՛ս %s --help֊ը հասանելի հրամանատողերի համար։\n"
+msgstr ""
+"%s: %s\n"
+"Տե՛ս %s --help֊ը հասանելի հրամանատողերի համար։\n"
 
-#: xfburn/xfburn-main.c:212
+#: xfburn/xfburn-main.c:220
 msgid "Unable to initialize the burning backend."
 msgstr "Հնարավոր չէ սկզբնավորել գրանցման ետներեսը։"
 
-#: xfburn/xfburn-main.c:286
+#: xfburn/xfburn-main.c:304
 msgid "No burners are currently available"
 msgstr "Ներկաումս մատչելի գրանցիչներ չկան"
 
-#: xfburn/xfburn-main.c:288
+#: xfburn/xfburn-main.c:306
 msgid ""
 "Possibly the disc(s) are in use, and cannot get accessed.\n"
 "\n"
-"If no disc is in the drive, check that you have read and write access to the drive with the current user."
+"If no disc is in the drive, check that you have read and write access to the "
+"drive with the current user."
 msgstr ""
 
-#: xfburn/xfburn-main.c:321
+#: xfburn/xfburn-main.c:340
 #, c-format
 msgid ""
 "Failed to initialize %s transcoder: %s\n"
 "\t(falling back to basic implementation)"
-msgstr "%s կրկնաայլագրիչի սկզբնավորման ձախողում․ %s\n\t"
+msgstr ""
+"%s կրկնաայլագրիչի սկզբնավորման ձախողում․ %s\n"
+"\t"
 
-#: xfburn/xfburn-main.c:364
+#: xfburn/xfburn-main.c:383
 #, c-format
 msgid "Image file '%s' does not exist."
 msgstr "«%s» պատկերը գոյություն չունի։"
 
-#: xfburn/xfburn-main-window.c:197
+#: xfburn/xfburn-main-window.c:201
 msgid "New data composition"
 msgstr "Տուեալների նոր համադրութիւն"
 
-#: xfburn/xfburn-main-window.c:200
+#: xfburn/xfburn-main-window.c:204
 msgid "New audio composition"
 msgstr "Ձայնային նոր համադրութիւն"
 
-#: xfburn/xfburn-main-window.c:205 xfburn.ui:42
+#: xfburn/xfburn-main-window.c:209 xfburn-x.ui:42
 msgid "Blank CD-RW"
 msgstr "Դատարկ CD-RW"
 
-#: xfburn/xfburn-main-window.c:208 xfburn.ui:46
+#: xfburn/xfburn-main-window.c:212 xfburn-x.ui:46
 msgid "Burn Image"
 msgstr "Գրանցել պատկերը"
 
-#: xfburn/xfburn-main-window.c:213 xfburn.ui:56
+#: xfburn/xfburn-main-window.c:217 xfburn-x.ui:62
 msgid "Refresh"
 msgstr "Թարմացնել"
 
-#: xfburn/xfburn-main-window.c:213
+#: xfburn/xfburn-main-window.c:217
 msgid "Refresh file list"
 msgstr "Թարմացնել նիշերի ցուցակը"
 
-#: xfburn/xfburn-main-window.c:371
-msgid "Another cd burning GUI"
-msgstr ""
+#: xfburn/xfburn-main-window.c:388
+msgid ""
+"CD, DVD, and Blu-ray burning GUI (fork of Xfburn with post-burn verification "
+"and diagnostic logging)"
+msgstr "CD, DVD եւ Blu-ray սկաւառակների գրանցման գրաֆիկական միջերես (Xfburn-ի ճիւղաւորում՝ գրանցումից յետոյ ստուգմամբ եւ ախտորոշիչ մատեանաւորմամբ)"
 
 #: xfburn/xfburn-notebook-tab.c:74
 msgid "Label"
@@ -821,365 +855,488 @@ msgstr "Ցուցադրել փակման կոճակը"
 msgid "Determine whether the close button is visible"
 msgstr "Որոշել, արդյոք փակման կոճակը տեսանելի է։"
 
-#: xfburn/xfburn-perform-burn.c:98 xfburn/xfburn-perform-burn.c:425
+#: xfburn/xfburn-perform-burn.c:388 xfburn/xfburn-perform-burn.c:1804
 msgid "Formatting..."
 msgstr "Ձեւաչափում..."
 
-#: xfburn/xfburn-perform-burn.c:251
+#: xfburn/xfburn-perform-burn.c:549
+msgid "sectors total"
+msgstr "ընդամէնը հատուած"
+
+#: xfburn/xfburn-perform-burn.c:564
+#, c-format
+msgid "Verifying track %2u/%u... (%u read/verify errors)"
+msgstr "Շաւիղի ստուգում %2u/%u... (%u ընթերցման/ստուգման սխալ)"
+
+#: xfburn/xfburn-perform-burn.c:567
+#, c-format
+msgid "Verifying track %2u/%u..."
+msgstr "Շաւիղի ստուգում %2u/%u..."
+
+#: xfburn/xfburn-perform-burn.c:571
+#, c-format
+msgid "Verifying... (%u read/verify errors)"
+msgstr "Ստուգում... (%u ընթերցման/ստուգման սխալ)"
+
+#: xfburn/xfburn-perform-burn.c:573
+msgid "Verifying..."
+msgstr "Ստուգում..."
+
+#: xfburn/xfburn-perform-burn.c:695
+msgid "Estimated reading speed:"
+msgstr "Ընթերցման գնահատուած արագութիւն՝"
+
+#: xfburn/xfburn-perform-burn.c:697 xfburn/xfburn-perform-burn.c:1752
+msgid "unused"
+msgstr "չաւգտագործուող"
+
+#: xfburn/xfburn-perform-burn.c:1331 xfburn/xfburn-perform-burn.c:1905
+msgid "Verification interrupted: drive disconnected"
+msgstr "Ստուգումն ընդհատուեց՝ սկաւառակակիրն անջատուել է"
+
+#: xfburn/xfburn-perform-burn.c:1342
+#, c-format
 msgid ""
-"Cannot append data to multisession disc in this write mode (use TAO "
-"instead)."
-msgstr "Գրառման այս ռեժիմում, բազմանիստ սկաւառակում տուեալներ հնարավոր չէ հավելել (օգտագործեք TAO)։"
+"Lost connection to the drive at LBA %u after verifying %u of %u sectors. %u "
+"earlier disc read/verify error(s) were also detected (%s).\n"
+"\n"
+"Diagnostic log saved to:\n"
+"%s"
+msgstr ""
+"Կորել է կապը սկաւառակակրի հետ LBA %u հասցէում՝ %u հատուած (%u-ից) ստուգելուց յետոյ։ Յայտնաբերուել է նաեւ %u աւելի վաղ ընթերցման/ստուգման սխալ (%s)։\n"
+"\n"
+"Ախտորոշիչ մատեանը պահուել է այստեղ՝\n"
+"%s"
 
-#: xfburn/xfburn-perform-burn.c:255
+#: xfburn/xfburn-perform-burn.c:1346
+#, c-format
+msgid ""
+"Lost connection to the drive at LBA %u after verifying %u of %u sectors. %u "
+"earlier disc read/verify error(s) were also detected (%s)."
+msgstr "Կորել է կապը սկաւառակակրի հետ LBA %u հասցէում՝ %u հատուած (%u-ից) ստուգելուց յետոյ։ Յայտնաբերուել է նաեւ %u աւելի վաղ ընթերցման/ստուգման սխալ (%s)։"
+
+#: xfburn/xfburn-perform-burn.c:1358
+#, c-format
+msgid ""
+"Lost connection to the drive at LBA %u after verifying %u of %u sectors with "
+"no disc read errors. The burn completed, so the disc is likely intact — "
+"check USB cable, power supply, or USB 3.0 power-saving settings.\n"
+"\n"
+"Diagnostic log saved to:\n"
+"%s"
+msgstr ""
+"Կորել է կապը սկաւառակակրի հետ LBA %u հասցէում՝ %u հատուած (%u-ից) առանց սկաւառակի ընթերցման սխալների ստուգելուց յետոյ։ Գրանցումն աւարտուել է, ուստի սկաւառակը հաւանաբար անվնաս է — ստուգէք USB մալուխը, սնուցումը կամ USB 3.0 էներգախնայողութեան կարգաւորումները։\n"
+"\n"
+"Ախտորոշիչ մատեանը պահուել է այստեղ՝\n"
+"%s"
+
+#: xfburn/xfburn-perform-burn.c:1362
+#, c-format
+msgid ""
+"Lost connection to the drive at LBA %u after verifying %u of %u sectors with "
+"no disc read errors. The burn completed, so the disc is likely intact — "
+"check USB cable, power supply, or USB 3.0 power-saving settings."
+msgstr "Կորել է կապը սկաւառակակրի հետ LBA %u հասցէում՝ %u հատուած (%u-ից) առանց սկաւառակի ընթերցման սխալների ստուգելուց յետոյ։ Գրանցումն աւարտուել է, ուստի սկաւառակը հաւանաբար անվնաս է — ստուգէք USB մալուխը, սնուցումը կամ USB 3.0 էներգախնայողութեան կարգաւորումները։"
+
+#: xfburn/xfburn-perform-burn.c:1381
+#, c-format
+msgid "Disc Read Error: %s"
+msgstr "Սկաւառակի ընթերցման սխալ՝ %s"
+
+#: xfburn/xfburn-perform-burn.c:1507
+msgid ""
+"Cannot append data to multisession disc in this write mode (use TAO instead)."
+msgstr ""
+"Գրառման այս ռեժիմում, բազմանիստ սկաւառակում տուեալներ հնարավոր չէ հավելել "
+"(օգտագործեք TAO)։"
+
+#: xfburn/xfburn-perform-burn.c:1512
 msgid "Closed disc with data detected, a blank or appendable disc is needed."
-msgstr "Հայտնաբերվել է տվյալներով, փակված սկաւառակ, պահանջվում է դատարկ կամ հավելվող սկաւառակ։"
+msgstr ""
+"Հայտնաբերվել է տվյալներով, փակված սկաւառակ, պահանջվում է դատարկ կամ հավելվող "
+"սկաւառակ։"
 
-#: xfburn/xfburn-perform-burn.c:257
+#: xfburn/xfburn-perform-burn.c:1514
 msgid "No disc detected in drive."
 msgstr "Հիշասարքում սկաւառակ չկա։"
 
-#: xfburn/xfburn-perform-burn.c:260
+#: xfburn/xfburn-perform-burn.c:1517
 msgid "Cannot recognize the state of the drive and disc."
 msgstr "Անհնար է ճանաչել հիշասարքի և սկաւառակի վիճակը։"
 
-#: xfburn/xfburn-perform-burn.c:267
+#: xfburn/xfburn-perform-burn.c:1525
 msgid "Formatting failed."
 msgstr "Ձևաչափման ձախողում։"
 
-#: xfburn/xfburn-perform-burn.c:285
+#: xfburn/xfburn-perform-burn.c:1562
 msgid "There is not enough space available on the inserted disc."
 msgstr "Ներդրված սկաւառակում հիշողության բավարար տիրույթ չկա։"
 
-#: xfburn/xfburn-perform-burn.c:328
+#: xfburn/xfburn-perform-burn.c:1571
+msgid "see console"
+msgstr "ցուցադրել"
+
+#: xfburn/xfburn-perform-burn.c:1667
 #, c-format
 msgid "Burning track %2d/%d..."
 msgstr "%2d/%d շաւիղի գրանցում..."
 
-#: xfburn/xfburn-perform-burn.c:332 xfburn/xfburn-perform-burn.c:390
+#: xfburn/xfburn-perform-burn.c:1671 xfburn/xfburn-perform-burn.c:1769
 msgid "Burning composition..."
 msgstr "Համադրութեան գրանցում..."
 
-#: xfburn/xfburn-perform-burn.c:359
+#: xfburn/xfburn-perform-burn.c:1738
 msgid "standby"
 msgstr "կանգ"
 
-#: xfburn/xfburn-perform-burn.c:367
+#: xfburn/xfburn-perform-burn.c:1746
 msgid "ending"
 msgstr "աւարտ"
 
-#: xfburn/xfburn-perform-burn.c:370
+#: xfburn/xfburn-perform-burn.c:1749
 msgid "failing"
 msgstr "ձախողում"
 
-#: xfburn/xfburn-perform-burn.c:373
-msgid "unused"
-msgstr "չաւգտագործուող"
-
-#: xfburn/xfburn-perform-burn.c:376
+#: xfburn/xfburn-perform-burn.c:1755
 msgid "abandoned"
 msgstr "թերատուած"
 
-#: xfburn/xfburn-perform-burn.c:379
+#: xfburn/xfburn-perform-burn.c:1758
 msgid "ended"
 msgstr "ավարտուած"
 
-#: xfburn/xfburn-perform-burn.c:382
+#: xfburn/xfburn-perform-burn.c:1761
 msgid "aborted"
 msgstr "ընդհատուած"
 
-#: xfburn/xfburn-perform-burn.c:385
+#: xfburn/xfburn-perform-burn.c:1764
 msgid "no info"
 msgstr "տեղեկոյթ չկայ"
 
-#: xfburn/xfburn-perform-burn.c:395
+#: xfburn/xfburn-perform-burn.c:1774
 msgid "Writing Lead-In..."
 msgstr "Lead-In֊ի գրանցում..."
 
-#: xfburn/xfburn-perform-burn.c:401
+#: xfburn/xfburn-perform-burn.c:1780
 msgid "Writing Lead-Out..."
 msgstr "Lead-Out֊ի գրանցում..."
 
-#: xfburn/xfburn-perform-burn.c:407
+#: xfburn/xfburn-perform-burn.c:1786
 msgid "Writing pregap..."
 msgstr "Pregap֊ի գրանցում..."
 
-#: xfburn/xfburn-perform-burn.c:413
+#: xfburn/xfburn-perform-burn.c:1792
 msgid "Closing track..."
 msgstr "Շաւիղի փակում..."
 
-#: xfburn/xfburn-perform-burn.c:419
+#: xfburn/xfburn-perform-burn.c:1798
 msgid "Closing session..."
 msgstr "Նիստի փակում..."
 
-#: xfburn/xfburn-perform-burn.c:438
-msgid "see console"
-msgstr "ցուցադրել"
+#: xfburn/xfburn-perform-burn.c:1895
+msgid "Disc successfully verified"
+msgstr "Սկաւառակը յաջողութեամբ ստուգուեց"
 
-#: xfburn/xfburn-perform-burn.c:467
+#: xfburn/xfburn-perform-burn.c:1899 xfburn/xfburn-perform-burn.c:1958
 msgid "User Aborted"
 msgstr "Ընդհատուած աւգտատիրոջ կողմից"
 
-#: xfburn/xfburn-preferences-dialog.c:106
+#: xfburn/xfburn-perform-burn.c:1908
+msgid "Drive disconnected during verification (communication error)"
+msgstr "Սկաւառակակիրն անջատուեց ստուգման ընթացքում (կապի սխալ)"
+
+#: xfburn/xfburn-perform-burn.c:1968
+msgid "Drive disconnected during burn (communication error)"
+msgstr "Սկաւառակակիրն անջատուեց գրանցման ընթացքում (կապի սխալ)"
+
+#: xfburn/xfburn-preferences-dialog.c:107
 msgid "Preferences"
 msgstr "Յարաչափեր"
 
-#: xfburn/xfburn-preferences-dialog.c:107
-msgid "Tune how Xfburn behaves"
-msgstr "Կարգաւորել Xfburn֊ի վարքագիծը"
+#: xfburn/xfburn-preferences-dialog.c:108
+msgid "Tune how Xfburn-X behaves"
+msgstr "Կարգաւորել Xfburn-X-ի վարքագիծը"
 
-#: xfburn/xfburn-preferences-dialog.c:138
-#: xfburn/xfburn-preferences-dialog.c:142
+#: xfburn/xfburn-preferences-dialog.c:139
+#: xfburn/xfburn-preferences-dialog.c:143
 msgid "Temporary directory"
 msgstr "Ժամանակաւոր նշարան"
 
-#: xfburn/xfburn-preferences-dialog.c:146
+#: xfburn/xfburn-preferences-dialog.c:147
 msgid "_Clean temporary directory on exit"
 msgstr "_Ավարտին, մաքրել ժամանակաւոր նշարանը"
 
-#: xfburn/xfburn-preferences-dialog.c:153
+#: xfburn/xfburn-preferences-dialog.c:154
 msgid "File browser"
 msgstr "Նիշի զննիչ"
 
-#: xfburn/xfburn-preferences-dialog.c:157
+#: xfburn/xfburn-preferences-dialog.c:158
 msgid "Show _hidden files"
 msgstr "Ցուցադրել _թաքնուած նիշերը"
 
-#: xfburn/xfburn-preferences-dialog.c:162
+#: xfburn/xfburn-preferences-dialog.c:163
 msgid "Show human_readable filesizes"
 msgstr "Ցուցադրել ընթեռնելի _նիշերի չափերը"
 
-#: xfburn/xfburn-preferences-dialog.c:172
-#: xfburn/xfburn-preferences-dialog.c:183
+#: xfburn/xfburn-preferences-dialog.c:173
+#: xfburn/xfburn-preferences-dialog.c:184
 msgid "General"
 msgstr "Ընդհանուր"
 
-#: xfburn/xfburn-preferences-dialog.c:187
-#: xfburn/xfburn-preferences-dialog.c:269
+#: xfburn/xfburn-preferences-dialog.c:188
+#: xfburn/xfburn-preferences-dialog.c:270
 msgid "Devices"
 msgstr "Սարքեր"
 
-#: xfburn/xfburn-preferences-dialog.c:196
+#: xfburn/xfburn-preferences-dialog.c:197
 msgid "Detected devices"
 msgstr "Յայտնաբերուած սարքեր"
 
-#: xfburn/xfburn-preferences-dialog.c:217
+#: xfburn/xfburn-preferences-dialog.c:218
 msgid "Name"
 msgstr "Անուն"
 
-#: xfburn/xfburn-preferences-dialog.c:230
+#: xfburn/xfburn-preferences-dialog.c:231
 msgid "Revision"
 msgstr ""
 
-#: xfburn/xfburn-preferences-dialog.c:232
+#: xfburn/xfburn-preferences-dialog.c:233
 msgid "Node"
 msgstr "Հանգոյց"
 
-#: xfburn/xfburn-preferences-dialog.c:234
+#: xfburn/xfburn-preferences-dialog.c:235
 msgid "Write CD-R"
 msgstr "Գրանցել CD-R֊ը"
 
-#: xfburn/xfburn-preferences-dialog.c:236
+#: xfburn/xfburn-preferences-dialog.c:237
 msgid "Write CD-RW"
 msgstr "Գրանցել CD-RW֊ին"
 
-#: xfburn/xfburn-preferences-dialog.c:239
+#: xfburn/xfburn-preferences-dialog.c:240
 msgid "Write DVD-R"
 msgstr "Գրանցել DVD-R֊ը"
 
-#: xfburn/xfburn-preferences-dialog.c:242
+#: xfburn/xfburn-preferences-dialog.c:243
 msgid "Write DVD-RAM"
 msgstr "Գրանցել DVD-RAM֊ը"
 
-#: xfburn/xfburn-preferences-dialog.c:245
+#: xfburn/xfburn-preferences-dialog.c:246
 msgid "Write Blu-ray"
 msgstr "Գրանցել Blu-ray֊ը"
 
-#: xfburn/xfburn-preferences-dialog.c:253
+#: xfburn/xfburn-preferences-dialog.c:254
 msgid "Sc_an for devices"
 msgstr "Յի_շասարքերի որոնում"
 
-#: xfburn/xfburn-preferences-dialog.c:279
+#: xfburn/xfburn-preferences-dialog.c:280
 msgid "FIFO buffer size (in kb)"
 msgstr "FIFO պահնակի չափ (ԿԲ֊ներով)"
 
-#: xfburn/xfburn-preferences-dialog.c:298
+#: xfburn/xfburn-preferences-dialog.c:299 xfburn/xfburn-disc-info-dialog.c:602
 msgid "_Close"
 msgstr "_Փակել"
 
-#: xfburn/xfburn-preferences-dialog.c:425
+#: xfburn/xfburn-preferences-dialog.c:431
 msgid "Changing this setting only takes full effect after a program restart."
-msgstr "Այս կարգավորման փոփոխումը, լիարժեքորեն կիրագործուի միայն ծրագրի վերագործարկման դեպքում։"
+msgstr ""
+"Այս կարգավորման փոփոխումը, լիարժեքորեն կիրագործուի միայն ծրագրի "
+"վերագործարկման դեպքում։"
 
 #. label
-#: xfburn/xfburn-progress-dialog.c:160 xfburn/xfburn-progress-dialog.c:164
-#: xfburn/xfburn-progress-dialog.c:517
+#: xfburn/xfburn-progress-dialog.c:165 xfburn/xfburn-progress-dialog.c:169
+#: xfburn/xfburn-progress-dialog.c:585
 msgid "Initializing..."
 msgstr "Սկզբնաւորում..."
 
-#: xfburn/xfburn-progress-dialog.c:179
+#: xfburn/xfburn-progress-dialog.c:184
 msgid "Estimated writing speed:"
 msgstr "Հաշվարկային գրառման արագություն․"
 
-#: xfburn/xfburn-progress-dialog.c:182 xfburn/xfburn-progress-dialog.c:198
-#: xfburn/xfburn-progress-dialog.c:207 xfburn/xfburn-progress-dialog.c:297
-#: xfburn/xfburn-progress-dialog.c:440 xfburn/xfburn-progress-dialog.c:464
-#: xfburn/xfburn-progress-dialog.c:488
+#: xfburn/xfburn-progress-dialog.c:187 xfburn/xfburn-progress-dialog.c:203
+#: xfburn/xfburn-progress-dialog.c:212 xfburn/xfburn-progress-dialog.c:308
+#: xfburn/xfburn-progress-dialog.c:508 xfburn/xfburn-progress-dialog.c:532
+#: xfburn/xfburn-progress-dialog.c:556
 msgid "unknown"
 msgstr "անյայտ"
 
-#: xfburn/xfburn-progress-dialog.c:193
+#: xfburn/xfburn-progress-dialog.c:198
 msgid "FIFO buffer:"
 msgstr "FIFO պահնակ․"
 
-#: xfburn/xfburn-progress-dialog.c:202
+#: xfburn/xfburn-progress-dialog.c:207
 msgid "Device buffer:"
 msgstr "Սարքի պահնակ․"
 
 #. action buttons
-#: xfburn/xfburn-progress-dialog.c:212
+#: xfburn/xfburn-progress-dialog.c:217
+msgid "Save _Log..."
+msgstr "Պահել մատեանը... (_L)"
+
+#: xfburn/xfburn-progress-dialog.c:218
+msgid "Save diagnostic flight recorder log to a file for bug reporting"
+msgstr "Պահել ախտորոշիչ մատեանը նիշքում՝ սխալների մասին զեկուցելու համար"
+
+#: xfburn/xfburn-progress-dialog.c:223
 msgid "_Stop"
 msgstr ""
 
-#: xfburn/xfburn-progress-dialog.c:219
+#: xfburn/xfburn-progress-dialog.c:230
 msgid "Close"
 msgstr "Փակել"
 
-#: xfburn/xfburn-progress-dialog.c:338
+#: xfburn/xfburn-progress-dialog.c:349
+msgid "Save Diagnostic Log"
+msgstr "Պահել ախտորոշիչ մատեանը"
+
+#: xfburn/xfburn-progress-dialog.c:353 xfburn/xfburn-utils.c:132
+msgid "_Save"
+msgstr "_Պահել"
+
+#: xfburn/xfburn-progress-dialog.c:375
+#, c-format
+msgid "Failed to save diagnostic log to '%s': %s"
+msgstr "Չյաջողուեց պահել ախտորոշիչ մատեանը «%s»-ում՝ %s"
+
+#: xfburn/xfburn-progress-dialog.c:396
 msgid "Are you sure you want to abort?"
 msgstr "Ընդհատե՞լ։"
 
-#: xfburn/xfburn-progress-dialog.c:466
+#: xfburn/xfburn-progress-dialog.c:534
 #, c-format
 msgid "Min. fill was %2d%%"
 msgstr "Նուազագոյն լցում՝ %2d%%"
 
-#: xfburn/xfburn-progress-dialog.c:534
+#: xfburn/xfburn-progress-dialog.c:603
 msgid "Aborted"
 msgstr "Ընդհատուած"
 
-#: xfburn/xfburn-progress-dialog.c:537
+#: xfburn/xfburn-progress-dialog.c:606
 msgid "Formatted."
 msgstr "Ձևաչափված։"
 
-#: xfburn/xfburn-progress-dialog.c:546
+#: xfburn/xfburn-progress-dialog.c:615
 msgid "Failed"
 msgstr "Ձախողուած"
 
-#: xfburn/xfburn-progress-dialog.c:549
+#: xfburn/xfburn-progress-dialog.c:618
 msgid "Cancelled"
 msgstr "Չեղարկուած"
 
-#: xfburn/xfburn-progress-dialog.c:552
+#: xfburn/xfburn-progress-dialog.c:621
 msgid "Completed"
 msgstr "Կատարուած"
 
-#: xfburn/xfburn-progress-dialog.c:590
+#: xfburn/xfburn-progress-dialog.c:659
 msgid "Aborting..."
 msgstr "Ընդհատուած..."
 
-#: xfburn/xfburn-utils.c:128
+#: xfburn/xfburn-progress-dialog.c:715
+#, c-format
+msgid ""
+"Diagnostic log saved to:\n"
+"%s"
+msgstr ""
+"Ախտորոշիչ մատեանը պահուել է այստեղ՝\n"
+"%s"
+
+#: xfburn/xfburn-utils.c:131
 msgid "Select command"
 msgstr "Ընտրել հրաման"
 
-#: xfburn/xfburn-utils.c:129
-msgid "_Save"
-msgstr "_Պահել"
-
-#: xfburn/xfburn-utils.c:168
+#: xfburn/xfburn-utils.c:171
 msgid "File(s) to add to composition"
 msgstr "Նիշ(եր)՝ համադրութեան մէջ յաւելելու համար"
 
-#: xfburn/xfburn-welcome-tab.c:98
-msgid "Welcome to Xfburn!"
-msgstr "Բարի գալուստ Xfburn"
+#: xfburn/xfburn-welcome-tab.c:99
+msgid "Welcome to Xfburn-X!"
+msgstr "Բարի գալուստ Xfburn-X։"
 
 #. buttons
-#: xfburn/xfburn-welcome-tab.c:118
+#: xfburn/xfburn-welcome-tab.c:119
 msgid "<big>Burn _Image</big>"
 msgstr "<big>Գրանցել _պատկերը</big>"
 
-#: xfburn/xfburn-welcome-tab.c:118
+#: xfburn/xfburn-welcome-tab.c:119
 msgid "Burn a prepared composition, i.e. an .ISO file"
 msgstr ""
 
-#: xfburn/xfburn-welcome-tab.c:123
+#: xfburn/xfburn-welcome-tab.c:124
 msgid "<big>New _Data Composition</big>"
 msgstr "<big>Տուեալների նոր համադրութիւն</big>"
 
-#: xfburn/xfburn-welcome-tab.c:123
+#: xfburn/xfburn-welcome-tab.c:124
 msgid "Create a new data disc with the files of your choosing"
 msgstr "Ստեղծել տուեալների նոր սկաւառակ, ձեր կողմից ընտրուող նիշերով"
 
-#: xfburn/xfburn-welcome-tab.c:128
+#: xfburn/xfburn-welcome-tab.c:129
 msgid "<big>_Blank Disc</big>"
 msgstr "<big>_Դատարկ սկաւառակ</big>"
 
-#: xfburn/xfburn-welcome-tab.c:128
+#: xfburn/xfburn-welcome-tab.c:129
 msgid "Prepare the rewriteable disc for a new burn"
 msgstr "Պատրաստել վերագրանցելի սկաւառակը նոր գրանցման համար"
 
-#: xfburn/xfburn-welcome-tab.c:133
+#: xfburn/xfburn-welcome-tab.c:134
 msgid "<big>_Audio CD</big>"
 msgstr "<big>_Ձայնասկաւառակ</big>"
 
-#: xfburn/xfburn-welcome-tab.c:133
+#: xfburn/xfburn-welcome-tab.c:134
 msgid "Audio CD playable in regular stereos"
 msgstr "Ձայնասկաւառակը նուագարկելի է, կանոնաւոր ձայնային սարքերում"
 
 #. Note to translators: you can probably keep this as gstreamer,
 #. * unless you have a good reason to call it by another name that
 #. * the user would understand better
-#: xfburn/xfburn-audio-composition.c:290 xfburn/xfburn-transcoder-gst.c:572
+#: xfburn/xfburn-audio-composition.c:291 xfburn/xfburn-transcoder-gst.c:584
 msgid "gstreamer"
 msgstr "GStreamer"
 
-#: xfburn/xfburn-audio-composition.c:290
+#: xfburn/xfburn-audio-composition.c:291
 msgid "What files can get burned to an audio CD?"
 msgstr "Ո՞ր նիշերն են կարող գրանցվել ձայնասկաւառակում։"
 
-#: xfburn/xfburn-audio-composition.c:319
+#: xfburn/xfburn-audio-composition.c:320
 msgid "Pos"
 msgstr "Դիրք"
 
-#: xfburn/xfburn-audio-composition.c:321
+#: xfburn/xfburn-audio-composition.c:322
 msgid "Length"
 msgstr "Երկարութիւն"
 
-#: xfburn/xfburn-audio-composition.c:323
+#: xfburn/xfburn-audio-composition.c:324
 msgid "Filename"
 msgstr "Նիշի անուն"
 
-#: xfburn/xfburn-audio-composition.c:447
+#: xfburn/xfburn-audio-composition.c:448
 msgid "Cannot burn audio onto a DVD."
 msgstr "Հնարավոր չէ գրանցել ձայնային նիշը՝ DVD֊ում։"
 
-#: xfburn/xfburn-audio-composition.c:941
+#: xfburn/xfburn-audio-composition.c:942
 msgid "You can only have a maximum of 99 tracks."
 msgstr "Կարելի է ունենալ առավելագույնը 99 շավիղ։"
 
-#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:230
+#: xfburn/xfburn-burn-audio-cd-composition-dialog.c:253
 msgid "A problem with the burn backend occurred."
 msgstr "Գրանցման ետներեսի խնդիր։"
 
-#: xfburn/xfburn-disc-usage.c:115
+#: xfburn/xfburn-disc-usage.c:113
 msgid "Proceed to Burn"
 msgstr "Առաջ անցնել դէպի գրանցումը"
 
-#: xfburn/xfburn-disc-usage.c:153
+#: xfburn/xfburn-disc-usage.c:169
 msgid "You are trying to burn more onto the disc than it can hold."
 msgstr "Դուք փորձում եք գրանցել ավելին, քան սկաւառակը կարող է պահել։"
 
 #. globals
-#: xfburn/xfburn-transcoder-basic.c:65 xfburn/xfburn-transcoder-gst.c:146
+#: xfburn/xfburn-transcoder-basic.c:66 xfburn/xfburn-transcoder-gst.c:148
 msgid "An error occurred while setting the burning backend up"
 msgstr ""
 
-#: xfburn/xfburn-transcoder-basic.c:119
+#: xfburn/xfburn-transcoder-basic.c:120
 msgid "basic"
 msgstr "հիմնական"
 
-#: xfburn/xfburn-transcoder-basic.c:125
+#: xfburn/xfburn-transcoder-basic.c:126
 msgid ""
 "The basic transcoder is built in,\n"
 "and does not require any library.\n"
@@ -1189,38 +1346,46 @@ msgid ""
 "compositions from different types of\n"
 "audio files, please compile with\n"
 "gstreamer support."
-msgstr "Հիմնական կրկնաայլագրիչը ներկառուցված է\n և չի պահանջում ոչ մի գրադարան։\nԱյն կարող է պահել միայն չսեղմված,\n.wav-նիշեր։.\n\nԵթե ցանկանում եք ստեղծել շավիղների\nհամադրություն տարբեր տեսակների\nձայնային նիշերից, համադրեք gstreamer սպասարկչի հետ։"
+msgstr ""
+"Հիմնական կրկնաայլագրիչը ներկառուցված է\n"
+" և չի պահանջում ոչ մի գրադարան։\n"
+"Այն կարող է պահել միայն չսեղմված,\n"
+".wav-նիշեր։.\n"
+"\n"
+"Եթե ցանկանում եք ստեղծել շավիղների\n"
+"համադրություն տարբեր տեսակների\n"
+"ձայնային նիշերից, համադրեք gstreamer սպասարկչի հետ։"
 
-#: xfburn/xfburn-transcoder-basic.c:149
+#: xfburn/xfburn-transcoder-basic.c:150
 #, c-format
 msgid "File %s does not have a .wav extension"
 msgstr "%s նիշը չունի .wav ընդլայնում"
 
-#: xfburn/xfburn-transcoder-basic.c:154
+#: xfburn/xfburn-transcoder-basic.c:155
 #, c-format
 msgid "File %s does not contain uncompressed PCM wave audio"
 msgstr "%s նիշը չի պարունակում չսեղմուած PCM ձայնային նիշեր"
 
-#: xfburn/xfburn-transcoder-basic.c:160
+#: xfburn/xfburn-transcoder-basic.c:161
 #, c-format
 msgid "Could not stat %s: %s"
 msgstr "Հնարաւոր չէ ստանալ վիճակագրութիւն %s․ %s֊ի վերաբերեալ"
 
-#: xfburn/xfburn-transcoder-basic.c:192
+#: xfburn/xfburn-transcoder-basic.c:193
 #, c-format
 msgid "Could not open %s."
 msgstr "%s֊ը չի բացվել։"
 
-#: xfburn/xfburn-transcoder-basic.c:271
+#: xfburn/xfburn-transcoder-basic.c:272
 #, c-format
 msgid "Could not open %s: %s"
 msgstr "%s․ %s֊ը չի բացվել։"
 
-#: xfburn/xfburn-transcoder-gst.c:145
+#: xfburn/xfburn-transcoder-gst.c:147
 msgid "An error occurred setting gstreamer up for transcoding"
 msgstr ""
 
-#: xfburn/xfburn-transcoder-gst.c:147
+#: xfburn/xfburn-transcoder-gst.c:149
 #, c-format
 msgid ""
 "%s is missing.\n"
@@ -1230,11 +1395,11 @@ msgid ""
 "for the necessary plugins.\n"
 msgstr ""
 
-#: xfburn/xfburn-transcoder-gst.c:535
+#: xfburn/xfburn-transcoder-gst.c:547
 msgid "File content has a decoder but is not audio."
 msgstr ""
 
-#: xfburn/xfburn-transcoder-gst.c:578
+#: xfburn/xfburn-transcoder-gst.c:590
 msgid ""
 "The gstreamer transcoder uses the gstreamer\n"
 "library for creating audio compositions.\n"
@@ -1244,30 +1409,39 @@ msgid ""
 "If an audio file is not recognized, make sure\n"
 "that you have the 'good','bad', and 'ugly'\n"
 "gstreamer plugin packages installed."
-msgstr "Կրկնաայլագրիչն օգտագործում է\ngstreamer գրադարան ձայնային համադրությունների ստեղծման համար։\n\nԸստ էության՝ բոլոր ձայնային նիշերը պետք է սատարվեն,\nհաշվի առնելով, որ բոլոր ճիշտ ներդրոնները տեղակայված են։\nԵթե ձայնային նիշը չի ճանաչվում՝ համոզուեք, gstreamer֊ի 'good','bad' և 'ugly' ներդրոնները։"
+msgstr ""
+"Կրկնաայլագրիչն օգտագործում է\n"
+"gstreamer գրադարան ձայնային համադրությունների ստեղծման համար։\n"
+"\n"
+"Ըստ էության՝ բոլոր ձայնային նիշերը պետք է սատարվեն,\n"
+"հաշվի առնելով, որ բոլոր ճիշտ ներդրոնները տեղակայված են։\n"
+"Եթե ձայնային նիշը չի ճանաչվում՝ համոզուեք, gstreamer֊ի 'good','bad' և 'ugly' "
+"ներդրոնները։"
 
-#: xfburn/xfburn-transcoder-gst.c:618
+#: xfburn/xfburn-transcoder-gst.c:630
 msgid "No information available on which plugin is required."
 msgstr ""
 
-#: xfburn/xfburn-transcoder-gst.c:620
+#: xfburn/xfburn-transcoder-gst.c:632
 msgid "Required plugins: "
 msgstr ""
 
-#: xfburn/xfburn-transcoder-gst.c:655 xfburn/xfburn-transcoder-gst.c:680
+#: xfburn/xfburn-transcoder-gst.c:667 xfburn/xfburn-transcoder-gst.c:692
 #, c-format
 msgid "An error occurred while identifying '%s' with gstreamer"
 msgstr "'%s', gstreamer֊ի հետ նոյնականացման սխալ"
 
-#: xfburn/xfburn-transcoder-gst.c:668
+#: xfburn/xfburn-transcoder-gst.c:680
 msgid "A plugin"
 msgstr "Ներդրաւն"
 
-#: xfburn/xfburn-transcoder-gst.c:796
+#: xfburn/xfburn-transcoder-gst.c:809
+#, c-format
 msgid "Gstreamer did not want to start transcoding (timed out)"
 msgstr "Gstreamer֊ը չի ցանկացել սկսել կրկնայլարգումը, ուշացման պատճառով։"
 
-#: xfburn/xfburn-transcoder-gst.c:830
+#: xfburn/xfburn-transcoder-gst.c:844
+#, c-format
 msgid "Failed to change songs while transcoding"
 msgstr "Երգերի փոփոխումը ձախողուել է, կրկնաայլագրման ընթացքում"
 
@@ -1277,177 +1451,715 @@ msgstr "ոչ մեկը"
 
 #: xfburn/xfburn-transcoder.c:76 xfburn/xfburn-transcoder.c:103
 #: xfburn/xfburn-transcoder.c:115
+#, c-format
 msgid "not implemented"
 msgstr "չիրագործուած"
 
-#: xfburn/xfburn-device.c:255 xfburn/xfburn-device.c:256
+#: xfburn/xfburn-device.c:265 xfburn/xfburn-device.c:266
 msgid "Display name"
 msgstr "Ցուցադրիչի անուն"
 
-#: xfburn/xfburn-device.c:258 xfburn/xfburn-device.c:259
+#: xfburn/xfburn-device.c:268 xfburn/xfburn-device.c:269
 msgid "Device address"
 msgstr "Սարքի հասցէ"
 
-#: xfburn/xfburn-device.c:261
+#: xfburn/xfburn-device.c:271
 msgid "Device revision"
 msgstr ""
 
-#: xfburn/xfburn-device.c:262
+#: xfburn/xfburn-device.c:272
 msgid "Device Revision"
 msgstr ""
 
-#: xfburn/xfburn-device.c:264 xfburn/xfburn-device.c:265
+#: xfburn/xfburn-device.c:274 xfburn/xfburn-device.c:275
 msgid "Burn speeds supported by the device"
 msgstr "Գրանցման արագութիւնը կախուած է սարքից"
 
-#: xfburn/xfburn-device.c:267 xfburn/xfburn-device.c:268
+#: xfburn/xfburn-device.c:277 xfburn/xfburn-device.c:278
 msgid "Disc status"
 msgstr "Սկաւառակի վիճակ"
 
-#: xfburn/xfburn-device.c:270 xfburn/xfburn-device.c:271
+#: xfburn/xfburn-device.c:280 xfburn/xfburn-device.c:281
 msgid "Profile no. as reported by libburn"
 msgstr "Յատկագրի համարն ըստ libburn֊ի"
 
-#: xfburn/xfburn-device.c:273 xfburn/xfburn-device.c:274
+#: xfburn/xfburn-device.c:283 xfburn/xfburn-device.c:284
 msgid "Profile name as reported by libburn"
 msgstr "Յատկագրի անունն ըստ libburn֊ի"
 
-#: xfburn/xfburn-device.c:276 xfburn/xfburn-device.c:277
+#: xfburn/xfburn-device.c:286 xfburn/xfburn-device.c:287
 msgid "Is the disc erasable"
 msgstr "Սկաւառակը ջնջուո՞ղ է"
 
-#: xfburn/xfburn-device.c:279 xfburn/xfburn-device.c:280
+#: xfburn/xfburn-device.c:289 xfburn/xfburn-device.c:290
 msgid "Can burn CDR"
 msgstr "Կարող է գրանցել CDR֊ը"
 
-#: xfburn/xfburn-device.c:282 xfburn/xfburn-device.c:283
+#: xfburn/xfburn-device.c:292 xfburn/xfburn-device.c:293
 msgid "Can burn CDRW"
 msgstr "Կարող է գրանցել CDRW֊ը"
 
-#: xfburn/xfburn-device.c:285 xfburn/xfburn-device.c:286
+#: xfburn/xfburn-device.c:295 xfburn/xfburn-device.c:296
 msgid "Can burn DVDR"
 msgstr "Կարող է գրանցել DVDR֊ը"
 
-#: xfburn/xfburn-device.c:288 xfburn/xfburn-device.c:289
+#: xfburn/xfburn-device.c:298 xfburn/xfburn-device.c:299
 msgid "Can burn DVDPLUSR"
 msgstr "Կարող է գրանցել DVDPLUSR֊ը"
 
-#: xfburn/xfburn-device.c:291 xfburn/xfburn-device.c:292
+#: xfburn/xfburn-device.c:301 xfburn/xfburn-device.c:302
 msgid "Can burn DVDRAM"
 msgstr "Կարող է գրանցել DVDRAM֊ը"
 
-#: xfburn/xfburn-device.c:294 xfburn/xfburn-device.c:295
+#: xfburn/xfburn-device.c:304 xfburn/xfburn-device.c:305
 msgid "Can burn Blu-ray"
 msgstr "Կարող է գրանցել Blu-ray֊ը"
 
-#: xfburn/xfburn-device.c:297 xfburn/xfburn-device.c:298
+#: xfburn/xfburn-device.c:307 xfburn/xfburn-device.c:308
 msgid "libburn TAO block types"
 msgstr "liburn TAO հանգոյցի տեսակներ"
 
-#: xfburn/xfburn-device.c:300 xfburn/xfburn-device.c:301
+#: xfburn/xfburn-device.c:310 xfburn/xfburn-device.c:311
 msgid "libburn SAO block types"
 msgstr "libburn SAO հանգոյցի տեսակներ"
 
-#: xfburn/xfburn-device.c:303 xfburn/xfburn-device.c:304
+#: xfburn/xfburn-device.c:313 xfburn/xfburn-device.c:314
 msgid "libburn RAW block types"
 msgstr "libburn RAW հանգոյցի տեսակներ"
 
-#: xfburn/xfburn-device.c:306 xfburn/xfburn-device.c:307
+#: xfburn/xfburn-device.c:316 xfburn/xfburn-device.c:317
 msgid "libburn PACKET block types"
 msgstr "libburn PACKET հանգոյցի տեսակներ"
 
-#: xfburn.ui:5
+#: xfburn/xfburn-disc-info.c:313
+msgid "Full format"
+msgstr "Լրիւ ձեւաւորում"
+
+#: xfburn/xfburn-disc-info.c:315
+msgid "CD-RW/DVD-RW full"
+msgstr "CD-RW/DVD-RW լրիւ"
+
+#: xfburn/xfburn-disc-info.c:317
+msgid "CD-RW/DVD-RW grow"
+msgstr "CD-RW/DVD-RW ընդլայնում"
+
+#: xfburn/xfburn-disc-info.c:319
+msgid "DVD-RW quick grow"
+msgstr "DVD-RW արագ ընդլայնում"
+
+#: xfburn/xfburn-disc-info.c:321
+msgid "DVD-RW quick"
+msgstr "DVD-RW արագ"
+
+#: xfburn/xfburn-disc-info.c:323
+msgid "DVD+RW background"
+msgstr "DVD+RW ֆոնային"
+
+#: xfburn/xfburn-disc-info.c:325
+msgid "BD-RE with spare areas"
+msgstr "BD-RE՝ պահեստային տիրոյթներով"
+
+#: xfburn/xfburn-disc-info.c:327
+msgid "BD-RE without spare areas"
+msgstr "BD-RE՝ առանց պահեստային տիրոյթների"
+
+#: xfburn/xfburn-disc-info.c:329
+msgid "BD-R with spare areas"
+msgstr "BD-R՝ պահեստային տիրոյթներով"
+
+#: xfburn/xfburn-disc-info.c:349
+msgid "None"
+msgstr "Ոչ մի"
+
+#: xfburn/xfburn-disc-info.c:357
+msgid "Busy"
+msgstr "Զբաղուած"
+
+#: xfburn/xfburn-disc-info.c:360 xfburn/xfburn-disc-info.c:378
+msgid "Unavailable"
+msgstr "Անհասանելի"
+
+#: xfburn/xfburn-disc-info.c:365
+msgid "Blank / Overwritable"
+msgstr "Դատարկ / Վերագրանցելի"
+
+#: xfburn/xfburn-disc-info.c:365 xfburn/xfburn-disc-info.c:1540
+msgid "Blank"
+msgstr "Դատարկ"
+
+#: xfburn/xfburn-disc-info.c:367
+msgid "Empty"
+msgstr "Թափուր"
+
+#: xfburn/xfburn-disc-info.c:369
+msgid "Appendable"
+msgstr "Լրացման ենթակայ"
+
+#: xfburn/xfburn-disc-info.c:371
+msgid "Full / Closed"
+msgstr "Լիքը / Փակուած"
+
+#: xfburn/xfburn-disc-info.c:373
+msgid "Unsuitable"
+msgstr "Անհամապատասխան"
+
+#: xfburn/xfburn-disc-info.c:375
+msgid "Not Ready"
+msgstr "Պատրաստ չէ"
+
+#: xfburn/xfburn-disc-info.c:386 xfburn/xfburn-disc-info.c:1044
+msgid "Drive is busy (burn or blank operation in progress)"
+msgstr "Սկաւառակակիրը զբաղուած է (գրանցման կամ մաքրման գործողութիւն է ընթանում)"
+
+#: xfburn/xfburn-disc-info.c:398
+msgid "Blank / Overwritable (ready to write)"
+msgstr "Դատարկ / Վերագրանցելի (պատրաստ է գրանցման)"
+
+#: xfburn/xfburn-disc-info.c:400
+msgid "Blank (ready to write)"
+msgstr "Դատարկ (պատրաստ է գրանցման)"
+
+#: xfburn/xfburn-disc-info.c:402
+msgid "Empty (no disc in drive)"
+msgstr "Թափուր (սկաւառակակրում սկաւառակ չկայ)"
+
+#: xfburn/xfburn-disc-info.c:404
+msgid "Appendable (incomplete / multisession)"
+msgstr "Լրացման ենթակայ (անաւարտ / բազմանստաշրջան)"
+
+#: xfburn/xfburn-disc-info.c:406
+msgid "Full / Closed (read-only)"
+msgstr "Լիքը / Փակուած (միայն ընթերցման համար)"
+
+#: xfburn/xfburn-disc-info.c:408
+msgid "Unsuitable media"
+msgstr "Անհամապատասխան կրիչ"
+
+#: xfburn/xfburn-disc-info.c:410
+msgid "Drive not ready"
+msgstr "Սկաւառակակիրը պատրաստ չէ"
+
+#: xfburn/xfburn-disc-info.c:413 xfburn/xfburn-disc-info.c:462
+#: xfburn/xfburn-disc-info.c:1377
+msgid "Unknown"
+msgstr "Անյայտ"
+
+#: xfburn/xfburn-disc-info.c:1057
+msgid "No disc in drive"
+msgstr "Սկաւառակակրում սկաւառակ չկայ"
+
+#: xfburn/xfburn-disc-info.c:1117
+msgid "Supported Media"
+msgstr "Աջակցուող կրիչներ"
+
+#: xfburn/xfburn-disc-info.c:1132 xfburn/xfburn-disc-info-dialog.c:263
+msgid "No optical burner detected.\n"
+msgstr ""
+"Օպտիկական այրող սարք չի յայտնաբերուել։\n"
+
+#. Section 1: Drive
+#: xfburn/xfburn-disc-info.c:1138
+msgid "Drive"
+msgstr "Սկաւառակակիր"
+
+#: xfburn/xfburn-disc-info.c:1140
+msgid "Device"
+msgstr "Սարք"
+
+#: xfburn/xfburn-disc-info.c:1145 xfburn/xfburn-disc-info.c:1148
+msgid "Model"
+msgstr "Մոդել"
+
+#: xfburn/xfburn-disc-info.c:1152
+msgid "Serial Number"
+msgstr "Սերիական համար"
+
+#: xfburn/xfburn-disc-info.c:1156
+msgid "Buffer Size"
+msgstr "Բուֆերի չափ"
+
+#. Section 2: Disc & Media Identity
+#: xfburn/xfburn-disc-info.c:1162
+msgid "Disc & Media Identity"
+msgstr "Սկաւառակի եւ կրիչի տուեալներ"
+
+#: xfburn/xfburn-disc-info.c:1163
+msgid "Status"
+msgstr "Կարգավիճակ"
+
+#: xfburn/xfburn-disc-info.c:1167
+msgid "Details"
+msgstr "Մանրամասներ"
+
+#: xfburn/xfburn-disc-info.c:1171
+msgid "Close any files open on the disc or unmount it, then click Refresh."
+msgstr "Փակէք սկաւառակում բացուած բոլոր նիշքերը կամ ապամիացրէք այն, ապա սեղմէք «Թարմացնել»։"
+
+#. Section 4: Speeds & Write Modes
+#: xfburn/xfburn-disc-info.c:1179 xfburn/xfburn-disc-info.c:1423
+msgid "Speeds & Write Modes"
+msgstr "Արագութիւններ եւ գրանցման ռեժիմներ"
+
+#: xfburn/xfburn-disc-info.c:1180 xfburn/xfburn-disc-info.c:1445
+msgid "Max Read Speed"
+msgstr "Ընթերցման առաւելագոյն արագութիւն"
+
+#: xfburn/xfburn-disc-info.c:1190
+msgid "Media Type"
+msgstr "Կրիչի տեսակ"
+
+#: xfburn/xfburn-disc-info.c:1195 xfburn/xfburn-disc-info.c:1197
+#: xfburn/xfburn-disc-info.c:1199 xfburn/xfburn-disc-info.c:1201
+msgid "Rewritable"
+msgstr "Վերագրանցելի"
+
+#: xfburn/xfburn-disc-info.c:1195
+msgid "No (read-only)"
+msgstr "Ոչ (միայն ընթերցման)"
+
+#: xfburn/xfburn-disc-info.c:1197
+msgid "Yes (overwritable)"
+msgstr "Այո (վերագրանցելի)"
+
+#: xfburn/xfburn-disc-info.c:1199
+msgid "Yes (erasable)"
+msgstr "Այո (մաքրուող)"
+
+#: xfburn/xfburn-disc-info.c:1201
+msgid "No (write-once)"
+msgstr "Ոչ (մէկանգամեայ գրանցման)"
+
+#: xfburn/xfburn-disc-info.c:1205
+msgid "Manufacturer"
+msgstr "Արտադրող"
+
+#: xfburn/xfburn-disc-info.c:1215
+msgid "Media ID (ASCII)"
+msgstr "Կրիչի ID (ASCII)"
+
+#: xfburn/xfburn-disc-info.c:1219
+msgid "Media ID (Hex)"
+msgstr "Կրիչի ID (Hex)"
+
+#: xfburn/xfburn-disc-info.c:1225
+msgid "Product ID"
+msgstr "Ապրանքի ID"
+
+#: xfburn/xfburn-disc-info.c:1239
+msgid "Media Code 1"
+msgstr "Կրիչի կոդ 1"
+
+#: xfburn/xfburn-disc-info.c:1243
+msgid "Media Code 2"
+msgstr "Կրիչի կոդ 2"
+
+#: xfburn/xfburn-disc-info.c:1249 xfburn/xfburn-disc-info.c:1251
+msgid "Book Type"
+msgstr "Գրքի տեսակ (Book Type)"
+
+#: xfburn/xfburn-disc-info.c:1257
+msgid "multi-layer"
+msgstr "բազմաշերտ"
+
+#: xfburn/xfburn-disc-info.c:1257
+msgid "single-layer"
+msgstr "միաշերտ"
+
+#: xfburn/xfburn-disc-info.c:1258
+msgid "part version"
+msgstr "մասի տարբերակ"
+
+#: xfburn/xfburn-disc-info.c:1260
+msgid "Physical Format"
+msgstr "Ֆիզիկական ձեւաչափ"
+
+#: xfburn/xfburn-disc-info.c:1265
+msgid "blocks"
+msgstr "բլոկ"
+
+#: xfburn/xfburn-disc-info.c:1266
+msgid "Physical Capacity"
+msgstr "Ֆիզիկական տարողութիւն"
+
+#: xfburn/xfburn-disc-info.c:1282
+msgid "ATIP Lead-In"
+msgstr "ATIP Lead-In"
+
+#: xfburn/xfburn-disc-info.c:1283
+msgid "ATIP Lead-Out"
+msgstr "ATIP Lead-Out"
+
+#: xfburn/xfburn-disc-info.c:1290
+msgid "CD Disc Type"
+msgstr "CD սկաւառակի տեսակ"
+
+#: xfburn/xfburn-disc-info.c:1294
+msgid "CD Disc ID"
+msgstr "CD սկաւառակի ID"
+
+#: xfburn/xfburn-disc-info.c:1298
+msgid "Bar Code"
+msgstr "Շտրիխ կոդ"
+
+#: xfburn/xfburn-disc-info.c:1308
+#, c-format
+msgid "%'d / %'d blocks free (%.1f%%)"
+msgstr "%'d / %'d բլոկ ազատ է (%.1f%%)"
+
+#: xfburn/xfburn-disc-info.c:1312
+msgid "BD Spare Area"
+msgstr "BD պահեստային տիրոյթ"
+
+#: xfburn/xfburn-disc-info.c:1317
+msgid "BD-R POW"
+msgstr "BD-R POW"
+
+#: xfburn/xfburn-disc-info.c:1317
+msgid "Yes (Pseudo Overwrite formatted; sequential multisession disabled)"
+msgstr "Այո (ձեւաւորուած է Pseudo Overwrite եղանակով․ յաջորդական բազմանստաշրջանն անջատուած է)"
+
+#. Section 3: Capacity & Format
+#: xfburn/xfburn-disc-info.c:1321
+msgid "Capacity & Format"
+msgstr "Տարողութիւն եւ ձեւաչափ"
+
+#: xfburn/xfburn-disc-info.c:1331 xfburn/xfburn-disc-info.c:1335
+#: xfburn/xfburn-disc-info.c:1352 xfburn/xfburn-disc-info.c:1356
+msgid "sectors"
+msgstr "հատուած"
+
+#: xfburn/xfburn-disc-info.c:1337 xfburn/xfburn-disc-info.c:1341
+msgid "Available Space"
+msgstr "Հասանելի տարածք"
+
+#: xfburn/xfburn-disc-info.c:1341
+msgid "0 B (none)"
+msgstr "0 Բ (չկայ)"
+
+#: xfburn/xfburn-disc-info.c:1358
+msgid "Recorded Size"
+msgstr "Գրանցուած չափ"
+
+#: xfburn/xfburn-disc-info.c:1370
+msgid "Unformatted"
+msgstr "Չձեւաւորուած"
+
+#: xfburn/xfburn-disc-info.c:1373
+msgid "Formatted"
+msgstr "Ձեւաւորուած"
+
+#: xfburn/xfburn-disc-info.c:1386
+msgid "Format Status"
+msgstr "Ձեւաւորման կարգավիճակ"
+
+#: xfburn/xfburn-disc-info.c:1403
+msgid "Available Formats"
+msgstr "Հասանելի ձեւաչափեր"
+
+#: xfburn/xfburn-disc-info.c:1411
+msgid "track start"
+msgstr "շաւիղի սկիզբ"
+
+#: xfburn/xfburn-disc-info.c:1412
+msgid "Next Writable"
+msgstr "Յաջորդ գրանցելի հասցէ"
+
+#: xfburn/xfburn-disc-info.c:1417 xfburn/xfburn-disc-info.c:1419
+msgid "Track Health"
+msgstr "Շաւիղի վիճակ"
+
+#: xfburn/xfburn-disc-info.c:1417
+msgid "Warning: last track marked damaged (theoretically writable)"
+msgstr "Զգուշացում՝ վերջին շաւիղը նշուած է որպէս վնասուած (տեսականօրէն գրանցելի)"
+
+#: xfburn/xfburn-disc-info.c:1419
+msgid "Warning: last track marked damaged and not writable"
+msgstr "Զգուշացում՝ վերջին շաւիղը նշուած է որպէս վնասուած եւ գրանցման ենթակայ չէ"
+
+#: xfburn/xfburn-disc-info.c:1437 xfburn/xfburn-disc-info.c:1440
+msgid "Write Speeds"
+msgstr "Գրանցման արագութիւններ"
+
+#: xfburn/xfburn-disc-info.c:1440
+msgid "None reported"
+msgstr "Տուեալներ չկան"
+
+#: xfburn/xfburn-disc-info.c:1470
+msgid "advised"
+msgstr "խորհուրդ տրուող"
+
+#: xfburn/xfburn-disc-info.c:1472
+msgid "Write Modes"
+msgstr "Գրանցման ռեժիմներ"
+
+#: xfburn/xfburn-disc-info.c:1477
+msgid "Multi-session"
+msgstr "Բազմանստաշրջան"
+
+#: xfburn/xfburn-disc-info.c:1483
+msgid "Multi-track"
+msgstr "Բազմաշաւիղ"
+
+#: xfburn/xfburn-disc-info.c:1489
+msgid "Simulation (dummy write)"
+msgstr "Մոդելաւորում (փորձնական գրանցում)"
+
+#: xfburn/xfburn-disc-info.c:1492
+msgid "Capabilities"
+msgstr "Հնարաւորութիւններ"
+
+#: xfburn/xfburn-disc-info.c:1502
+msgid "Sessions & Tracks"
+msgstr "Նստաշրջաններ եւ շաւիղներ"
+
+#: xfburn/xfburn-disc-info.c:1504
+#, c-format
+msgid "%d complete, %d incomplete"
+msgstr "%d աւարտուած, %d անաւարտ"
+
+#: xfburn/xfburn-disc-info.c:1508
+#, c-format
+msgid "%d complete"
+msgstr "%d աւարտուած"
+
+#: xfburn/xfburn-disc-info.c:1510
+msgid "Sessions"
+msgstr "Նստաշրջաններ"
+
+#: xfburn/xfburn-disc-info.c:1518
+msgid "Sess"
+msgstr "Նստ."
+
+#: xfburn/xfburn-disc-info.c:1518
+msgid "Track"
+msgstr "Շաւիղ"
+
+#: xfburn/xfburn-disc-info.c:1518
+msgid "Start LBA"
+msgstr "Սկզբ. LBA"
+
+#: xfburn/xfburn-disc-info.c:1519
+msgid "Sectors"
+msgstr "Հատուած"
+
+#: xfburn/xfburn-disc-info.c:1519
+msgid "Flags"
+msgstr "Դրօշներ"
+
+#: xfburn/xfburn-disc-info.c:1524
+msgid "Data"
+msgstr "Տուեալներ"
+
+#: xfburn/xfburn-disc-info.c:1524
+msgid "Audio"
+msgstr "Ձայնային"
+
+#: xfburn/xfburn-disc-info.c:1546
+msgid "Damaged"
+msgstr "Վնասուած"
+
+#: xfburn/xfburn-disc-info.c:1552
+msgid "Packet"
+msgstr "Փաթեթային"
+
+#: xfburn/xfburn-disc-info-dialog.c:182
+msgid "Reading disc information..."
+msgstr "Սկաւառակի տուեալների ընթերցում..."
+
+#: xfburn/xfburn-disc-info-dialog.c:345
+msgid "Unknown drive"
+msgstr "Անյայտ սկաւառակակիր"
+
+#: xfburn/xfburn-disc-info-dialog.c:428
+msgid "Copied to clipboard"
+msgstr "Պատճէնուել է փոխանակման բուֆերում"
+
+#: xfburn/xfburn-disc-info-dialog.c:509 xfburn-x.ui:53
+msgid "Disc Info"
+msgstr "Սկաւառակի տուեալներ"
+
+#: xfburn/xfburn-disc-info-dialog.c:511
+msgid "Inspect inserted optical media and drive capabilities"
+msgstr "Ստուգել տեղադրուած օպտիկական կրիչի եւ սկաւառակակրի հնարաւորութիւնները"
+
+#: xfburn/xfburn-disc-info-dialog.c:529
+msgid "_Drive:"
+msgstr "Սկաւառակակիր (_D)՝"
+
+#: xfburn/xfburn-disc-info-dialog.c:548
+msgid "Refresh disc information"
+msgstr "Թարմացնել սկաւառակի տուեալները"
+
+#. Action buttons
+#: xfburn/xfburn-disc-info-dialog.c:596
+msgid "_Copy"
+msgstr "Պատճէնել (_C)"
+
+#: xfburn/xfburn-disc-info-dialog.c:597
+msgid "Copy full disc report to clipboard"
+msgstr "Պատճէնել սկաւառակի ամբողջական հաշուետուութիւնը փոխանակման բուֆերում"
+
+#: xfburn-x.ui:5
 msgid "_Files"
 msgstr ""
 
-#: xfburn.ui:8
+#: xfburn-x.ui:8
 msgid "New _data composition"
 msgstr ""
 
-#: xfburn.ui:12
+#: xfburn-x.ui:12
 msgid "New _audio composition"
 msgstr ""
 
-#: xfburn.ui:18
+#: xfburn-x.ui:18
 msgid "_Close composition"
 msgstr ""
 
-#: xfburn.ui:24
+#: xfburn-x.ui:24
 msgid "_Quit"
 msgstr "_Փակել"
 
-#: xfburn.ui:30
+#: xfburn-x.ui:30
 msgid "_Edit"
 msgstr "_Խմբագրում"
 
-#: xfburn.ui:33
+#: xfburn-x.ui:33
 msgid "Prefere_nce"
 msgstr ""
 
-#: xfburn.ui:39
+#: xfburn-x.ui:39
 msgid "_Action"
 msgstr "_Գործողութիւն"
 
-#: xfburn.ui:53
+#: xfburn-x.ui:59
 msgid "_View"
 msgstr "_Տեսք"
 
-#: xfburn.ui:62
+#: xfburn-x.ui:68
 msgid "Show Toolbars"
 msgstr ""
 
-#: xfburn.ui:66
+#: xfburn-x.ui:72
 msgid "Show Filebrowser"
 msgstr ""
 
-#: xfburn.ui:73
+#: xfburn-x.ui:79
 msgid "_Help"
 msgstr "_Աջակցութիւն"
 
-#: xfburn.ui:81
+#: xfburn-x.ui:87
 msgid "About"
 msgstr "Մասին"
 
-#: xfburn-popup-menus.ui:13
+#: xfburn-x-popup-menus.ui:13
 msgid "Rename"
 msgstr "Անուանափոխել"
 
-#: xfburn-popup-menus.ui:33
+#: xfburn-x-popup-menus.ui:33
 msgid "Rename Artist"
 msgstr "Անուանափոխել կատարողին"
 
-#: xfburn-popup-menus.ui:37
+#: xfburn-x-popup-menus.ui:37
 msgid "Rename Title"
 msgstr "Փոխել անունը"
 
-#: desktop-integration/thunar-sendto-xfburn.desktop.in:5
-msgid "Data Composition"
-msgstr "Տուեալների համադրութիւն"
+#: desktop-integration/thunar-sendto-xfburn-x.desktop.in:4
+msgid "Data Composition (Xfburn-X)"
+msgstr "Տուեալների համադրութիւն (Xfburn-X)"
 
-#: xfburn.desktop.in:6
+#: xfburn-x.desktop.in:5
 msgid "Disk Burning"
 msgstr "Սկաւառակի գրանցում"
 
-#: xfburn.desktop.in:7
-msgid "CD and DVD burning application"
-msgstr "CD եւ DVD գրանցող ծրագիր"
+#: xfburn-x.desktop.in:6
+msgid "CD, DVD, and Blu-ray burning application with post-burn verification"
+msgstr "CD, DVD եւ Blu-ray սկաւառակների գրանցման ծրագիր՝ գրանցումից յետոյ ստուգմամբ"
 
-#: xfburn.desktop.in:14
-msgid "Burn;CD;DVD;ISO;Disc;Write;Audio;Video;"
-msgstr ""
+#: xfburn-x.desktop.in:13
+msgid "Burn;CD;DVD;BD;Blu-ray;ISO;Disc;Write;Verify;Audio;Video;"
+msgstr "Գրանցում;Այրում;CD;DVD;BD;Blu-ray;ISO;Սկաւառակ;Գրել;Ստուգել;Ձայն;Տեսանիւթ;"
 
-#: xfburn.desktop.in:22
-msgid "Burn Image (xfburn)"
-msgstr "Գրանցել պատկերը (xfburn)"
+#: xfburn-x.desktop.in:22
+msgid "Burn Image (Xfburn-X)"
+msgstr "Գրանցել պատկերը (Xfburn-X)"
 
-#: org.xfce.xfburn.appdata.xml.in:9
-msgid "A simple CD burning tool"
-msgstr ""
-
-#: org.xfce.xfburn.appdata.xml.in:12
+#: io.github.asdfjkl.xfburn-x.metainfo.xml.in:10
 msgid ""
-"Xfburn is a simple CD/DVD burning tool based on libburnia libraries. It can "
-"blank CD/DVD(-RW)s, burn and create iso images, audio CDs, as well as burn "
-"personal compositions of data to either CD or DVD. It is stable and under "
-"ongoing development."
-msgstr "Xfburn – ը պարզ CD/DVD գրանցող սարք է, հիմնված՝ libburnia գրադարանների վրա։ Այն կարող է մաքրել CD/DVD(-RW)ներ, գրանցել և ստեղծել iso պատկերներ, ձայնայինCD֊ներ, ինչպէս նաև գրանցել անձնական տվյալների համադրություններ CD֊ում և DVD֊ում։Այն կայուն է և գտնվում է շարունակական մշակման մեջ։"
+"CD, DVD, and Blu-ray burning tool with verification and diagnostic logging"
+msgstr "CD, DVD եւ Blu-ray սկաւառակների գրանցման գործիք՝ ստուգմամբ եւ ախտորոշիչ մատեանաւորմամբ"
+
+#: io.github.asdfjkl.xfburn-x.metainfo.xml.in:13
+msgid "Dominik Klein"
+msgstr "Dominik Klein"
+
+#: io.github.asdfjkl.xfburn-x.metainfo.xml.in:17
+msgid ""
+"Xfburn-X is an enhanced fork of Xfburn based on the libburnia libraries, "
+"designed to install side-by-side with upstream Xfburn without conflicts. It "
+"can blank rewritable discs, burn and create ISO images, create audio CDs, "
+"and burn data compositions to CD, DVD, or Blu-ray (including M-DISC), with "
+"built-in post-burn per-sector hash verification and a user-mode diagnostic "
+"flight-recorder logger."
+msgstr "Xfburn-X-ը Xfburn-ի ընդլայնուած ճիւղաւորումն է՝ հիմնուած libburnia գրադարանների վրայ, որը նախագծուած է հիմնական Xfburn-ի հետ զուգահեռ՝ առանց բախումների տեղադրուելու համար։ Այն կարող է մաքրել վերագրանցելի սկաւառակները, գրանցել եւ ստեղծել ISO պատկերներ, ստեղծել ձայնային CD-ներ եւ գրանցել տուեալների համադրութիւններ CD, DVD կամ Blu-ray (ներառեալ M-DISC) սկաւառակների վրայ՝ ներկառուցուած գրանցումից յետոյ հատուած առ հատուած հեշային ստուգմամբ եւ օգտատիրոջ ռեժիմի ախտորոշիչ մատեանաւորիչով։"
+
+#: io.github.asdfjkl.xfburn-x.metainfo.xml.in:37
+msgid ""
+"Initial Xfburn-X release forked from Xfburn with post-burn verification, GDK/"
+"udev threading deadlock fixes, and user-mode diagnostic logging."
+msgstr "Xfburn-X-ի առաջին թողարկումը՝ ճիւղաւորուած Xfburn-ից, որը ներառում է գրանցումից յետոյ ստուգում, GDK/udev հոսքերի փակուղիների ուղղումներ եւ օգտատիրոջ ռեժիմի ախտորոշիչ մատեանաւորում։"
+
+#~ msgid ""
+#~ "Cannot append data to multisession disc in this write mode (use TAO "
+#~ "instead)"
+#~ msgstr ""
+#~ "Անհնար է յաւելել տուեալներ, բազմանիստ սկաւառակում (գործածէք TAO), այս "
+#~ "եղանակում"
+
+#~ msgid "Closed disc with data detected. Need blank or appendable disc"
+#~ msgstr ""
+#~ "Հայտնաբերվել է փակված սկաւառակ՝ տվյալներով։ Պահանջվում է դատարկ կամ "
+#~ "գրանցելի սկաւառակ։"
+
+#~ msgid "No disc detected in drive"
+#~ msgstr "Յիշասարքում սկաւառակ չի յայտնաբերուել"
+
+#~ msgid "Cannot recognize state of drive and disc"
+#~ msgstr "Անհնար է պարզել յիշասարքի եւ սկաւառակի վիճակը"
+
+#~ msgid "The selected image does not fit on the inserted disc"
+#~ msgstr "Ընտրուած պատկերները չեն համապատասխանում ներդրուած սկաւառակին"
+
+#~ msgid "Failed to get image size"
+#~ msgstr "Անհնար է ստանալ պատկերի չափը"
+
+#~ msgid "default"
+#~ msgstr "լռելեայն"
+
+#~ msgid "Xfburn"
+#~ msgstr "Xfburn"
+
+#~ msgid "Tune how Xfburn behaves"
+#~ msgstr "Կարգաւորել Xfburn֊ի վարքագիծը"
+
+#~ msgid "Welcome to Xfburn!"
+#~ msgstr "Բարի գալուստ Xfburn"
+
+#~ msgid "Data Composition"
+#~ msgstr "Տուեալների համադրութիւն"
+
+#~ msgid "CD and DVD burning application"
+#~ msgstr "CD եւ DVD գրանցող ծրագիր"
+
+#~ msgid "Burn Image (xfburn)"
+#~ msgstr "Գրանցել պատկերը (xfburn)"
+
+#~ msgid ""
+#~ "Xfburn is a simple CD/DVD burning tool based on libburnia libraries. It "
+#~ "can blank CD/DVD(-RW)s, burn and create iso images, audio CDs, as well as "
+#~ "burn personal compositions of data to either CD or DVD. It is stable and "
+#~ "under ongoing development."
+#~ msgstr ""
+#~ "Xfburn – ը պարզ CD/DVD գրանցող սարք է, հիմնված՝ libburnia գրադարանների "
+#~ "վրա։ Այն կարող է մաքրել CD/DVD(-RW)ներ, գրանցել և ստեղծել iso պատկերներ, "
+#~ "ձայնայինCD֊ներ, ինչպէս նաև գրանցել անձնական տվյալների համադրություններ CD֊"
+#~ "ում և DVD֊ում։Այն կայուն է և գտնվում է շարունակական մշակման մեջ։"
