@@ -6,10 +6,27 @@
 
 > [!IMPORTANT]
 > **Pre-built `x86_64` (`amd64`) `.deb` packages for Ubuntu-based distributions** (Ubuntu 24.04 LTS, 26.04 LTS, Xubuntu, Linux Mint, Pop!_OS, etc.) are provided for download on the **[GitHub Releases](https://github.com/asdfjkl/xfburn-x/releases)** page.
->
-> ```bash
-> sudo apt install ./xfburn-x_*_amd64.deb
-> ```
+
+## Installing on Ubuntu-Based Distributions (`.deb`)
+
+1. Download the latest `xfburn-x_*_amd64.deb` from **[GitHub Releases](https://github.com/asdfjkl/xfburn-x/releases)**.
+2. Install the required runtime libraries and then install the `.deb` package:
+
+```bash
+# 1. Install required runtime libraries (and recommended GStreamer/GVfs packages)
+sudo apt update
+sudo apt install -y \
+  hicolor-icon-theme libburn4t64 libexo-2-0 libgdk-pixbuf-2.0-0 \
+  libglib2.0-0t64 libgstreamer-plugins-base1.0-0 libgstreamer1.0-0 \
+  libgtk-3-0t64 libgudev-1.0-0 libisofs6t64 libxfce4ui-2-0 libxfce4util7 \
+  gvfs gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
+  gstreamer1.0-plugins-ugly gstreamer1.0-libav
+
+# 2. Install Xfburn-X
+sudo dpkg -i xfburn-x_*_amd64.deb
+```
+
+*(Alternatively, `sudo apt install ./xfburn-x_*_amd64.deb` installs the package and resolves all dependencies in one command. To uninstall later, run `sudo apt remove xfburn-x`.)*
 
 ---
 
