@@ -13,21 +13,12 @@
 2. Install the required runtime libraries and then install the `.deb` package:
 
 ```bash
-# 1. Install required runtime libraries (and recommended GStreamer/GVfs packages)
-sudo apt update
-sudo apt install -y \
-  hicolor-icon-theme libburn4t64 libexo-2-0 libgdk-pixbuf-2.0-0 \
-  libglib2.0-0t64 libgstreamer-plugins-base1.0-0 libgstreamer1.0-0 \
-  libgtk-3-0t64 libgudev-1.0-0 libisofs6t64 libxfce4ui-2-0 libxfce4util7 \
-  gvfs gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
-  gstreamer1.0-plugins-ugly gstreamer1.0-libav
+# 1. Install Xfburn-X
+sudo apt install ./xfburn-x_*_amd64.deb
 
-# 2. Install Xfburn-X
-sudo dpkg -i xfburn-x_*_amd64.deb
+# 2. Uninstall Xfburn-X
+sudo apt remove xfburn-x
 ```
-
-*(Alternatively, `sudo apt install ./xfburn-x_*_amd64.deb` installs the package and resolves all dependencies in one command. To uninstall later, run `sudo apt remove xfburn-x`.)*
-
 ---
 
 ## New Features
