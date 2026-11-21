@@ -225,22 +225,25 @@ static void fill_combo_mode (XfburnBlankDialog *dialog)
   GtkTreeModel *model = gtk_combo_box_get_model (GTK_COMBO_BOX (priv->combo_type));
   XfburnDeviceList *devlist = xfburn_device_list_new ();
   XfburnDevice *device = xfburn_device_list_get_current_device (devlist);
+  gboolean refreshing = xfburn_device_list_is_refreshing (devlist);
   int n = 0;
 
   gtk_list_store_clear (GTK_LIST_STORE (model));
 
-  while (mode < XFBURN_BLANK_MODE_LAST) {
-    if (is_valid_blank_mode (device, mode)) {
-      GtkTreeIter iter;
+  if (!refreshing) {
+    while (mode < XFBURN_BLANK_MODE_LAST) {
+      if (is_valid_blank_mode (device, mode)) {
+        GtkTreeIter iter;
 
-      gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-      gtk_list_store_set (GTK_LIST_STORE (model), &iter, BLANK_COMBO_NAME_COLUMN, _(blank_mode_names[mode]), BLANK_COMBO_MODE_COLUMN, mode, -1);
-      n++;
+        gtk_list_store_append (GTK_LIST_STORE (model), &iter);
+        gtk_list_store_set (GTK_LIST_STORE (model), &iter, BLANK_COMBO_NAME_COLUMN, _(blank_mode_names[mode]), BLANK_COMBO_MODE_COLUMN, mode, -1);
+        n++;
+      }
+      mode++;
     }
-    mode++;
   }
   gtk_combo_box_set_active (GTK_COMBO_BOX (priv->combo_type), 0);
-  gtk_widget_set_sensitive (priv->button_blank, n > 0);
+  gtk_widget_set_sensitive (priv->button_blank, !refreshing && n > 0);
   g_object_unref (devlist);
 }
 
@@ -413,13 +416,12 @@ thread_blank (ThreadBlankParams * params)
     xfburn_device_release (drive_info, params->eject);
   }
 
+  g_clear_object (&params->device);
   g_free (params);
 
 #ifdef HAVE_GUDEV
-  gdk_threads_enter ();
   DBG ("blanking done!");
   xfburn_udev_manager_send_volume_changed ();
-  gdk_threads_leave ();
 #endif
   return NULL;
 }
@@ -454,7 +456,10 @@ xfburn_blank_dialog_response_cb (XfburnBlankDialog * dialog, gint response_id, g
     ThreadBlankParams *params = NULL;
 
     device = xfburn_device_box_get_selected_device (XFBURN_DEVICE_BOX (priv->device_box));
-
+    if (device == NULL) {
+      xfce_dialog_show_error (GTK_WINDOW (dialog), NULL, _("No burner device selected."));
+      return;
+    }
 
     dialog_progress = xfburn_progress_dialog_new (GTK_WINDOW (dialog));
     g_object_set (dialog_progress, "animate", TRUE, NULL);
@@ -465,7 +470,7 @@ xfburn_blank_dialog_response_cb (XfburnBlankDialog * dialog, gint response_id, g
 
     params = g_new0 (ThreadBlankParams, 1);
     params->dialog_progress = dialog_progress;
-    params->device = device;
+    params->device = g_object_ref (device);
     params->blank_mode = get_selected_mode (priv);
     params->eject = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (priv->check_eject));
     g_thread_unref (g_thread_new ("xfburn_blank", (GThreadFunc) thread_blank, params));

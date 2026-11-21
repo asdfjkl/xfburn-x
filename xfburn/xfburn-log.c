@@ -879,10 +879,98 @@ severity_to_log_level (const gchar *severity)
   return XFBURN_LOG_LEVEL_DEBUG;
 }
 
+#define XFBURN_LIBBURN_CODE_NOT_GRABBED_READ  0x20142
+#define XFBURN_LIBBURN_CODE_LOST_CONNECTION   0x201A6
+#define XFBURN_LIBBURN_CODE_SCSI_HOST_PROBLEM 0x201A7
+
+static gboolean
+is_secondary_not_grabbed_msg (const gchar *msg)
+{
+  return (msg != NULL && strstr (msg, "Drive is not grabbed") != NULL);
+}
+
+void
+xfburn_log_classify_libburn_message (gint error_code,
+                                     gint os_errno,
+                                     const gchar *severity,
+                                     const gchar *msg_text,
+                                     XfburnBackendMsgSummary *summary)
+{
+  gboolean msg_is_lost = FALSE;
+  gboolean msg_is_transport = FALSE;
+  gboolean msg_is_failure;
+
+  if (summary == NULL) {
+    return;
+  }
+
+  msg_is_failure = is_failure_severity (severity);
+  if (msg_is_failure) {
+    summary->total_failures++;
+  }
+
+  if (error_code == XFBURN_LIBBURN_CODE_LOST_CONNECTION ||
+      error_code == XFBURN_LIBBURN_CODE_NOT_GRABBED_READ) {
+    msg_is_lost = TRUE;
+  }
+  if (error_code == XFBURN_LIBBURN_CODE_SCSI_HOST_PROBLEM) {
+    msg_is_transport = TRUE;
+  }
+
+  if (msg_text != NULL) {
+    if (strstr (msg_text, "Lost connection to drive") != NULL ||
+        strstr (msg_text, "Drive is not grabbed") != NULL) {
+      msg_is_lost = TRUE;
+    }
+    if (strstr (msg_text, "yielded host problem:") != NULL ||
+        strstr (msg_text, "yielded driver problem:") != NULL ||
+        strstr (msg_text, "SG_ERR_DID_") != NULL) {
+      msg_is_transport = TRUE;
+    }
+  }
+
+  if (msg_is_failure && (os_errno == ENODEV || os_errno == ENXIO)) {
+    msg_is_lost = TRUE;
+    msg_is_transport = TRUE;
+  }
+
+  if (msg_is_lost) {
+    summary->drive_lost = TRUE;
+  }
+  if (msg_is_transport) {
+    summary->transport_error = TRUE;
+  }
+
+  if (msg_is_lost || msg_is_transport) {
+    /* Preserve the first specific root-cause message (e.g. SG_ERR_DID_ERROR or
+     * "Lost connection to drive") rather than letting follow-up "Command: ..."
+     * or secondary "Drive is not grabbed" lines overwrite it. */
+    gboolean should_store = FALSE;
+
+    if (summary->last_transport_msg[0] == '\0') {
+      should_store = TRUE;
+    } else if (is_secondary_not_grabbed_msg (summary->last_transport_msg) &&
+               !is_secondary_not_grabbed_msg (msg_text)) {
+      should_store = TRUE;
+    }
+
+    if (should_store) {
+      summary->last_transport_code = error_code;
+      summary->last_transport_errno = os_errno;
+      if (msg_text != NULL) {
+        g_strlcpy (summary->last_transport_msg, msg_text, sizeof (summary->last_transport_msg));
+      }
+    }
+  } else if (msg_is_failure) {
+    summary->media_error = TRUE;
+  }
+}
+
 gint
-xfburn_log_drain_backend_messages (const gchar *context,
-                                   gchar *last_failure_buf,
-                                   gsize last_failure_buf_len)
+xfburn_log_drain_backend_messages_ex (const gchar *context,
+                                      gchar *last_failure_buf,
+                                      gsize last_failure_buf_len,
+                                      XfburnBackendMsgSummary *summary)
 {
   gint failure_count = 0;
   int ret;
@@ -931,6 +1019,10 @@ xfburn_log_drain_backend_messages (const gchar *context,
                           ctx_str, severity, error_code, (unsigned int) error_code, msg_text);
     }
 
+    if (summary != NULL) {
+      xfburn_log_classify_libburn_message (error_code, os_errno, severity, msg_text, summary);
+    }
+
     if (is_failure_severity (severity)) {
       failure_count++;
       if (last_failure_buf != NULL && last_failure_buf_len > 0) {
@@ -963,6 +1055,9 @@ xfburn_log_drain_backend_messages (const gchar *context,
 
     if (is_failure_severity (severity)) {
       failure_count++;
+      if (summary != NULL) {
+        summary->total_failures++;
+      }
       if (last_failure_buf != NULL && last_failure_buf_len > 0 && last_failure_buf[0] == '\0') {
         g_strlcpy (last_failure_buf, iso_msg_text, last_failure_buf_len);
       }
@@ -970,6 +1065,14 @@ xfburn_log_drain_backend_messages (const gchar *context,
   }
 
   return failure_count;
+}
+
+gint
+xfburn_log_drain_backend_messages (const gchar *context,
+                                   gchar *last_failure_buf,
+                                   gsize last_failure_buf_len)
+{
+  return xfburn_log_drain_backend_messages_ex (context, last_failure_buf, last_failure_buf_len, NULL);
 }
 
 static gchar *
@@ -1121,6 +1224,122 @@ xfburn_log_read_device_io_counters (const gchar *dev_node,
   return FALSE;
 }
 
+static void
+copy_attr_or_default (gchar *dest, gsize dest_len, const gchar *val, const gchar *fallback)
+{
+  if (val != NULL && val[0] != '\0') {
+    g_strlcpy (dest, val, dest_len);
+  } else {
+    g_strlcpy (dest, fallback, dest_len);
+  }
+}
+
+gboolean
+xfburn_log_read_device_transport (const gchar *dev_node,
+                                  const gchar *sysfs_root_override,
+                                  XfburnDeviceTransportInfo *info)
+{
+  gchar *block_dir;
+  gchar *dev_subdir;
+  char *resolved_dev;
+  gchar *cur_dir;
+  gint depth;
+
+  if (info == NULL) {
+    return FALSE;
+  }
+  memset (info, 0, sizeof (*info));
+
+  block_dir = resolve_block_sysfs_dir (dev_node, sysfs_root_override);
+  if (block_dir == NULL) {
+    return FALSE;
+  }
+
+  info->valid = TRUE;
+  info->is_usb = FALSE;
+  g_strlcpy (info->lpm_u1, "n/a", sizeof (info->lpm_u1));
+  g_strlcpy (info->lpm_u2, "n/a", sizeof (info->lpm_u2));
+  g_strlcpy (info->lpm_permit, "n/a", sizeof (info->lpm_permit));
+
+  /* Walk parent directories of <block_dir>/device to locate any parent USB device node */
+  dev_subdir = g_build_filename (block_dir, "device", NULL);
+  resolved_dev = realpath (dev_subdir, NULL);
+  if (resolved_dev != NULL) {
+    cur_dir = g_strdup (resolved_dev);
+    free (resolved_dev);
+  } else {
+    cur_dir = g_strdup (dev_subdir);
+  }
+  g_free (dev_subdir);
+
+  for (depth = 0; depth < 10 && cur_dir != NULL; depth++) {
+    gchar *usb_speed = read_sysfs_attr_str (cur_dir, "speed");
+    gchar *usb_max_power = read_sysfs_attr_str (cur_dir, "bMaxPower");
+    gchar *usb_id_vendor = read_sysfs_attr_str (cur_dir, "idVendor");
+
+    if (usb_speed != NULL || usb_max_power != NULL || usb_id_vendor != NULL) {
+      gchar *usb_id_product = read_sysfs_attr_str (cur_dir, "idProduct");
+      gchar *usb_version = read_sysfs_attr_str (cur_dir, "version");
+      gchar *power_control = read_sysfs_attr_str (cur_dir, "power/control");
+      gchar *runtime_status = read_sysfs_attr_str (cur_dir, "power/runtime_status");
+      gchar *manufacturer = read_sysfs_attr_str (cur_dir, "manufacturer");
+      gchar *product = read_sysfs_attr_str (cur_dir, "product");
+      gchar *lpm_u1 = read_sysfs_attr_str (cur_dir, "power/usb3_hardware_lpm_u1");
+      gchar *lpm_u2 = read_sysfs_attr_str (cur_dir, "power/usb3_hardware_lpm_u2");
+      gchar *lpm_permit = read_sysfs_attr_str (cur_dir, "port/usb3_lpm_permit");
+      gchar *usb_dir_base = g_path_get_basename (cur_dir);
+
+      info->is_usb = TRUE;
+      copy_attr_or_default (info->usb_node, sizeof (info->usb_node), usb_dir_base, "unknown");
+      copy_attr_or_default (info->vendor_id, sizeof (info->vendor_id), usb_id_vendor, "unknown");
+      copy_attr_or_default (info->product_id, sizeof (info->product_id), usb_id_product, "unknown");
+      copy_attr_or_default (info->speed_mbps, sizeof (info->speed_mbps), usb_speed, "unknown");
+      copy_attr_or_default (info->usb_ver, sizeof (info->usb_ver), usb_version, "unknown");
+      copy_attr_or_default (info->max_power, sizeof (info->max_power), usb_max_power, "unknown");
+      copy_attr_or_default (info->power_control, sizeof (info->power_control), power_control, "unknown");
+      copy_attr_or_default (info->runtime_status, sizeof (info->runtime_status), runtime_status, "unknown");
+      copy_attr_or_default (info->manufacturer, sizeof (info->manufacturer), manufacturer, "unknown");
+      copy_attr_or_default (info->product, sizeof (info->product), product, "unknown");
+      copy_attr_or_default (info->lpm_u1, sizeof (info->lpm_u1), lpm_u1, "n/a");
+      copy_attr_or_default (info->lpm_u2, sizeof (info->lpm_u2), lpm_u2, "n/a");
+      copy_attr_or_default (info->lpm_permit, sizeof (info->lpm_permit), lpm_permit, "n/a");
+      info->has_over_current = read_sysfs_attr_i64 (cur_dir, "port/over_current_count", &info->over_current_count);
+
+      g_free (usb_dir_base);
+      g_free (lpm_permit);
+      g_free (lpm_u2);
+      g_free (lpm_u1);
+      g_free (product);
+      g_free (manufacturer);
+      g_free (runtime_status);
+      g_free (power_control);
+      g_free (usb_version);
+      g_free (usb_id_product);
+      g_free (usb_id_vendor);
+      g_free (usb_max_power);
+      g_free (usb_speed);
+      break;
+    }
+
+    g_free (usb_id_vendor);
+    g_free (usb_max_power);
+    g_free (usb_speed);
+
+    if (g_strcmp0 (cur_dir, "/") == 0 || g_strcmp0 (cur_dir, ".") == 0) {
+      break;
+    }
+    {
+      gchar *parent = g_path_get_dirname (cur_dir);
+      g_free (cur_dir);
+      cur_dir = parent;
+    }
+  }
+
+  g_free (cur_dir);
+  g_free (block_dir);
+  return TRUE;
+}
+
 void
 xfburn_log_dump_device_hardware (const gchar *dev_node,
                                  const gchar *sysfs_root_override)
@@ -1133,10 +1352,7 @@ xfburn_log_dump_device_hardware (const gchar *dev_node,
   gchar *timeout;
   gchar *max_sectors_kb;
   XfburnDeviceIoCounters counters;
-  gchar *dev_subdir;
-  char *resolved_dev;
-  gchar *cur_dir;
-  gint depth;
+  XfburnDeviceTransportInfo transport;
 
   if (!log_initialized || dev_node == NULL || dev_node[0] == '\0') {
     return;
@@ -1170,73 +1386,34 @@ xfburn_log_dump_device_hardware (const gchar *dev_node,
                       counters.iodone_cnt,
                       counters.ioerr_cnt);
 
-  /* Walk parent directories of <block_dir>/device to locate any parent USB device node */
-  dev_subdir = g_build_filename (block_dir, "device", NULL);
-  resolved_dev = realpath (dev_subdir, NULL);
-  if (resolved_dev != NULL) {
-    cur_dir = g_strdup (resolved_dev);
-    free (resolved_dev);
-  } else {
-    cur_dir = g_strdup (dev_subdir);
-  }
-  g_free (dev_subdir);
+  if (xfburn_log_read_device_transport (dev_node, sysfs_root_override, &transport) && transport.is_usb) {
+    gchar over_current_str[32];
 
-  for (depth = 0; depth < 10 && cur_dir != NULL; depth++) {
-    gchar *usb_speed = read_sysfs_attr_str (cur_dir, "speed");
-    gchar *usb_max_power = read_sysfs_attr_str (cur_dir, "bMaxPower");
-    gchar *usb_id_vendor = read_sysfs_attr_str (cur_dir, "idVendor");
-
-    if (usb_speed != NULL || usb_max_power != NULL || usb_id_vendor != NULL) {
-      gchar *usb_id_product = read_sysfs_attr_str (cur_dir, "idProduct");
-      gchar *usb_version = read_sysfs_attr_str (cur_dir, "version");
-      gchar *power_control = read_sysfs_attr_str (cur_dir, "power/control");
-      gchar *runtime_status = read_sysfs_attr_str (cur_dir, "power/runtime_status");
-      gchar *manufacturer = read_sysfs_attr_str (cur_dir, "manufacturer");
-      gchar *product = read_sysfs_attr_str (cur_dir, "product");
-      gchar *usb_dir_base = g_path_get_basename (cur_dir);
-
-      xfburn_log_message (XFBURN_LOG_LEVEL_INFO, "HW_USB", NULL, 0, NULL,
-                          "dev=\"%s\" usb_node=\"%s\" id=\"%s:%s\" speed_mbps=\"%s\" usb_ver=\"%s\" max_power=\"%s\" power_control=\"%s\" runtime_status=\"%s\" manufacturer=\"%s\" product=\"%s\"",
-                          dev_node,
-                          non_null_or_unknown (usb_dir_base),
-                          non_null_or_unknown (usb_id_vendor),
-                          non_null_or_unknown (usb_id_product),
-                          non_null_or_unknown (usb_speed),
-                          non_null_or_unknown (usb_version),
-                          non_null_or_unknown (usb_max_power),
-                          non_null_or_unknown (power_control),
-                          non_null_or_unknown (runtime_status),
-                          non_null_or_unknown (manufacturer),
-                          non_null_or_unknown (product));
-
-      g_free (usb_dir_base);
-      g_free (product);
-      g_free (manufacturer);
-      g_free (runtime_status);
-      g_free (power_control);
-      g_free (usb_version);
-      g_free (usb_id_product);
-      g_free (usb_id_vendor);
-      g_free (usb_max_power);
-      g_free (usb_speed);
-      break;
+    if (transport.has_over_current) {
+      g_snprintf (over_current_str, sizeof (over_current_str), "%" G_GINT64_FORMAT, transport.over_current_count);
+    } else {
+      g_strlcpy (over_current_str, "n/a", sizeof (over_current_str));
     }
 
-    g_free (usb_id_vendor);
-    g_free (usb_max_power);
-    g_free (usb_speed);
-
-    if (g_strcmp0 (cur_dir, "/") == 0 || g_strcmp0 (cur_dir, ".") == 0) {
-      break;
-    }
-    {
-      gchar *parent = g_path_get_dirname (cur_dir);
-      g_free (cur_dir);
-      cur_dir = parent;
-    }
+    xfburn_log_message (XFBURN_LOG_LEVEL_INFO, "HW_USB", NULL, 0, NULL,
+                        "dev=\"%s\" usb_node=\"%s\" id=\"%s:%s\" speed_mbps=\"%s\" usb_ver=\"%s\" max_power=\"%s\" power_control=\"%s\" runtime_status=\"%s\" manufacturer=\"%s\" product=\"%s\" lpm_u1=\"%s\" lpm_u2=\"%s\" lpm_permit=\"%s\" over_current=\"%s\"",
+                        dev_node,
+                        non_null_or_unknown (transport.usb_node),
+                        non_null_or_unknown (transport.vendor_id),
+                        non_null_or_unknown (transport.product_id),
+                        non_null_or_unknown (transport.speed_mbps),
+                        non_null_or_unknown (transport.usb_ver),
+                        non_null_or_unknown (transport.max_power),
+                        non_null_or_unknown (transport.power_control),
+                        non_null_or_unknown (transport.runtime_status),
+                        non_null_or_unknown (transport.manufacturer),
+                        non_null_or_unknown (transport.product),
+                        non_null_or_unknown (transport.lpm_u1),
+                        non_null_or_unknown (transport.lpm_u2),
+                        non_null_or_unknown (transport.lpm_permit),
+                        over_current_str);
   }
 
-  g_free (cur_dir);
   g_free (max_sectors_kb);
   g_free (timeout);
   g_free (state);
@@ -1244,4 +1421,154 @@ xfburn_log_dump_device_hardware (const gchar *dev_node,
   g_free (model);
   g_free (vendor);
   g_free (block_dir);
+}
+
+gchar *
+xfburn_log_format_transport_hint (const XfburnDeviceTransportInfo *initial_info,
+                                  const XfburnDeviceTransportInfo *current_info,
+                                  gboolean sysfs_missing)
+{
+  const XfburnDeviceTransportInfo *ref_info = NULL;
+  GString *hint;
+
+  if (initial_info != NULL && initial_info->valid) {
+    ref_info = initial_info;
+  } else if (current_info != NULL && current_info->valid) {
+    ref_info = current_info;
+  }
+
+  hint = g_string_new (NULL);
+
+  if (ref_info != NULL && ref_info->is_usb) {
+    gboolean lpm_active;
+    gboolean is_usb3;
+    gboolean over_current_tripped = FALSE;
+
+    g_string_append (hint,
+                     "External USB drive lost connection (hardware/bus communication error, not necessarily a defective disc).");
+
+    if (current_info != NULL && current_info->valid && current_info->has_over_current &&
+        current_info->over_current_count > 0 &&
+        (initial_info == NULL || !initial_info->has_over_current ||
+         current_info->over_current_count > initial_info->over_current_count)) {
+      over_current_tripped = TRUE;
+    } else if (ref_info->has_over_current && ref_info->over_current_count > 0) {
+      over_current_tripped = TRUE;
+    }
+
+    if (over_current_tripped) {
+      g_string_append (hint,
+                       " USB port over-current event detected: supply dedicated external power (5V AC adapter or powered USB hub).");
+    }
+
+    g_string_append_printf (hint,
+                            " Check power delivery (external 5V power supply, powered hub, or Y-cable power demand; bMaxPower=%s) and USB cable quality/seating (avoid passive USB 3.0 Y-splitters; try a short shielded cable or a USB 2.0 cable/port, since 480 Mbps exceeds 6x BD speed).",
+                            non_null_or_unknown (ref_info->max_power));
+
+    lpm_active = (g_strcmp0 (ref_info->lpm_u1, "enabled") == 0 ||
+                  g_strcmp0 (ref_info->lpm_u2, "enabled") == 0);
+    is_usb3 = (g_ascii_strtoll (ref_info->speed_mbps, NULL, 10) >= 5000 ||
+               g_str_has_prefix (ref_info->usb_ver, "3."));
+
+    if (lpm_active) {
+      g_string_append_printf (hint,
+                              " USB 3.0 Hardware LPM sleep states were enabled (lpm_u1=%s, lpm_u2=%s, permit=%s) — some xHCI controllers/USB-SATA bridges drop links on U1/U2 transitions; try disabling LPM (usbcore.quirks=%s:%s:k) or using USB 2.0.",
+                              non_null_or_unknown (ref_info->lpm_u1),
+                              non_null_or_unknown (ref_info->lpm_u2),
+                              non_null_or_unknown (ref_info->lpm_permit),
+                              non_null_or_unknown (ref_info->vendor_id),
+                              non_null_or_unknown (ref_info->product_id));
+    } else if (is_usb3) {
+      g_string_append_printf (hint,
+                              " Connected at USB 3.0 (%s Mbps) — if disconnects persist, try usbcore.quirks=%s:%s:k or a USB 2.0 cable/port.",
+                              non_null_or_unknown (ref_info->speed_mbps),
+                              non_null_or_unknown (ref_info->vendor_id),
+                              non_null_or_unknown (ref_info->product_id));
+    }
+
+    if (g_strcmp0 (ref_info->power_control, "auto") == 0) {
+      g_string_append (hint,
+                       " USB runtime autosuspend is active (power/control=auto); try setting power/control=on or usbcore.autosuspend=-1.");
+    }
+  } else {
+    g_string_append (hint,
+                     "Drive lost connection or encountered a SCSI host transport error (hardware/bus communication error, not necessarily a defective disc). Check drive power supply, data cable seating (SATA/USB), and host controller/port stability.");
+  }
+
+  if (sysfs_missing) {
+    g_string_append (hint,
+                     " Block device sysfs node disappeared during operation, confirming a bus disconnect/reset.");
+  }
+
+  return g_string_free (hint, FALSE);
+}
+
+void
+xfburn_log_emit_transport_disconnect (const gchar *phase,
+                                      const gchar *dev_node,
+                                      const gchar *sysfs_root_override,
+                                      const XfburnDeviceTransportInfo *initial_info,
+                                      gint64 position_lba,
+                                      const XfburnBackendMsgSummary *summary,
+                                      gboolean drive_ungrabbed)
+{
+  XfburnDeviceIoCounters cur_cnt;
+  XfburnDeviceTransportInfo cur_info;
+  gboolean has_cnt;
+  gboolean has_info;
+  gboolean sysfs_missing;
+  const gchar *phase_str = (phase != NULL && phase[0] != '\0') ? phase : "unknown";
+  const gchar *addr_str = (dev_node != NULL && dev_node[0] != '\0') ? dev_node : "unknown";
+  const gchar *bus_str = "unknown";
+  const gchar *libburn_msg = "none";
+  gint libburn_code = 0;
+  gint libburn_errno = 0;
+  gboolean drive_lost = FALSE;
+  gboolean transport_err = FALSE;
+  gchar *hint;
+
+  if (!log_initialized) {
+    return;
+  }
+
+  has_cnt = xfburn_log_read_device_io_counters (dev_node, sysfs_root_override, &cur_cnt);
+  has_info = xfburn_log_read_device_transport (dev_node, sysfs_root_override, &cur_info);
+  sysfs_missing = (!has_cnt && !has_info);
+
+  if (summary != NULL) {
+    drive_lost = summary->drive_lost;
+    transport_err = summary->transport_error;
+    libburn_code = summary->last_transport_code;
+    libburn_errno = summary->last_transport_errno;
+    if (summary->last_transport_msg[0] != '\0') {
+      libburn_msg = summary->last_transport_msg;
+    }
+  }
+
+  if ((initial_info != NULL && initial_info->valid && initial_info->is_usb) ||
+      (has_info && cur_info.is_usb)) {
+    bus_str = "usb";
+  } else if ((initial_info != NULL && initial_info->valid) || has_info) {
+    bus_str = "non-usb";
+  }
+
+  xfburn_log_message (XFBURN_LOG_LEVEL_FATAL, "TRANSPORT", NULL, 0, NULL,
+                      "Drive disconnect / transport error during phase=\"%s\" addr=\"%s\" lba=%" G_GINT64_FORMAT " bus=\"%s\" drive_lost=%d transport_error=%d drive_ungrabbed=%d sysfs_present=%d dev_state=\"%s\" libburn_code=0x%X libburn_errno=%d libburn_msg=\"%s\"",
+                      phase_str, addr_str, position_lba, bus_str,
+                      drive_lost ? 1 : 0,
+                      transport_err ? 1 : 0,
+                      drive_ungrabbed ? 1 : 0,
+                      sysfs_missing ? 0 : 1,
+                      has_cnt ? non_null_or_unknown (cur_cnt.state) : "missing",
+                      (unsigned int) libburn_code,
+                      libburn_errno,
+                      libburn_msg);
+
+  hint = xfburn_log_format_transport_hint (initial_info, has_info ? &cur_info : NULL, sysfs_missing);
+  xfburn_log_message (XFBURN_LOG_LEVEL_WARN, "DIAG_HINT", NULL, 0, NULL,
+                      "phase=\"%s\" addr=\"%s\" bus=\"%s\" hint=\"%s\"",
+                      phase_str, addr_str, bus_str, hint);
+  g_free (hint);
+
+  xfburn_log_flush ();
 }

@@ -580,13 +580,51 @@ xfburn_verify_update_status_text (GtkWidget *dialog_progress,
   g_free (str);
 }
 
+typedef enum
+{
+  XFBURN_VERIFY_OK = 0,
+  XFBURN_VERIFY_STOPPED,
+  XFBURN_VERIFY_DISC_ERROR,
+  XFBURN_VERIFY_DRIVE_DISCONNECTED
+} XfburnVerifyOutcome;
+
 static gboolean
+verify_is_transport_disconnect (const XfburnBackendMsgSummary *summary,
+                                struct burn_drive *drive,
+                                gboolean *out_ungrabbed)
+{
+  gboolean ungrabbed = FALSE;
+
+  if (summary != NULL && summary->drive_lost) {
+    if (out_ungrabbed != NULL) {
+      *out_ungrabbed = TRUE;
+    }
+    return TRUE;
+  }
+
+  ungrabbed = (burn_disc_get_status (drive) == BURN_DISC_UNGRABBED);
+  if (out_ungrabbed != NULL) {
+    *out_ungrabbed = ungrabbed;
+  }
+
+  if (ungrabbed) {
+    return TRUE;
+  }
+  if (summary != NULL && summary->transport_error) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+static XfburnVerifyOutcome
 xfburn_perform_burn_verify (GtkWidget *dialog_progress,
                             struct burn_drive *drive,
                             int media_no,
+                            const XfburnDeviceTransportInfo *transport_info,
                             XfburnVerifyData *verify_data,
-                            gboolean *stopped,
-                            gchar **verify_failed_msg)
+                            gchar **verify_failed_msg,
+                            gchar **verify_secondary_msg,
+                            gboolean *had_disc_errors_before_disconnect)
 {
   guint total_verify_sectors;
   guint verified_sectors = 0;
@@ -605,7 +643,10 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
   gint64 last_watchdog_us;
   char drive_addr[BURN_DRIVE_ADR_LEN];
   gboolean stop = FALSE;
-  gboolean success = TRUE;
+  gboolean stopped = FALSE;
+  gboolean disconnected = FALSE;
+  guint disconnect_lba = 0;
+  XfburnVerifyOutcome outcome = XFBURN_VERIFY_OK;
   guint last_reported_failures = 0;
   /* bit1 (2): suppress ERROR-level libburn message on read error
    * bit2 (4): do NOT retry on error with single-block steps inside libburn
@@ -613,11 +654,16 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
    * bit5 (32): still emit suppressed read-error SCSI sense details at DEBUG severity */
   const int read_flags = (1 << 1) | (1 << 2) | (1 << 4) | (1 << 5);
 
-  *stopped = FALSE;
   *verify_failed_msg = NULL;
+  if (verify_secondary_msg != NULL) {
+    *verify_secondary_msg = NULL;
+  }
+  if (had_disc_errors_before_disconnect != NULL) {
+    *had_disc_errors_before_disconnect = FALSE;
+  }
 
   if (verify_data == NULL) {
-    return TRUE;
+    return XFBURN_VERIFY_OK;
   }
 
   if (verify_data->partial_len > 0) {
@@ -626,7 +672,7 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
 
   total_verify_sectors = verify_data->sector_hashes->len;
   if (total_verify_sectors == 0) {
-    return TRUE;
+    return XFBURN_VERIFY_OK;
   }
 
   sector_size = verify_data->sector_size;
@@ -653,40 +699,58 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
   xfburn_verify_update_status_text (dialog_progress, 0, 0, 0);
   xfburn_progress_dialog_set_progress_bar_fraction (XFBURN_PROGRESS_DIALOG (dialog_progress), 0.0);
 
-  t_call = g_get_monotonic_time ();
-  XFBURN_LOG_CALL_ENTER ("burn_drive_re_assess", "addr=\"%s\"", drive_addr);
-  burn_drive_re_assess (drive, 0);
-  XFBURN_LOG_CALL_EXIT ("burn_drive_re_assess", t_call, "done");
-  xfburn_log_drain_backend_messages ("verify_re_assess", NULL, 0);
-
-  wait_start_us = g_get_monotonic_time ();
-  last_watchdog_us = wait_start_us;
-  while (burn_drive_get_status (drive, NULL) != BURN_DRIVE_IDLE) {
-    gint64 now_us = g_get_monotonic_time ();
-    if (now_us - wait_start_us > 30 * G_USEC_PER_SEC &&
-        now_us - last_watchdog_us >= 10 * G_USEC_PER_SEC) {
-      XfburnDeviceIoCounters wd_cnt;
-      xfburn_log_read_device_io_counters (drive_addr, NULL, &wd_cnt);
-      XFBURN_LOG_WARN ("WATCHDOG",
-                       "Verify re-assess wait >30s addr=\"%s\" elapsed_s=%ld dev_state=\"%s\" ioreq=%" G_GINT64_FORMAT " iodone=%" G_GINT64_FORMAT " ioerr=%" G_GINT64_FORMAT,
-                       drive_addr,
-                       (long) ((now_us - wait_start_us) / G_USEC_PER_SEC),
-                       wd_cnt.state, wd_cnt.iorequest_cnt, wd_cnt.iodone_cnt, wd_cnt.ioerr_cnt);
-      last_watchdog_us = now_us;
-    }
-    usleep (100001);
-  }
-
-  burn_drive_set_speed (drive, 0, 0);
-
-  buf = g_malloc ((gsize) chunk_max_sectors * (gsize) sector_size);
   failed_sectors = g_array_new (FALSE, FALSE, sizeof (guint));
   time_start_us = g_get_monotonic_time ();
-  speed_win_us = time_start_us;
-  prev_win_us = time_start_us;
-  last_log_us = time_start_us;
 
-  if (sector_size == DATA_BYTES_PER_SECTOR) {
+  {
+    XfburnBackendMsgSummary reassess_summary;
+    int reassess_ret;
+    gboolean drive_ungrabbed = FALSE;
+
+    memset (&reassess_summary, 0, sizeof (reassess_summary));
+    t_call = g_get_monotonic_time ();
+    XFBURN_LOG_CALL_ENTER ("burn_drive_re_assess", "addr=\"%s\"", drive_addr);
+    reassess_ret = burn_drive_re_assess (drive, 0);
+    XFBURN_LOG_CALL_EXIT ("burn_drive_re_assess", t_call, "ret=%d", reassess_ret);
+    xfburn_log_drain_backend_messages_ex ("verify_re_assess", NULL, 0, &reassess_summary);
+
+    if (verify_is_transport_disconnect (&reassess_summary, drive, &drive_ungrabbed)) {
+      xfburn_log_emit_transport_disconnect ("verify_re_assess", drive_addr, NULL, transport_info,
+                                            0, &reassess_summary, drive_ungrabbed);
+      disconnected = TRUE;
+      disconnect_lba = 0;
+    }
+  }
+
+  if (!disconnected) {
+    wait_start_us = g_get_monotonic_time ();
+    last_watchdog_us = wait_start_us;
+    while (burn_drive_get_status (drive, NULL) != BURN_DRIVE_IDLE) {
+      gint64 now_us = g_get_monotonic_time ();
+      if (now_us - wait_start_us > 30 * G_USEC_PER_SEC &&
+          now_us - last_watchdog_us >= 10 * G_USEC_PER_SEC) {
+        XfburnDeviceIoCounters wd_cnt;
+        xfburn_log_read_device_io_counters (drive_addr, NULL, &wd_cnt);
+        XFBURN_LOG_WARN ("WATCHDOG",
+                         "Verify re-assess wait >30s addr=\"%s\" elapsed_s=%ld dev_state=\"%s\" ioreq=%" G_GINT64_FORMAT " iodone=%" G_GINT64_FORMAT " ioerr=%" G_GINT64_FORMAT,
+                         drive_addr,
+                         (long) ((now_us - wait_start_us) / G_USEC_PER_SEC),
+                         wd_cnt.state, wd_cnt.iorequest_cnt, wd_cnt.iodone_cnt, wd_cnt.ioerr_cnt);
+        last_watchdog_us = now_us;
+      }
+      usleep (100001);
+    }
+
+    burn_drive_set_speed (drive, 0, 0);
+
+    buf = g_malloc ((gsize) chunk_max_sectors * (gsize) sector_size);
+    time_start_us = g_get_monotonic_time ();
+    speed_win_us = time_start_us;
+    prev_win_us = time_start_us;
+    last_log_us = time_start_us;
+  }
+
+  if (!disconnected && sector_size == DATA_BYTES_PER_SECTOR) {
     int start_lba = 0;
     int nwa = 0;
     guint s = 0;
@@ -708,10 +772,11 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
       gdouble percent;
       gdouble elapsed_sec;
       gint64 now_us;
+      XfburnBackendMsgSummary err_summary;
 
       g_object_get (G_OBJECT (dialog_progress), "stop", &stop, NULL);
       if (stop) {
-        *stopped = TRUE;
+        stopped = TRUE;
         XFBURN_LOG_WARN ("VERIFY", "User cancelled data verification at sector %u/%u", s, total_verify_sectors);
         xfburn_progress_dialog_set_status (XFBURN_PROGRESS_DIALOG (dialog_progress),
                                            XFBURN_PROGRESS_DIALOG_STATUS_STOPPING);
@@ -733,6 +798,41 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
         good_sectors = 0;
       }
 
+      memset (&err_summary, 0, sizeof (err_summary));
+      if (good_sectors < chunk_sectors) {
+        xfburn_log_drain_backend_messages_ex ("verify_read_err", NULL, 0, &err_summary);
+
+        /* On a transient SCSI host/bus reset where libburn still holds the drive grabbed,
+         * retry the chunk once after a short backoff before declaring a transport failure. */
+        if (err_summary.transport_error && !err_summary.drive_lost &&
+            burn_disc_get_status (drive) != BURN_DISC_UNGRABBED) {
+          XFBURN_LOG_WARN ("VERIFY",
+                           "Transient host transport error at LBA %u (%s) - retrying chunk once after 250ms",
+                           (guint) (start_lba + (int) s),
+                           err_summary.last_transport_msg[0] != '\0' ? err_summary.last_transport_msg : "host problem");
+          usleep (250000);
+          data_count = 0;
+          ret = burn_read_data (drive,
+                                (off_t) (start_lba + (int) s) * DATA_BYTES_PER_SECTOR,
+                                (char *) buf,
+                                chunk_bytes,
+                                &data_count,
+                                read_flags);
+          if (ret > 0 && data_count >= chunk_bytes) {
+            good_sectors = chunk_sectors;
+          } else if (data_count > 0) {
+            good_sectors = (guint) (data_count / DATA_BYTES_PER_SECTOR);
+          } else {
+            good_sectors = 0;
+          }
+          if (good_sectors < chunk_sectors) {
+            xfburn_log_drain_backend_messages_ex ("verify_read_retry_err", NULL, 0, &err_summary);
+          } else {
+            xfburn_log_drain_backend_messages ("verify_read_retry_ok", NULL, 0);
+          }
+        }
+      }
+
       for (k = 0; k < good_sectors; k++) {
         guint64 expected_h = g_array_index (verify_data->sector_hashes, guint64, s + k);
         guint64 actual_h = xfburn_hash_sector (buf + (gsize) k * DATA_BYTES_PER_SECTOR, DATA_BYTES_PER_SECTOR);
@@ -748,8 +848,17 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
       if (good_sectors < chunk_sectors) {
         guint probe_start_k;
         XfburnDeviceIoCounters err_cnt;
+        gboolean drive_ungrabbed = FALSE;
 
-        xfburn_log_drain_backend_messages ("verify_read_err", NULL, 0);
+        if (verify_is_transport_disconnect (&err_summary, drive, &drive_ungrabbed)) {
+          disconnect_lba = (guint) (start_lba + (int) (s + good_sectors));
+          verified_sectors = s + good_sectors;
+          xfburn_log_emit_transport_disconnect ("verify_data", drive_addr, NULL, transport_info,
+                                                (gint64) disconnect_lba, &err_summary, drive_ungrabbed);
+          disconnected = TRUE;
+          break;
+        }
+
         xfburn_log_read_device_io_counters (drive_addr, NULL, &err_cnt);
 
         if (good_sectors > 0 || chunk_sectors == 1) {
@@ -788,7 +897,7 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
 
           g_object_get (G_OBJECT (dialog_progress), "stop", &stop, NULL);
           if (stop) {
-            *stopped = TRUE;
+            stopped = TRUE;
             xfburn_progress_dialog_set_status (XFBURN_PROGRESS_DIALOG (dialog_progress),
                                                XFBURN_PROGRESS_DIALOG_STATUS_STOPPING);
             break;
@@ -801,7 +910,19 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
                                        &single_count,
                                        read_flags);
           if (ret_single <= 0 || single_count != DATA_BYTES_PER_SECTOR) {
-            xfburn_log_drain_backend_messages ("verify_single_read_err", NULL, 0);
+            XfburnBackendMsgSummary single_summary;
+            gboolean single_ungrabbed = FALSE;
+
+            memset (&single_summary, 0, sizeof (single_summary));
+            xfburn_log_drain_backend_messages_ex ("verify_single_read_err", NULL, 0, &single_summary);
+            if (verify_is_transport_disconnect (&single_summary, drive, &single_ungrabbed)) {
+              disconnect_lba = cur_lba;
+              verified_sectors = s + k;
+              xfburn_log_emit_transport_disconnect ("verify_data_single", drive_addr, NULL, transport_info,
+                                                    (gint64) cur_lba, &single_summary, single_ungrabbed);
+              disconnected = TRUE;
+              break;
+            }
             XFBURN_LOG_ERROR ("VERIFY",
                               "Single-sector read error at LBA %u: ret=%d single_count=%" G_GINT64_FORMAT,
                               cur_lba, ret_single, (gint64) single_count);
@@ -844,7 +965,7 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
           }
         }
 
-        if (*stopped) {
+        if (stopped || disconnected) {
           break;
         }
       }
@@ -884,7 +1005,7 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
         last_log_us = now_us;
       }
     }
-  } else {
+  } else if (!disconnected) {
     /* Audio CD verification */
     guint n_tracks = verify_data->track_sector_counts->len;
     guint t;
@@ -908,7 +1029,7 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
       }
     }
 
-    for (t = 0; t < n_tracks && !(*stopped); t++) {
+    for (t = 0; t < n_tracks && !stopped && !disconnected; t++) {
       guint t_sectors = g_array_index (verify_data->track_sector_counts, guint, t);
       guint disc_t_sectors = t_sectors;
       int track_lba = fallback_lba;
@@ -947,10 +1068,11 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
         gdouble percent;
         gdouble elapsed_sec;
         gint64 now_us;
+        XfburnBackendMsgSummary err_summary;
 
         g_object_get (G_OBJECT (dialog_progress), "stop", &stop, NULL);
         if (stop) {
-          *stopped = TRUE;
+          stopped = TRUE;
           XFBURN_LOG_WARN ("VERIFY", "User cancelled audio verification at track %u sector %u", t + 1, ts);
           xfburn_progress_dialog_set_status (XFBURN_PROGRESS_DIALOG (dialog_progress),
                                              XFBURN_PROGRESS_DIALOG_STATUS_STOPPING);
@@ -970,6 +1092,39 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
           good_sectors = (guint) (data_count / AUDIO_BYTES_PER_SECTOR);
         } else {
           good_sectors = 0;
+        }
+
+        memset (&err_summary, 0, sizeof (err_summary));
+        if (good_sectors < chunk_sectors) {
+          xfburn_log_drain_backend_messages_ex ("verify_audio_read_err", NULL, 0, &err_summary);
+
+          if (err_summary.transport_error && !err_summary.drive_lost &&
+              burn_disc_get_status (drive) != BURN_DISC_UNGRABBED) {
+            XFBURN_LOG_WARN ("VERIFY",
+                             "Transient audio host transport error at LBA %u (%s) - retrying chunk once after 250ms",
+                             (guint) MAX (0, track_lba + (int) ts),
+                             err_summary.last_transport_msg[0] != '\0' ? err_summary.last_transport_msg : "host problem");
+            usleep (250000);
+            data_count = 0;
+            ret = burn_read_audio (drive,
+                                   track_lba + (int) ts,
+                                   (char *) buf,
+                                   chunk_bytes,
+                                   &data_count,
+                                   read_flags);
+            if (ret > 0 && data_count >= chunk_bytes) {
+              good_sectors = chunk_sectors;
+            } else if (data_count > 0) {
+              good_sectors = (guint) (data_count / AUDIO_BYTES_PER_SECTOR);
+            } else {
+              good_sectors = 0;
+            }
+            if (good_sectors < chunk_sectors) {
+              xfburn_log_drain_backend_messages_ex ("verify_audio_read_retry_err", NULL, 0, &err_summary);
+            } else {
+              xfburn_log_drain_backend_messages ("verify_audio_read_retry_ok", NULL, 0);
+            }
+          }
         }
 
         for (k = 0; k < good_sectors; k++) {
@@ -994,8 +1149,17 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
         if (good_sectors < chunk_sectors) {
           guint probe_start_k;
           XfburnDeviceIoCounters err_cnt;
+          gboolean drive_ungrabbed = FALSE;
 
-          xfburn_log_drain_backend_messages ("verify_audio_read_err", NULL, 0);
+          if (verify_is_transport_disconnect (&err_summary, drive, &drive_ungrabbed)) {
+            disconnect_lba = (guint) MAX (0, track_lba + (int) (ts + good_sectors));
+            verified_sectors = global_s + MIN (ts + good_sectors, t_sectors);
+            xfburn_log_emit_transport_disconnect ("verify_audio", drive_addr, NULL, transport_info,
+                                                  (gint64) disconnect_lba, &err_summary, drive_ungrabbed);
+            disconnected = TRUE;
+            break;
+          }
+
           xfburn_log_read_device_io_counters (drive_addr, NULL, &err_cnt);
 
           if (good_sectors > 0 || chunk_sectors == 1) {
@@ -1032,7 +1196,7 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
 
             g_object_get (G_OBJECT (dialog_progress), "stop", &stop, NULL);
             if (stop) {
-              *stopped = TRUE;
+              stopped = TRUE;
               xfburn_progress_dialog_set_status (XFBURN_PROGRESS_DIALOG (dialog_progress),
                                                  XFBURN_PROGRESS_DIALOG_STATUS_STOPPING);
               break;
@@ -1045,7 +1209,19 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
                                           &single_count,
                                           read_flags);
             if (ret_single <= 0 || single_count != AUDIO_BYTES_PER_SECTOR) {
-              xfburn_log_drain_backend_messages ("verify_audio_single_read_err", NULL, 0);
+              XfburnBackendMsgSummary single_summary;
+              gboolean single_ungrabbed = FALSE;
+
+              memset (&single_summary, 0, sizeof (single_summary));
+              xfburn_log_drain_backend_messages_ex ("verify_audio_single_read_err", NULL, 0, &single_summary);
+              if (verify_is_transport_disconnect (&single_summary, drive, &single_ungrabbed)) {
+                disconnect_lba = cur_lba;
+                verified_sectors = global_s + MIN (ts + k, t_sectors);
+                xfburn_log_emit_transport_disconnect ("verify_audio_single", drive_addr, NULL, transport_info,
+                                                      (gint64) cur_lba, &single_summary, single_ungrabbed);
+                disconnected = TRUE;
+                break;
+              }
               XFBURN_LOG_ERROR ("VERIFY",
                                 "Single audio sector read error at LBA %u: ret=%d single_count=%" G_GINT64_FORMAT,
                                 cur_lba, ret_single, (gint64) single_count);
@@ -1095,7 +1271,7 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
             }
           }
 
-          if (*stopped) {
+          if (stopped || disconnected) {
             break;
           }
         }
@@ -1148,11 +1324,54 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
   /* Drain and log any pending libburn messages from read probes */
   xfburn_log_drain_backend_messages ("verify_read", NULL, 0);
 
-  if (!(*stopped)) {
+  if (disconnected) {
+    const gchar *log_path = xfburn_log_get_file_path ();
+
+    outcome = XFBURN_VERIFY_DRIVE_DISCONNECTED;
+    *verify_failed_msg = g_strdup (_("Verification interrupted: drive disconnected"));
+
+    if (failed_sectors->len > 0) {
+      gchar *sectors_str = xfburn_format_failed_sectors (failed_sectors);
+
+      if (had_disc_errors_before_disconnect != NULL) {
+        *had_disc_errors_before_disconnect = TRUE;
+      }
+      if (verify_secondary_msg != NULL) {
+        if (log_path != NULL && log_path[0] != '\0') {
+          *verify_secondary_msg = g_strdup_printf (
+            _("Lost connection to the drive at LBA %u after verifying %u of %u sectors. %u earlier disc read/verify error(s) were also detected (%s).\n\nDiagnostic log saved to:\n%s"),
+            disconnect_lba, verified_sectors, total_verify_sectors, failed_sectors->len, sectors_str, log_path);
+        } else {
+          *verify_secondary_msg = g_strdup_printf (
+            _("Lost connection to the drive at LBA %u after verifying %u of %u sectors. %u earlier disc read/verify error(s) were also detected (%s)."),
+            disconnect_lba, verified_sectors, total_verify_sectors, failed_sectors->len, sectors_str);
+        }
+      }
+      XFBURN_LOG_ERROR ("VERIFY",
+                        "Verification ABORTED due to drive disconnect at LBA %u: verified_sectors=%u/%u prior_failed_sectors=%u ranges=\"%s\"",
+                        disconnect_lba, verified_sectors, total_verify_sectors, failed_sectors->len, sectors_str);
+      g_free (sectors_str);
+    } else {
+      if (verify_secondary_msg != NULL) {
+        if (log_path != NULL && log_path[0] != '\0') {
+          *verify_secondary_msg = g_strdup_printf (
+            _("Lost connection to the drive at LBA %u after verifying %u of %u sectors with no disc read errors. The burn completed, so the disc is likely intact — check USB cable, power supply, or USB 3.0 power-saving settings.\n\nDiagnostic log saved to:\n%s"),
+            disconnect_lba, verified_sectors, total_verify_sectors, log_path);
+        } else {
+          *verify_secondary_msg = g_strdup_printf (
+            _("Lost connection to the drive at LBA %u after verifying %u of %u sectors with no disc read errors. The burn completed, so the disc is likely intact — check USB cable, power supply, or USB 3.0 power-saving settings."),
+            disconnect_lba, verified_sectors, total_verify_sectors);
+        }
+      }
+      XFBURN_LOG_WARN ("VERIFY",
+                       "Verification INTERRUPTED due to drive disconnect at LBA %u: verified_sectors=%u/%u prior_failed_sectors=0",
+                       disconnect_lba, verified_sectors, total_verify_sectors);
+    }
+  } else if (!stopped) {
     xfburn_progress_dialog_set_progress_bar_fraction (XFBURN_PROGRESS_DIALOG (dialog_progress), 100.0);
 
     if (failed_sectors->len == 0) {
-      success = TRUE;
+      outcome = XFBURN_VERIFY_OK;
       XFBURN_LOG_INFO ("VERIFY",
                        "Verification completed successfully: verified_sectors=%u/%u elapsed_s=%ld",
                        verified_sectors, total_verify_sectors,
@@ -1164,18 +1383,18 @@ xfburn_perform_burn_verify (GtkWidget *dialog_progress,
                         "Verification FAILED: failed_sectors=%u/%u ranges=\"%s\"",
                         failed_sectors->len, total_verify_sectors, sectors_str);
       g_free (sectors_str);
-      success = FALSE;
+      outcome = XFBURN_VERIFY_DISC_ERROR;
     }
   } else {
     XFBURN_LOG_WARN ("VERIFY", "Verification aborted by user at sector %u/%u",
                      verified_sectors, total_verify_sectors);
-    success = FALSE;
+    outcome = XFBURN_VERIFY_STOPPED;
   }
 
   g_array_free (failed_sectors, TRUE);
   g_free (buf);
 
-  return success;
+  return outcome;
 }
 
 void
@@ -1217,8 +1436,12 @@ xfburn_perform_burn_write (GtkWidget *dialog_progress,
   int last_progress_sector = -1;
   gint64 prev_ioerr_cnt = -1;
   XfburnDeviceIoCounters io_counters;
+  XfburnDeviceTransportInfo transport_info;
+  XfburnBackendMsgSummary burn_summary;
 
   memset (&progress, 0, sizeof (progress));
+  memset (&transport_info, 0, sizeof (transport_info));
+  memset (&burn_summary, 0, sizeof (burn_summary));
   media_name[0] = '\0';
   drive_addr[0] = '\0';
   if (burn_drive_d_get_adr (drive, drive_addr) <= 0) {
@@ -1226,6 +1449,7 @@ xfburn_perform_burn_write (GtkWidget *dialog_progress,
   }
 
   xfburn_log_dump_device_hardware (drive_addr, NULL);
+  xfburn_log_read_device_transport (drive_addr, NULL, &transport_info);
   if (xfburn_log_read_device_io_counters (drive_addr, NULL, &io_counters)) {
     prev_ioerr_cnt = io_counters.ioerr_cnt;
   }
@@ -1390,7 +1614,7 @@ xfburn_perform_burn_write (GtkWidget *dialog_progress,
     int fifo_size = 0;
     int fifo_free = 0;
 
-    xfburn_log_drain_backend_messages ("burn_loop", msg_text, sizeof (msg_text));
+    xfburn_log_drain_backend_messages_ex ("burn_loop", msg_text, sizeof (msg_text), &burn_summary);
 
     if (status != prev_status) {
       XFBURN_LOG_INFO ("STATE", "Burn drive status transition: %s (%d) -> %s (%d) sector=%d/%d",
@@ -1634,7 +1858,7 @@ xfburn_perform_burn_write (GtkWidget *dialog_progress,
                    drive_status_to_string (prev_status), prev_status);
 
   /* check the libburn message queue for errors */
-  xfburn_log_drain_backend_messages ("burn_post", msg_text, sizeof (msg_text));
+  xfburn_log_drain_backend_messages_ex ("burn_post", msg_text, sizeof (msg_text), &burn_summary);
 
   xfburn_console_libburn_messages ();
 
@@ -1655,21 +1879,37 @@ xfburn_perform_burn_write (GtkWidget *dialog_progress,
 
   if (G_LIKELY (wrote_well)) {
     if (verify_data != NULL && (verify_data->sector_hashes->len > 0 || verify_data->partial_len > 0)) {
-      gboolean verify_stopped = FALSE;
+      XfburnVerifyOutcome verify_outcome;
+      gboolean had_disc_errors = FALSE;
       gchar *verify_failed_msg = NULL;
       gchar *popup_msg = NULL;
+      gchar *popup_secondary = NULL;
       GtkMessageType popup_type = GTK_MESSAGE_INFO;
 
-      if (xfburn_perform_burn_verify (dialog_progress, drive, media_no, verify_data,
-                                      &verify_stopped, &verify_failed_msg)) {
+      verify_outcome = xfburn_perform_burn_verify (dialog_progress, drive, media_no, &transport_info, verify_data,
+                                                   &verify_failed_msg, &popup_secondary, &had_disc_errors);
+      switch (verify_outcome) {
+      case XFBURN_VERIFY_OK:
         final_message = g_strdup (_("Done"));
         final_status = XFBURN_PROGRESS_DIALOG_STATUS_COMPLETED;
         popup_msg = g_strdup (_("Disc successfully verified"));
         popup_type = GTK_MESSAGE_INFO;
-      } else if (verify_stopped) {
+        break;
+      case XFBURN_VERIFY_STOPPED:
         final_message = g_strdup (_("User Aborted"));
         final_status = XFBURN_PROGRESS_DIALOG_STATUS_CANCELLED;
-      } else {
+        break;
+      case XFBURN_VERIFY_DRIVE_DISCONNECTED:
+        final_message = (verify_failed_msg != NULL)
+                        ? verify_failed_msg
+                        : g_strdup (_("Verification interrupted: drive disconnected"));
+        verify_failed_msg = NULL;
+        final_status = XFBURN_PROGRESS_DIALOG_STATUS_FAILED;
+        popup_msg = g_strdup (_("Drive disconnected during verification (communication error)"));
+        popup_type = had_disc_errors ? GTK_MESSAGE_ERROR : GTK_MESSAGE_WARNING;
+        break;
+      case XFBURN_VERIFY_DISC_ERROR:
+      default:
         if (verify_failed_msg != NULL) {
           final_message = verify_failed_msg;
         } else {
@@ -1679,6 +1919,7 @@ xfburn_perform_burn_write (GtkWidget *dialog_progress,
         final_status = XFBURN_PROGRESS_DIALOG_STATUS_FAILED;
         popup_msg = g_strdup (final_message);
         popup_type = GTK_MESSAGE_ERROR;
+        break;
       }
       g_free (verify_failed_msg);
 
@@ -1697,11 +1938,15 @@ xfburn_perform_burn_write (GtkWidget *dialog_progress,
                                         popup_type,
                                         GTK_BUTTONS_OK,
                                         "%s", popup_msg);
+        if (popup_secondary != NULL && popup_secondary[0] != '\0') {
+          gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (popup), "%s", popup_secondary);
+        }
         g_signal_connect (G_OBJECT (popup), "response", G_CALLBACK (gtk_widget_destroy), NULL);
         gtk_widget_show (popup);
         gdk_threads_leave ();
         g_free (popup_msg);
       }
+      g_free (popup_secondary);
       return;
     } else {
       final_message = g_strdup (_("Done"));
@@ -1710,11 +1955,20 @@ xfburn_perform_burn_write (GtkWidget *dialog_progress,
   } else {
     xfburn_log_dump_device_hardware (drive_addr, NULL);
     if (stopping) {
-      final_status_text  = _("User Aborted");
+      final_status_text = _("User Aborted");
       final_status = XFBURN_PROGRESS_DIALOG_STATUS_CANCELLED;
     } else {
-      final_status_text  = _("Failure");
+      gboolean burn_ungrabbed = FALSE;
+
       final_status = XFBURN_PROGRESS_DIALOG_STATUS_FAILED;
+      if (verify_is_transport_disconnect (&burn_summary, drive, &burn_ungrabbed)) {
+        xfburn_log_emit_transport_disconnect ("burn", drive_addr, NULL, &transport_info,
+                                              (gint64) (burned_sectors + progress.sector),
+                                              &burn_summary, burn_ungrabbed);
+        final_status_text = _("Drive disconnected during burn (communication error)");
+      } else {
+        final_status_text = _("Failure");
+      }
     }
     if (msg_text[0] != '\0') {
       final_message = g_strdup_printf ("%s: %s", final_status_text, msg_text);

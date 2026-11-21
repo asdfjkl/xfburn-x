@@ -417,6 +417,11 @@ xfburn_preferences_dialog_response_cb (XfburnPreferencesDialog * dialog, guint r
 static void
 scan_button_clicked_cb (GtkWidget * button, gpointer user_data)
 {
+  XfburnDeviceList *devlist = xfburn_device_list_new ();
+
+  xfburn_device_list_rescan_devices_only (devlist);
+  g_object_unref (devlist);
+
   refresh_devices_list (user_data);
 }
 

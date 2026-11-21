@@ -40,6 +40,38 @@ typedef struct
   gchar state[64];
 } XfburnDeviceIoCounters;
 
+typedef struct
+{
+  gint total_failures;
+  gboolean drive_lost;
+  gboolean transport_error;
+  gboolean media_error;
+  gint last_transport_code;
+  gint last_transport_errno;
+  gchar last_transport_msg[512];
+} XfburnBackendMsgSummary;
+
+typedef struct
+{
+  gboolean valid;
+  gboolean is_usb;
+  gchar usb_node[64];
+  gchar vendor_id[16];
+  gchar product_id[16];
+  gchar speed_mbps[32];
+  gchar usb_ver[16];
+  gchar max_power[32];
+  gchar power_control[32];
+  gchar runtime_status[32];
+  gchar manufacturer[128];
+  gchar product[128];
+  gchar lpm_u1[32];
+  gchar lpm_u2[32];
+  gchar lpm_permit[32];
+  gboolean has_over_current;
+  gint64 over_current_count;
+} XfburnDeviceTransportInfo;
+
 gboolean xfburn_log_init (const gchar *custom_path);
 void xfburn_log_shutdown (void);
 gboolean xfburn_log_is_initialized (void);
@@ -74,6 +106,15 @@ void xfburn_log_call_exit (const gchar *call_name,
                            ...) G_GNUC_PRINTF (6, 7);
 
 void xfburn_log_configure_backends (void);
+void xfburn_log_classify_libburn_message (gint error_code,
+                                          gint os_errno,
+                                          const gchar *severity,
+                                          const gchar *msg_text,
+                                          XfburnBackendMsgSummary *summary);
+gint xfburn_log_drain_backend_messages_ex (const gchar *context,
+                                           gchar *last_failure_buf,
+                                           gsize last_failure_buf_len,
+                                           XfburnBackendMsgSummary *summary);
 gint xfburn_log_drain_backend_messages (const gchar *context,
                                         gchar *last_failure_buf,
                                         gsize last_failure_buf_len);
@@ -83,6 +124,19 @@ void xfburn_log_dump_device_hardware (const gchar *dev_node,
 gboolean xfburn_log_read_device_io_counters (const gchar *dev_node,
                                              const gchar *sysfs_root_override,
                                              XfburnDeviceIoCounters *counters);
+gboolean xfburn_log_read_device_transport (const gchar *dev_node,
+                                           const gchar *sysfs_root_override,
+                                           XfburnDeviceTransportInfo *info);
+gchar *xfburn_log_format_transport_hint (const XfburnDeviceTransportInfo *initial_info,
+                                         const XfburnDeviceTransportInfo *current_info,
+                                         gboolean sysfs_missing);
+void xfburn_log_emit_transport_disconnect (const gchar *phase,
+                                           const gchar *dev_node,
+                                           const gchar *sysfs_root_override,
+                                           const XfburnDeviceTransportInfo *initial_info,
+                                           gint64 position_lba,
+                                           const XfburnBackendMsgSummary *summary,
+                                           gboolean drive_ungrabbed);
 
 void xfburn_log_install_crash_handlers (void);
 

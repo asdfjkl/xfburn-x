@@ -31,6 +31,7 @@
 #include "xfburn-file-browser.h"
 #include "xfburn-compositions-notebook.h"
 #include "xfburn-blank-dialog.h"
+#include "xfburn-disc-info-dialog.h"
 #include "xfburn-copy-cd-dialog.h"
 #include "xfburn-copy-dvd-dialog.h"
 #include "xfburn-burn-image-dialog.h"
@@ -82,6 +83,7 @@ static void action_quit (GAction *, GVariant*, XfburnMainWindow *);
 
 static void action_blank (GAction *, GVariant*, XfburnMainWindow *);
 static void action_burn_image (GAction *, GVariant*, XfburnMainWindow *);
+static void action_disc_info (GAction *, GVariant*, XfburnMainWindow *);
 
 static void action_refresh_directorybrowser (GAction *, GVariant*, XfburnMainWindow *);
 static void action_show_filebrowser (GSimpleAction *, GVariant*, XfburnMainWindow *);
@@ -100,6 +102,7 @@ static const GActionEntry action_entries[] = {
   { .name = "about", .activate = (gActionCallback)action_about},
   { .name = "blank-disc", .activate = (gActionCallback)action_blank},
   { .name = "burn-image", .activate = (gActionCallback)action_burn_image},
+  { .name = "disc-info", .activate = (gActionCallback)action_disc_info},
 };
 
 static const GActionEntry toggle_action_entries[] = {
@@ -291,6 +294,17 @@ action_burn_image (GAction * action, GVariant* param, XfburnMainWindow * window)
 }
 
 static void
+action_disc_info (GAction * action, GVariant* param, XfburnMainWindow * window)
+{
+  GtkWidget *dialog;
+
+  dialog = xfburn_disc_info_dialog_new ();
+  gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (window));
+  gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
+}
+
+static void
 action_close (GAction *action, GVariant* param, XfburnMainWindow * window)
 {
   XfburnMainWindowPrivate *priv = XFBURN_MAIN_WINDOW_GET_PRIVATE (window);
@@ -373,7 +387,7 @@ action_about (GAction * action, GVariant* param, XfburnMainWindow * window)
 		  "version", VERSION_FULL,
 		  "comments", _("CD, DVD, and Blu-ray burning GUI (fork of Xfburn with post-burn verification and diagnostic logging)"),
 		  "website", "https://github.com/asdfjkl/xfburn-x",
-		  "copyright", "2005-2025 Xfce development team\n" COPYRIGHT_YEAR " Dominik Klein",
+		  "copyright", "2005-2025 Xfce development team",
 		  "authors", auth,
 		  "translator-credits", translators,
 		  NULL);

@@ -31,7 +31,6 @@ static void xfburn_audio_disc_usage_update_size (XfburnDiscUsage * disc_usage);
 
 #define DEFAULT_DISK_SIZE_LABEL 2
 #define LAST_CD_LABEL 4
-#define NUM_LABELS 7
 
 XfburnDiscLabels audiodiscsizes[] = {
   {
@@ -76,16 +75,19 @@ xfburn_audio_disc_usage_init (XfburnAudioDiscUsage* disc_usage)
 static void
 xfburn_audio_disc_usage_update_size (XfburnDiscUsage * disc_usage)
 {
-  gfloat fraction;
+  gint active = gtk_combo_box_get_active (GTK_COMBO_BOX (disc_usage->combo));
+  gfloat fraction = 0.0;
   gchar *len;
 
-  fraction = disc_usage->size / audiodiscsizes[gtk_combo_box_get_active (GTK_COMBO_BOX (disc_usage->combo))].size;
+  if (active >= 0 && active < (gint) G_N_ELEMENTS (audiodiscsizes) && audiodiscsizes[active].size > 0) {
+    fraction = disc_usage->size / audiodiscsizes[active].size;
+  }
   if (fraction > 1.0)
     fraction = 1.0;
   if (fraction < 0.0)
     fraction = 0.0;
 
-  gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (disc_usage->progress_bar), fraction > 1.0 ? 1.0 : fraction);
+  gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (disc_usage->progress_bar), fraction);
 
   if (xfburn_settings_get_boolean ("human-readable-units", TRUE))
     len = g_strdup_printf ("%2.0lfm %02.0lfs", disc_usage->size / 60, (gdouble) (((guint64) disc_usage->size) % 60));
@@ -100,8 +102,11 @@ xfburn_audio_disc_usage_update_size (XfburnDiscUsage * disc_usage)
 static gboolean
 can_burn (XfburnDiscUsage *disc_usage)
 {
-  if (disc_usage->size == 0 ||
-      disc_usage->size > audiodiscsizes[gtk_combo_box_get_active (GTK_COMBO_BOX (disc_usage->combo))].size)
+  gint active = gtk_combo_box_get_active (GTK_COMBO_BOX (disc_usage->combo));
+
+  if (active < 0 || active >= (gint) G_N_ELEMENTS (audiodiscsizes) ||
+      disc_usage->size <= 0 ||
+      disc_usage->size > audiodiscsizes[active].size)
     return FALSE;
   else
     return TRUE;

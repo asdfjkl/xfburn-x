@@ -327,7 +327,8 @@ cb_volume_changed (XfburnDeviceBox *box, gboolean device_changed, XfburnDevice *
 
   g_object_get (box, "valid", &valid_disc, NULL);
 
-  gtk_widget_set_sensitive (priv->button_proceed, valid_disc);
+  gtk_widget_set_sensitive (priv->button_proceed,
+                            valid_disc || gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (priv->check_only_iso)));
 }
 
 typedef struct {
@@ -537,6 +538,7 @@ thread_burn_composition (ThreadBurnCompositionParams * params)
   burn_disc_free (disc);
   burn_source_free (params->src);
   xfburn_verify_data_free (params->verify_data);
+  g_clear_object (&params->device);
 
   g_free (params);
   return NULL;
@@ -605,6 +607,12 @@ cb_dialog_response (XfburnBurnDataCompositionBaseDialog * dialog, gint response_
       gboolean verify;
 
       device = xfburn_device_box_get_selected_device (XFBURN_DEVICE_BOX (priv->device_box));
+      if (device == NULL) {
+        burn_source_free (src);
+        gtk_widget_destroy (dialog_progress);
+        xfce_dialog_show_error (GTK_WINDOW (dialog), NULL, _("No burner device selected."));
+        return;
+      }
       speed = xfburn_device_box_get_speed (XFBURN_DEVICE_BOX (priv->device_box));
       write_mode = xfburn_device_box_get_mode (XFBURN_DEVICE_BOX (priv->device_box));
       dummy = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (priv->check_dummy));
@@ -625,7 +633,7 @@ cb_dialog_response (XfburnBurnDataCompositionBaseDialog * dialog, gint response_
       /* burn composition */
       params = g_new0 (ThreadBurnCompositionParams, 1);
       params->dialog_progress = dialog_progress;
-      params->device = device;
+      params->device = g_object_ref (device);
       params->src = src_fifo;
       params->is_fifo = TRUE;
       params->speed = speed;

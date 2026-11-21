@@ -75,6 +75,14 @@ enum XfburnDiscProfiles {
 };
 
 XfburnDeviceList* xfburn_device_list_new (void);
+void xfburn_device_list_shutdown (XfburnDeviceList *devlist);
+
+gboolean xfburn_device_list_is_refreshing (XfburnDeviceList *devlist);
+gboolean xfburn_device_list_needs_refresh (XfburnDeviceList *devlist);
+void xfburn_device_list_refresh_async (XfburnDeviceList *devlist);
+void xfburn_device_list_rescan_devices_only (XfburnDeviceList *devlist);
+void xfburn_device_list_cancel_refresh (XfburnDeviceList *devlist);
+void xfburn_device_list_cancel_refresh_if_unobserved (XfburnDeviceList *devlist);
 
 XfburnDevice * xfburn_device_list_lookup_by_name (XfburnDeviceList *devlist, const gchar * name);
 GtkWidget * xfburn_device_list_get_refresh_button (XfburnDeviceList *devlist);

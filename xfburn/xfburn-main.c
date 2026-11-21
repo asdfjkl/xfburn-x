@@ -415,6 +415,8 @@ main (int argc, char **argv)
 
   /*----------shutdown--------------------------------------------------*/
 
+  xfburn_device_list_shutdown (devlist);
+  xfburn_device_wait_for_probes ();
   g_object_unref (devlist);
   g_object_unref (transcoder);
 

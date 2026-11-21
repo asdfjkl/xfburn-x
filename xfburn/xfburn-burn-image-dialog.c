@@ -81,9 +81,6 @@ typedef struct _XfburnBurnImageDialogPrivate
 
   GtkWidget *burn_button;
 
-  XfburnDeviceList *devlist;
-  gulong handler_volchange;
-
   ThreadBurnIsoParams *params;
 
 } XfburnBurnImageDialogPrivate;
@@ -100,13 +97,12 @@ static void xfburn_burn_image_dialog_finalize (GObject *object);
 
 /* internal prototypes */
 void burn_image_dialog_error (XfburnBurnImageDialog * dialog, const gchar * msg_error);
-static void cb_volume_change_end (XfburnDeviceList *devlist, gboolean device_changed, XfburnDevice *device, XfburnBurnImageDialog * dialog);
+static void cb_volume_changed (XfburnDeviceBox *device_box, gboolean device_changed, XfburnDevice *device, XfburnBurnImageDialog * dialog);
 static void cb_check_dummy_toggled (GtkToggleButton * button, XfburnBurnImageDialog * dialog);
 static void cb_dialog_response (XfburnBurnImageDialog * dialog, gint response_id, gpointer user_data);
 
 static void update_image_label (GtkFileChooser *chooser, XfburnBurnImageDialog * dialog);
 static void check_burn_button (XfburnBurnImageDialog * dialog);
-static gboolean check_media (XfburnBurnImageDialog * dialog, ThreadBurnIsoParams *params, struct burn_drive *drive);
 static void cb_clicked_ok (GtkButton * button, gpointer user_data);
 
 static void free_params (ThreadBurnIsoParams *params);
@@ -176,8 +172,6 @@ xfburn_burn_image_dialog_init (XfburnBurnImageDialog * obj)
   priv->image_label = gtk_label_new ("");
   gtk_widget_show (priv->image_label);
   gtk_box_pack_start (GTK_BOX (box), priv->image_label, FALSE, FALSE, 0);
-  update_image_label (GTK_FILE_CHOOSER (priv->chooser_image), obj);
-  g_signal_connect (G_OBJECT (priv->chooser_image), "selection-changed", G_CALLBACK (update_image_label), obj);
 
   /* devices list */
   priv->device_box = xfburn_device_box_new (SHOW_CD_WRITERS | SHOW_CDRW_WRITERS | SHOW_DVD_WRITERS | SHOW_MODE_SELECTION | SHOW_SPEED_SELECTION);
@@ -242,25 +236,18 @@ xfburn_burn_image_dialog_init (XfburnBurnImageDialog * obj)
   gtk_widget_grab_focus (priv->burn_button);
   gtk_widget_grab_default (priv->burn_button);
 
-  priv->devlist = xfburn_device_list_new ();
-
-  priv->handler_volchange = g_signal_connect (G_OBJECT (priv->devlist), "volume-change-end", G_CALLBACK (cb_volume_change_end), obj);
+  g_signal_connect (G_OBJECT (priv->chooser_image), "selection-changed", G_CALLBACK (update_image_label), obj);
+  g_signal_connect (G_OBJECT (priv->device_box), "volume-changed", G_CALLBACK (cb_volume_changed), obj);
   g_signal_connect (G_OBJECT (obj), "response", G_CALLBACK (cb_dialog_response), obj);
-  device = xfburn_device_list_get_current_device (priv->devlist);
 
-  if (device)
-    cb_volume_change_end (priv->devlist, TRUE, device, obj);
+  update_image_label (GTK_FILE_CHOOSER (priv->chooser_image), obj);
+  device = xfburn_device_box_get_selected_device (XFBURN_DEVICE_BOX (priv->device_box));
+  cb_volume_changed (XFBURN_DEVICE_BOX (priv->device_box), TRUE, device, obj);
 }
 
 static void
 xfburn_burn_image_dialog_finalize (GObject *object)
 {
-  XfburnBurnImageDialog *dialog = XFBURN_BURN_IMAGE_DIALOG (object);
-  XfburnBurnImageDialogPrivate *priv = XFBURN_BURN_IMAGE_DIALOG_GET_PRIVATE (dialog);
-
-  g_clear_signal_handler (&priv->handler_volchange, priv->devlist);
-  g_object_unref (priv->devlist);
-
   G_OBJECT_CLASS (xfburn_burn_image_dialog_parent_class)->finalize (object);
 }
 
@@ -292,6 +279,14 @@ prepare_params (ThreadBurnIsoParams *params, struct burn_drive *drive, gchar **f
                    params->eject, params->verify,
                    xfburn_settings_get_int ("fifo-size", FIFO_DEFAULT_SIZE));
 
+  params->disc = burn_disc_create ();
+  params->session = burn_session_create ();
+  params->track = burn_track_create ();
+
+  if (!create_disc (params, failure_msg)) {
+    return FALSE;
+  }
+
   burn_options = burn_write_opts_new (drive);
   burn_write_opts_set_perform_opc (burn_options, 0);
   burn_write_opts_set_multi (burn_options, 0);
@@ -311,14 +306,6 @@ prepare_params (ThreadBurnIsoParams *params, struct burn_drive *drive, gchar **f
   }
 
   params->burn_options = burn_options;
-
-  params->disc = burn_disc_create ();
-  params->session = burn_session_create ();
-  params->track = burn_track_create ();
-
-  if (!create_disc (params, failure_msg)) {
-    return FALSE;
-  }
 
   return TRUE;
 }
@@ -344,6 +331,7 @@ free_params (ThreadBurnIsoParams *params)
   if (params->verify_data)
     xfburn_verify_data_free (params->verify_data);
 
+  g_clear_object (&params->device);
   g_free (params->iso_path);
 }
 
@@ -367,19 +355,24 @@ create_disc (ThreadBurnIsoParams *params, gchar **failure_msg)
   burn_track_define_data (params->track, 0, 300*1024, 1, BURN_MODE1);
 
   fd = open (params->iso_path, O_RDONLY);
-  if (fd >= 0)
-    if (fstat (fd, &stbuf) != -1)
-      if( (stbuf.st_mode & S_IFMT) == S_IFREG)
-	fixed_size = stbuf.st_size;
+  if (fd >= 0) {
+    if (fstat (fd, &stbuf) != -1 && (stbuf.st_mode & S_IFMT) == S_IFREG) {
+      fixed_size = stbuf.st_size;
+    }
+  }
 
   if (fixed_size == 0) {
+    if (fd >= 0) {
+      close (fd);
+    }
     *failure_msg = _("Unable to determine image size.");
     return FALSE;
   }
 
-  data_src = burn_fd_source_new(fd, -1, fixed_size);
+  data_src = burn_fd_source_new (fd, -1, fixed_size);
 
   if (data_src == NULL) {
+    close (fd);
     *failure_msg = _("Cannot open image.");
     return FALSE;
   }
@@ -416,26 +409,33 @@ thread_burn_iso (ThreadBurnIsoParams * params)
   struct burn_drive_info *drive_info = NULL;
   struct burn_source **fifos = NULL;
   int sectors[1];
+  gchar *failure_msg = NULL;
 
   xfburn_log_set_thread_name ("burn_image");
 
   if (xfburn_device_grab (params->device, &drive_info)) {
     drive = drive_info->drive;
 
-    DBG ("Set speed to %d kb/s", params->speed);
-    burn_drive_set_speed (drive, 0, params->speed);
+    if (!prepare_params (params, drive, &failure_msg)) {
+      xfburn_progress_dialog_burning_failed (XFBURN_PROGRESS_DIALOG (dialog_progress),
+                                             failure_msg != NULL ? failure_msg : _("An error occurred in the burn backend"));
+      xfburn_device_release (drive_info, FALSE);
+    } else {
+      DBG ("Set speed to %d kb/s", params->speed);
+      burn_drive_set_speed (drive, 0, params->speed);
 
-    // this assumes that an iso image can only have one track
-    sectors[0] = burn_disc_get_sectors (params->disc);
+      /* this assumes that an iso image can only have one track */
+      sectors[0] = burn_disc_get_sectors (params->disc);
 
-    xfburn_progress_dialog_set_status_with_text (XFBURN_PROGRESS_DIALOG (dialog_progress), XFBURN_PROGRESS_DIALOG_STATUS_RUNNING, _("Burning image..."));
+      xfburn_progress_dialog_set_status_with_text (XFBURN_PROGRESS_DIALOG (dialog_progress), XFBURN_PROGRESS_DIALOG_STATUS_RUNNING, _("Burning image..."));
 
-    fifos = g_new(struct burn_source *,1);
-    fifos[0] = params->fifo_src;
+      fifos = g_new (struct burn_source *, 1);
+      fifos[0] = params->fifo_src;
 
-    xfburn_perform_burn_write (dialog_progress, drive_info->drive, params->write_mode, params->burn_options, DATA_BYTES_PER_SECTOR, params->disc, fifos, sectors, params->verify_data);
+      xfburn_perform_burn_write (dialog_progress, drive_info->drive, params->write_mode, params->burn_options, DATA_BYTES_PER_SECTOR, params->disc, fifos, sectors, params->verify_data);
 
-    xfburn_device_release (drive_info, params->eject);
+      xfburn_device_release (drive_info, params->eject);
+    }
   } else {
     xfburn_progress_dialog_burning_failed (XFBURN_PROGRESS_DIALOG (dialog_progress), _("Unable to grab the drive."));
   }
@@ -457,12 +457,11 @@ burn_image_dialog_error (XfburnBurnImageDialog * dialog, const gchar * msg_error
 }
 
 static void
-cb_volume_change_end (XfburnDeviceList *devlist, gboolean device_changed, XfburnDevice *device, XfburnBurnImageDialog * dialog)
+cb_volume_changed (XfburnDeviceBox *device_box, gboolean device_changed, XfburnDevice *device, XfburnBurnImageDialog * dialog)
 {
   XfburnBurnImageDialogPrivate *priv = XFBURN_BURN_IMAGE_DIALOG_GET_PRIVATE (dialog);
 
-  if (device_changed)
-    gtk_widget_set_sensitive (priv->check_dummy, xfburn_device_can_dummy_write (device));
+  gtk_widget_set_sensitive (priv->check_dummy, device != NULL && xfburn_device_can_dummy_write (device));
   check_burn_button (dialog);
 }
 
@@ -483,6 +482,12 @@ cb_dialog_response (XfburnBurnImageDialog * dialog, gint response_id, gpointer u
 
     GtkWidget *dialog_progress;
     gboolean quit;
+    ThreadBurnIsoParams *params = priv->params;
+
+    priv->params = NULL;
+    if (params == NULL) {
+      return;
+    }
 
     dialog_progress = xfburn_progress_dialog_new (GTK_WINDOW (dialog));
     gtk_window_set_transient_for (GTK_WINDOW (dialog_progress), gtk_window_get_transient_for (GTK_WINDOW (dialog)));
@@ -493,10 +498,10 @@ cb_dialog_response (XfburnBurnImageDialog * dialog, gint response_id, gpointer u
 
     g_object_set (G_OBJECT (dialog_progress), "quit", quit, NULL);
 
-    priv->params->dialog_progress = dialog_progress;
+    params->dialog_progress = dialog_progress;
     gtk_widget_show (dialog_progress);
 
-    g_thread_unref (g_thread_new ("burn_iso", (GThreadFunc) thread_burn_iso, priv->params));
+    g_thread_unref (g_thread_new ("burn_iso", (GThreadFunc) thread_burn_iso, params));
   } else {
     xfburn_main_leave_window ();
   }
@@ -506,22 +511,28 @@ static void
 update_image_label (GtkFileChooser *chooser, XfburnBurnImageDialog * dialog)
 {
   XfburnBurnImageDialogPrivate *priv = XFBURN_BURN_IMAGE_DIALOG_GET_PRIVATE (dialog);
+  gchar *filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (chooser));
 
-  if (gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (chooser)) == NULL) {
+  if (filename == NULL) {
     gtk_label_set_markup (GTK_LABEL(priv->image_label),
                           _("<span weight=\"bold\" foreground=\"darkred\" stretch=\"semiexpanded\">Please select an image to burn</span>"));
   } else {
     gtk_label_set_text (GTK_LABEL(priv->image_label), "");
-    check_burn_button (dialog);
+    g_free (filename);
   }
+  check_burn_button (dialog);
 }
 
 static void
 check_burn_button (XfburnBurnImageDialog * dialog)
 {
   XfburnBurnImageDialogPrivate *priv = XFBURN_BURN_IMAGE_DIALOG_GET_PRIVATE (dialog);
-  gboolean valid_disc;
+  gboolean valid_disc = FALSE;
   gchar *filename;
+
+  if (priv->device_box == NULL || priv->burn_button == NULL) {
+    return;
+  }
 
   g_object_get (G_OBJECT (priv->device_box), "valid", &valid_disc, NULL);
   filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (priv->chooser_image));
@@ -534,85 +545,51 @@ check_burn_button (XfburnBurnImageDialog * dialog)
   }
 }
 
-static gboolean
-check_media (XfburnBurnImageDialog * dialog, ThreadBurnIsoParams *params, struct burn_drive *drive)
-{
-  enum burn_disc_status disc_state;
-  struct stat st;
-  int ret;
-
-  while (burn_drive_get_status (drive, NULL) != BURN_DRIVE_IDLE)
-    usleep(100001);
-
-  /* Evaluate drive and disc */
-  while ((disc_state = burn_disc_get_status(drive)) == BURN_DISC_UNREADY)
-    usleep(100001);
-  if (disc_state == BURN_DISC_APPENDABLE && params->write_mode != WRITE_MODE_TAO) {
-    burn_image_dialog_error (dialog, _("Cannot append data to multisession disc in this write mode (use TAO instead)"));
-    return FALSE;
-  } else if (disc_state != BURN_DISC_BLANK) {
-    if (disc_state == BURN_DISC_FULL)
-      burn_image_dialog_error (dialog, _("Closed disc with data detected. Need blank or appendable disc"));
-    else if (disc_state == BURN_DISC_EMPTY)
-      burn_image_dialog_error (dialog, _("No disc detected in drive"));
-    else {
-      burn_image_dialog_error (dialog, _("Cannot recognize state of drive and disc"));
-      DBG ("disc_state = %d", disc_state);
-    }
-    return FALSE;
-  }
-
-  /* check if the image fits on the inserted disc */
-  ret = stat (params->iso_path, &st);
-  if (ret == 0) {
-    off_t disc_size;
-    disc_size = burn_disc_available_space (drive, params->burn_options);
-    if (st.st_size > disc_size) {
-      burn_image_dialog_error (dialog, _("The selected image does not fit on the inserted disc"));
-      return FALSE;
-    }
-  } else {
-    burn_image_dialog_error (dialog, _("Failed to get image size"));
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
 static void
 cb_clicked_ok (GtkButton *button, gpointer user_data)
 {
   XfburnBurnImageDialog * dialog = (XfburnBurnImageDialog *) user_data;
   XfburnBurnImageDialogPrivate *priv = XFBURN_BURN_IMAGE_DIALOG_GET_PRIVATE (dialog);
-  FILE *fp;
+  gint fd;
+  struct stat st;
   char *iso_path;
-  gboolean checks_passed = FALSE;
   XfburnDevice *device;
   gint speed;
   XfburnWriteMode write_mode;
-
   ThreadBurnIsoParams *params = NULL;
-  struct burn_drive_info *drive_info = NULL;
 
-  gchar *failure_msg;
-
-  /* check if the image file really exists and can be opened */
+  /* check if the image file really exists and can be opened (fast non-blocking check) */
   iso_path = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (priv->chooser_image));
-
-  fp = fopen(iso_path, "r");
-  if (fp == NULL) {
+  if (iso_path == NULL) {
     burn_image_dialog_error (dialog, _("Make sure you selected a valid file and you have the proper permissions to access it."));
-
     return;
   }
-  fclose(fp);
+
+  fd = open (iso_path, O_RDONLY);
+  if (fd < 0) {
+    g_free (iso_path);
+    burn_image_dialog_error (dialog, _("Make sure you selected a valid file and you have the proper permissions to access it."));
+    return;
+  }
+  if (fstat (fd, &st) != 0 || (st.st_mode & S_IFMT) != S_IFREG || st.st_size <= 0) {
+    close (fd);
+    g_free (iso_path);
+    burn_image_dialog_error (dialog, _("Unable to determine image size."));
+    return;
+  }
+  close (fd);
 
   device = xfburn_device_box_get_selected_device (XFBURN_DEVICE_BOX (priv->device_box));
+  if (device == NULL) {
+    g_free (iso_path);
+    burn_image_dialog_error (dialog, _("No burner device selected."));
+    return;
+  }
   speed = xfburn_device_box_get_speed (XFBURN_DEVICE_BOX (priv->device_box));
   write_mode = xfburn_device_box_get_mode (XFBURN_DEVICE_BOX (priv->device_box));
 
   params = g_new0 (ThreadBurnIsoParams, 1);
-  params->device = device;
+  params->device = g_object_ref (device);
   params->iso_path = iso_path;
   params->speed = speed;
   params->write_mode = write_mode;
@@ -622,31 +599,8 @@ cb_clicked_ok (GtkButton *button, gpointer user_data)
   params->stream_recording = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (priv->check_stream_recording));
   params->verify = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (priv->check_verify));
 
-  if (!xfburn_device_grab (device, &drive_info)) {
-    burn_image_dialog_error (dialog, _("Unable to grab the drive."));
-
-    g_free (params->iso_path);
-    g_free (params);
-    return;
-  }
-
-  if (!prepare_params(params, drive_info->drive, &failure_msg)) {
-    burn_image_dialog_error (dialog, failure_msg);
-  } else {
-    checks_passed = check_media (dialog, params, drive_info->drive);
-  }
-
-  xfburn_device_release (drive_info, 0);
-
-
-  if (checks_passed) {
-    priv->params = params;
-
-    gtk_dialog_response (GTK_DIALOG(dialog), GTK_RESPONSE_OK);
-  } else {
-    free_params (params);
-    g_free (params);
-  }
+  priv->params = params;
+  gtk_dialog_response (GTK_DIALOG (dialog), GTK_RESPONSE_OK);
 }
 
 /* public */

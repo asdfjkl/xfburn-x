@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <errno.h>
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -434,6 +435,239 @@ test_crash_signal_handler (void)
   g_free (tmp_dir);
 }
 
+static void
+test_backend_error_classification (void)
+{
+  GError *error = NULL;
+  gchar *tmp_dir;
+  gchar *log_path;
+  XfburnBackendMsgSummary summary;
+  gboolean ok;
+
+  tmp_dir = g_dir_make_tmp ("xfburn-test-classify-XXXXXX", &error);
+  g_assert_no_error (error);
+  log_path = g_build_filename (tmp_dir, "classify.log", NULL);
+
+  ok = xfburn_log_init (log_path);
+  g_assert_true (ok);
+
+  g_assert_true (burn_initialize () != 0);
+  g_assert_true (iso_init () >= 0);
+  xfburn_log_configure_backends ();
+
+  /* Case 1: Real USB disconnect sequence as emitted by libburn on Linux */
+  burn_msgs_submit (0x201A7,
+                    "SCSI command 28h yielded host problem: 0x7 SG_ERR_DID_ERROR (Internal error detected in the host adapter)",
+                    0, "FAILURE", 0);
+  burn_msgs_submit (0x201A7,
+                    "Command: READ(10) : 28 00 00 0e 07 20 00 00 20 00  : dxfer_len= 65536",
+                    0, "FAILURE", 0);
+  burn_msgs_submit (0x201A6, "Lost connection to drive", 0, "FATAL", 0);
+  burn_msgs_submit (0x20142, "Drive is not grabbed on random access read", 0, "FATAL", 0);
+
+  memset (&summary, 0, sizeof (summary));
+  g_assert_cmpint (xfburn_log_drain_backend_messages_ex ("usb_disconnect", NULL, 0, &summary), ==, 4);
+  g_assert_true (summary.drive_lost);
+  g_assert_true (summary.transport_error);
+  g_assert_false (summary.media_error);
+  g_assert_cmpint (summary.last_transport_code, ==, 0x201A7);
+  g_assert_nonnull (strstr (summary.last_transport_msg, "SG_ERR_DID_ERROR"));
+
+  /* Case 2: Actual SCSI disc medium read error while drive stays grabbed */
+  burn_msgs_submit (0x20155,
+                    "SCSI error on read_10(919328,32): [3 11 05] Medium error. L-EC uncorrectable error.",
+                    0, "FAILURE", 0);
+
+  memset (&summary, 0, sizeof (summary));
+  g_assert_cmpint (xfburn_log_drain_backend_messages_ex ("media_read_err", NULL, 0, &summary), ==, 1);
+  g_assert_false (summary.drive_lost);
+  g_assert_false (summary.transport_error);
+  g_assert_true (summary.media_error);
+
+  /* Case 3: OS ENODEV failure on a disappeared device */
+  memset (&summary, 0, sizeof (summary));
+  xfburn_log_classify_libburn_message (0x20001, ENODEV, "FAILURE", "Device read failed", &summary);
+  g_assert_true (summary.drive_lost);
+  g_assert_true (summary.transport_error);
+  g_assert_false (summary.media_error);
+  g_assert_cmpint (summary.last_transport_errno, ==, ENODEV);
+
+  xfburn_log_shutdown ();
+  iso_finish ();
+  burn_finish ();
+
+  g_free (log_path);
+  remove_tree_recursive (tmp_dir);
+  g_free (tmp_dir);
+}
+
+static void
+test_transport_telemetry_and_hints (void)
+{
+  GError *error = NULL;
+  gchar *tmp_dir;
+  gchar *log_path;
+  gchar *mock_sys;
+  gchar *usb3_dir;
+  gchar *scsi3_dir;
+  gchar *block3_dir;
+  gchar *symlink3_path;
+  gchar *sata_dir;
+  gchar *block_sata_dir;
+  gchar *symlink_sata_path;
+  gchar *contents = NULL;
+  gchar *hint = NULL;
+  XfburnDeviceTransportInfo usb3_info;
+  XfburnDeviceTransportInfo usb3_oc_info;
+  XfburnDeviceTransportInfo usb2_info;
+  XfburnDeviceTransportInfo sata_info;
+  XfburnBackendMsgSummary summary;
+  gboolean ok;
+
+  tmp_dir = g_dir_make_tmp ("xfburn-test-transport-XXXXXX", &error);
+  g_assert_no_error (error);
+  log_path = g_build_filename (tmp_dir, "transport.log", NULL);
+  mock_sys = g_build_filename (tmp_dir, "sys", NULL);
+
+  /* Mock USB 3.0 optical drive with LPM U1/U2 enabled */
+  usb3_dir = g_build_filename (mock_sys, "devices", "pci0000:00", "usb2", "2-4", NULL);
+  scsi3_dir = g_build_filename (usb3_dir, "host3", "target3:0:0", "3:0:0:0", NULL);
+  block3_dir = g_build_filename (mock_sys, "class", "block", "sr_usb3", NULL);
+
+  g_mkdir_with_parents (scsi3_dir, 0700);
+  g_mkdir_with_parents (block3_dir, 0700);
+
+  write_text_file (usb3_dir, "idVendor", "18a5\n");
+  write_text_file (usb3_dir, "idProduct", "0414\n");
+  write_text_file (usb3_dir, "speed", "5000\n");
+  write_text_file (usb3_dir, "version", " 3.00\n");
+  write_text_file (usb3_dir, "bMaxPower", "896mA\n");
+  write_text_file (usb3_dir, "manufacturer", "Verbatim\n");
+  write_text_file (usb3_dir, "product", "Verbatim BD RW\n");
+  write_text_file (usb3_dir, "power/control", "on\n");
+  write_text_file (usb3_dir, "power/runtime_status", "active\n");
+  write_text_file (usb3_dir, "power/usb3_hardware_lpm_u1", "enabled\n");
+  write_text_file (usb3_dir, "power/usb3_hardware_lpm_u2", "enabled\n");
+  write_text_file (usb3_dir, "port/usb3_lpm_permit", "u1_u2\n");
+  write_text_file (usb3_dir, "port/over_current_count", "0\n");
+
+  write_text_file (scsi3_dir, "vendor", "PIONEER\n");
+  write_text_file (scsi3_dir, "model", "BD-RW BDR-UD03\n");
+  write_text_file (scsi3_dir, "rev", "1.14\n");
+  write_text_file (scsi3_dir, "state", "running\n");
+  write_text_file (scsi3_dir, "timeout", "30\n");
+  write_text_file (scsi3_dir, "iorequest_cnt", "0x10\n");
+  write_text_file (scsi3_dir, "iodone_cnt", "0x10\n");
+  write_text_file (scsi3_dir, "ioerr_cnt", "0x0\n");
+  write_text_file (block3_dir, "queue/max_sectors_kb", "1024\n");
+
+  symlink3_path = g_build_filename (block3_dir, "device", NULL);
+  g_assert_cmpint (symlink (scsi3_dir, symlink3_path), ==, 0);
+
+  /* Mock internal SATA optical drive (no USB ancestor) */
+  sata_dir = g_build_filename (mock_sys, "devices", "pci0000:00", "ata1", "host0", "target0:0:0", "0:0:0:0", NULL);
+  block_sata_dir = g_build_filename (mock_sys, "class", "block", "sr_sata0", NULL);
+  g_mkdir_with_parents (sata_dir, 0700);
+  g_mkdir_with_parents (block_sata_dir, 0700);
+  write_text_file (sata_dir, "state", "running\n");
+  symlink_sata_path = g_build_filename (block_sata_dir, "device", NULL);
+  g_assert_cmpint (symlink (sata_dir, symlink_sata_path), ==, 0);
+
+  ok = xfburn_log_init (log_path);
+  g_assert_true (ok);
+
+  /* Snapshot USB 3.0 transport info before disconnect */
+  g_assert_true (xfburn_log_read_device_transport ("/dev/sr_usb3", mock_sys, &usb3_info));
+  g_assert_true (usb3_info.valid);
+  g_assert_true (usb3_info.is_usb);
+  g_assert_cmpstr (usb3_info.speed_mbps, ==, "5000");
+  g_assert_cmpstr (usb3_info.lpm_u1, ==, "enabled");
+  g_assert_cmpstr (usb3_info.lpm_u2, ==, "enabled");
+  g_assert_cmpstr (usb3_info.lpm_permit, ==, "u1_u2");
+  g_assert_true (usb3_info.has_over_current);
+  g_assert_cmpint (usb3_info.over_current_count, ==, 0);
+
+  xfburn_log_dump_device_hardware ("/dev/sr_usb3", mock_sys);
+
+  /* Simulate block device disappearing from sysfs on USB disconnect */
+  remove_tree_recursive (block3_dir);
+
+  memset (&summary, 0, sizeof (summary));
+  xfburn_log_classify_libburn_message (
+    0x201A7, 0, "FAILURE",
+    "SCSI command 28h yielded host problem: 0x7 SG_ERR_DID_ERROR (Internal error detected in the host adapter)",
+    &summary);
+  xfburn_log_classify_libburn_message (0x201A6, 0, "FATAL", "Lost connection to drive", &summary);
+
+  xfburn_log_emit_transport_disconnect ("verify_data", "/dev/sr_usb3", mock_sys,
+                                        &usb3_info, 919328, &summary, TRUE);
+
+  /* Test over-current and autosuspend hint branches */
+  usb3_oc_info = usb3_info;
+  usb3_oc_info.over_current_count = 1;
+  g_strlcpy (usb3_oc_info.power_control, "auto", sizeof (usb3_oc_info.power_control));
+  hint = xfburn_log_format_transport_hint (&usb3_info, &usb3_oc_info, FALSE);
+  g_assert_nonnull (strstr (hint, "over-current"));
+  g_assert_nonnull (strstr (hint, "usbcore.quirks=18a5:0414:k"));
+  g_free (hint);
+
+  hint = xfburn_log_format_transport_hint (&usb3_oc_info, NULL, FALSE);
+  g_assert_nonnull (strstr (hint, "autosuspend"));
+  g_free (hint);
+
+  /* Test USB 2.0 drive without LPM files */
+  memset (&usb2_info, 0, sizeof (usb2_info));
+  usb2_info.valid = TRUE;
+  usb2_info.is_usb = TRUE;
+  g_strlcpy (usb2_info.speed_mbps, "480", sizeof (usb2_info.speed_mbps));
+  g_strlcpy (usb2_info.usb_ver, "2.10", sizeof (usb2_info.usb_ver));
+  g_strlcpy (usb2_info.max_power, "500mA", sizeof (usb2_info.max_power));
+  g_strlcpy (usb2_info.power_control, "on", sizeof (usb2_info.power_control));
+  g_strlcpy (usb2_info.lpm_u1, "n/a", sizeof (usb2_info.lpm_u1));
+  g_strlcpy (usb2_info.lpm_u2, "n/a", sizeof (usb2_info.lpm_u2));
+  g_strlcpy (usb2_info.lpm_permit, "n/a", sizeof (usb2_info.lpm_permit));
+  hint = xfburn_log_format_transport_hint (&usb2_info, NULL, FALSE);
+  g_assert_nonnull (strstr (hint, "Check power delivery"));
+  g_assert_null (strstr (hint, "USB 3.0 Hardware LPM"));
+  g_free (hint);
+
+  /* Test internal SATA drive */
+  g_assert_true (xfburn_log_read_device_transport ("/dev/sr_sata0", mock_sys, &sata_info));
+  g_assert_true (sata_info.valid);
+  g_assert_false (sata_info.is_usb);
+  hint = xfburn_log_format_transport_hint (&sata_info, NULL, FALSE);
+  g_assert_nonnull (strstr (hint, "SATA/USB"));
+  g_assert_null (strstr (hint, "External USB drive"));
+  g_free (hint);
+
+  xfburn_log_shutdown ();
+
+  ok = g_file_get_contents (log_path, &contents, NULL, &error);
+  g_assert_no_error (error);
+  g_assert_true (ok);
+
+  g_assert_nonnull (strstr (contents, "lpm_u1=\"enabled\" lpm_u2=\"enabled\" lpm_permit=\"u1_u2\" over_current=\"0\""));
+  g_assert_nonnull (strstr (contents, "[FATAL]"));
+  g_assert_nonnull (strstr (contents, "[TRANSPORT] Drive disconnect / transport error during phase=\"verify_data\" addr=\"/dev/sr_usb3\" lba=919328 bus=\"usb\" drive_lost=1 transport_error=1 drive_ungrabbed=1 sysfs_present=0"));
+  g_assert_nonnull (strstr (contents, "[DIAG_HINT] phase=\"verify_data\" addr=\"/dev/sr_usb3\" bus=\"usb\""));
+  g_assert_nonnull (strstr (contents, "USB 3.0 Hardware LPM sleep states were enabled"));
+  g_assert_nonnull (strstr (contents, "usbcore.quirks=18a5:0414:k"));
+  g_assert_nonnull (strstr (contents, "Block device sysfs node disappeared"));
+
+  g_free (contents);
+  g_free (symlink_sata_path);
+  g_free (block_sata_dir);
+  g_free (sata_dir);
+  g_free (symlink3_path);
+  g_free (block3_dir);
+  g_free (scsi3_dir);
+  g_free (usb3_dir);
+  g_free (mock_sys);
+  g_free (log_path);
+  remove_tree_recursive (tmp_dir);
+  g_free (tmp_dir);
+}
+
 int
 main (int argc, char **argv)
 {
@@ -442,7 +676,9 @@ main (int argc, char **argv)
   g_test_add_func ("/xfburn/log/init-and-header", test_init_and_header);
   g_test_add_func ("/xfburn/log/multithreaded-trace", test_multithreaded_trace);
   g_test_add_func ("/xfburn/log/backend-message-drain", test_backend_message_drain);
+  g_test_add_func ("/xfburn/log/backend-error-classification", test_backend_error_classification);
   g_test_add_func ("/xfburn/log/sysfs-telemetry", test_sysfs_telemetry);
+  g_test_add_func ("/xfburn/log/transport-telemetry-and-hints", test_transport_telemetry_and_hints);
   g_test_add_func ("/xfburn/log/crash-signal-handler", test_crash_signal_handler);
 
   return g_test_run ();

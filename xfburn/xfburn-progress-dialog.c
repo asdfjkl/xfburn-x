@@ -260,7 +260,7 @@ xfburn_progress_dialog_get_property (GObject * object, guint prop_id, GValue * v
     g_value_set_boolean (value, priv->quit);
     break;
   case PROP_STOP:
-    g_value_set_boolean (value, priv->stop);
+    g_value_set_boolean (value, g_atomic_int_get (&priv->stop) != 0);
     break;
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -335,7 +335,7 @@ stop (XfburnProgressDialog *dialog)
 {
   XfburnProgressDialogPrivate *priv = XFBURN_PROGRESS_DIALOG_GET_PRIVATE (dialog);
 
-  priv->stop = TRUE;
+  g_atomic_int_set (&priv->stop, TRUE);
 }
 
 /* callbacks */
@@ -593,6 +593,7 @@ xfburn_progress_dialog_set_progress_bar_fraction (XfburnProgressDialog * dialog,
   gdouble cur_fraction = 0.0;
   gchar *text = NULL;
 
+  gdk_threads_enter ();
   cur_fraction = gtk_progress_bar_get_fraction (GTK_PROGRESS_BAR (priv->progress_bar)) * 100.0;
 
   if (fraction >= 100.0) {
@@ -635,10 +636,10 @@ xfburn_progress_dialog_set_progress_bar_fraction (XfburnProgressDialog * dialog,
     }
   }
   else if (fraction < cur_fraction) {
+    gdk_threads_leave ();
     return;
   }
 
-  gdk_threads_enter ();
   gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (priv->progress_bar), fraction / 100.0);
   gtk_progress_bar_set_text (GTK_PROGRESS_BAR (priv->progress_bar), text);
   gdk_threads_leave ();

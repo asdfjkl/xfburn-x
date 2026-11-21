@@ -31,7 +31,6 @@ static void xfburn_data_disc_usage_update_size (XfburnDiscUsage * disc_usage);
 
 #define DEFAULT_DISK_SIZE_LABEL 2
 #define LAST_CD_LABEL 4
-#define NUM_LABELS 10
 
 XfburnDiscLabels datadiscsizes[] = {
   {
@@ -92,16 +91,19 @@ xfburn_data_disc_usage_init (XfburnDataDiscUsage *disc_usage)
 static void
 xfburn_data_disc_usage_update_size (XfburnDiscUsage * disc_usage)
 {
-  gfloat fraction;
+  gint active = gtk_combo_box_get_active (GTK_COMBO_BOX (disc_usage->combo));
+  gfloat fraction = 0.0;
   gchar *size;
 
-  fraction = disc_usage->size / datadiscsizes[gtk_combo_box_get_active (GTK_COMBO_BOX (disc_usage->combo))].size;
+  if (active >= 0 && active < (gint) G_N_ELEMENTS (datadiscsizes) && datadiscsizes[active].size > 0) {
+    fraction = disc_usage->size / datadiscsizes[active].size;
+  }
   if (fraction > 1.0)
     fraction = 1.0;
   if (fraction < 0.0)
     fraction = 0.0;
 
-  gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (disc_usage->progress_bar), fraction > 1.0 ? 1.0 : fraction);
+  gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (disc_usage->progress_bar), fraction);
 
   if (xfburn_settings_get_boolean ("human-readable-units", TRUE))
     size = xfburn_humanreadable_filesize ((guint64) disc_usage->size);
@@ -116,8 +118,11 @@ xfburn_data_disc_usage_update_size (XfburnDiscUsage * disc_usage)
 static gboolean
 can_burn (XfburnDiscUsage *disc_usage)
 {
-  if (disc_usage->size == 0 ||
-      disc_usage->size > datadiscsizes[gtk_combo_box_get_active (GTK_COMBO_BOX (disc_usage->combo))].size)
+  gint active = gtk_combo_box_get_active (GTK_COMBO_BOX (disc_usage->combo));
+
+  if (active < 0 || active >= (gint) G_N_ELEMENTS (datadiscsizes) ||
+      disc_usage->size <= 0 ||
+      disc_usage->size > datadiscsizes[active].size)
     return FALSE;
   else
     return TRUE;

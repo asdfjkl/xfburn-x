@@ -48,6 +48,12 @@
         </item>
 <!--        <placeholder name="placeholder-action-cd"/>  -->
       </section>
+      <section>
+        <item>
+          <attribute name="label" translatable="yes">Disc Info</attribute>
+          <attribute name="action">app.disc-info</attribute>
+        </item>
+      </section>
     </submenu>
     <submenu>
       <attribute name="label" translatable="yes">_View</attribute>

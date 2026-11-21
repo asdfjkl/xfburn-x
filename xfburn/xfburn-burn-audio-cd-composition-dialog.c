@@ -381,6 +381,7 @@ thread_burn_composition (ThreadBurnCompositionParams * params)
   burn_session_free (session);
   burn_disc_free (disc);
   xfburn_verify_data_free (params->verify_data);
+  g_clear_object (&params->device);
 
   /* FIXME: free track_list here? */
   g_free (params);
@@ -398,13 +399,18 @@ cb_dialog_response (XfburnBurnAudioCdCompositionDialog * dialog, gint response_i
     gint speed;
     XfburnWriteMode write_mode;
 
+    device = xfburn_device_box_get_selected_device (XFBURN_DEVICE_BOX (priv->device_box));
+    if (device == NULL) {
+      xfce_dialog_show_error (GTK_WINDOW (dialog), NULL, _("No burner device selected."));
+      return;
+    }
+
     dialog_progress = xfburn_progress_dialog_new (GTK_WINDOW (dialog));
     gtk_window_set_transient_for (GTK_WINDOW (dialog_progress), gtk_window_get_transient_for (GTK_WINDOW (dialog)));
     gtk_widget_hide (GTK_WIDGET (dialog));
 
     gtk_widget_show (dialog_progress);
 
-    device = xfburn_device_box_get_selected_device (XFBURN_DEVICE_BOX (priv->device_box));
     speed = xfburn_device_box_get_speed (XFBURN_DEVICE_BOX (priv->device_box));
     /* cdrskin burns audio with SAO, but we assume auto knows that */
     write_mode = WRITE_MODE_AUTO;
@@ -412,7 +418,7 @@ cb_dialog_response (XfburnBurnAudioCdCompositionDialog * dialog, gint response_i
     /* burn composition */
     params = g_new0 (ThreadBurnCompositionParams, 1);
     params->dialog_progress = dialog_progress;
-    params->device = device;
+    params->device = g_object_ref (device);
     params->tracks = priv->track_list;
     params->speed = speed;
     params->write_mode = write_mode;

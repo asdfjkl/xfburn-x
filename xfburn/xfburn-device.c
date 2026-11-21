@@ -89,6 +89,7 @@ struct _XfburnDevicePrivate {
   int profile_no;
   char profile_name[80];
   int is_erasable;
+  gboolean last_umount_failed;
 };
 
 struct _XfburnDevice
@@ -175,12 +176,15 @@ xfburn_device_set_property (GObject *object, guint property_id,
 
   switch (property_id) {
     case PROP_NAME:
+      g_free (priv->name);
       priv->name = g_value_dup_string (value);
       break;
     case PROP_ADDRESS:
+      g_free (priv->addr);
       priv->addr = g_value_dup_string (value);
       break;
     case PROP_REVISION:
+      g_free (priv->rev);
       priv->rev = g_value_dup_string (value);
       break;
     case PROP_SUPPORTED_SPEEDS:
@@ -240,6 +244,8 @@ xfburn_device_finalize (GObject *object)
   XfburnDevicePrivate *priv = GET_PRIVATE (dev);
 
   g_free (priv->name);
+  g_free (priv->addr);
+  g_free (priv->rev);
 
   g_slist_free (priv->supported_speeds);
 
@@ -346,48 +352,79 @@ cmp_ints (gconstpointer a, gconstpointer b)
   return GPOINTER_TO_INT(a) - GPOINTER_TO_INT(b);
 }
 
-static void
-refresh_disc (XfburnDevice * device, struct burn_drive_info *drive_info)
+static gboolean
+cancellable_sleep_ms (guint total_ms, GCancellable *cancellable)
 {
-  XfburnDevicePrivate *priv = GET_PRIVATE (device);
+  guint remaining = total_ms;
+
+  while (remaining > 0) {
+    guint step = MIN (remaining, 50U);
+
+    if (cancellable != NULL && g_cancellable_is_cancelled (cancellable)) {
+      return FALSE;
+    }
+
+    g_usleep ((gulong) step * 1000UL);
+    remaining -= step;
+  }
+
+  return !(cancellable != NULL && g_cancellable_is_cancelled (cancellable));
+}
+
+static void
+probe_disc_into_result (const gchar *addr,
+                        const gchar *name,
+                        struct burn_drive_info *drive_info,
+                        GCancellable *cancellable,
+                        XfburnDeviceProbeResult *res)
+{
   int wait_ticks = 0;
   int prof_ret;
   gint64 t_call;
 
   /* check if there is a disc in the drive */
   t_call = g_get_monotonic_time ();
-  XFBURN_LOG_CALL_ENTER ("burn_disc_get_status", "addr=\"%s\"", priv->addr);
-  while ((priv->disc_status = burn_disc_get_status (drive_info->drive)) == BURN_DISC_UNREADY && wait_ticks < 50) {
-    usleep(100001);
+  XFBURN_LOG_CALL_ENTER ("burn_disc_get_status", "addr=\"%s\"", addr);
+  while ((res->disc_status = burn_disc_get_status (drive_info->drive)) == BURN_DISC_UNREADY && wait_ticks < 50) {
+    if (cancellable != NULL && g_cancellable_is_cancelled (cancellable)) {
+      res->cancelled = TRUE;
+      break;
+    }
+    g_usleep (100001);
     wait_ticks++;
   }
-  XFBURN_LOG_CALL_EXIT ("burn_disc_get_status", t_call, "disc_status=%d wait_ticks=%d", priv->disc_status, wait_ticks);
+  XFBURN_LOG_CALL_EXIT ("burn_disc_get_status", t_call, "disc_status=%d wait_ticks=%d", res->disc_status, wait_ticks);
 
-  DBG ("disc_status = %d", priv->disc_status);
+  if (res->cancelled) {
+    return;
+  }
+
+  DBG ("disc_status = %d", res->disc_status);
 
   t_call = g_get_monotonic_time ();
-  XFBURN_LOG_CALL_ENTER ("burn_disc_get_profile", "addr=\"%s\"", priv->addr);
-  prof_ret = burn_disc_get_profile (drive_info->drive, &(priv->profile_no), priv->profile_name);
+  XFBURN_LOG_CALL_ENTER ("burn_disc_get_profile", "addr=\"%s\"", addr);
+  prof_ret = burn_disc_get_profile (drive_info->drive, &(res->profile_no), res->profile_name);
   XFBURN_LOG_CALL_EXIT ("burn_disc_get_profile", t_call, "ret=%d profile_no=0x%x profile_name=\"%s\"",
-                        prof_ret, priv->profile_no, priv->profile_name);
+                        prof_ret, res->profile_no, res->profile_name);
 
   if (prof_ret != 1) {
     g_warning ("no profile could be retrieved");
   }
-  priv->is_erasable = burn_disc_erasable (drive_info->drive);
+  res->is_erasable = burn_disc_erasable (drive_info->drive);
   xfburn_log_drain_backend_messages ("refresh_disc", NULL, 0);
 
   XFBURN_LOG_INFO ("MEDIA",
                    "addr=\"%s\" name=\"%s\" disc_status=%d profile_no=0x%x profile_name=\"%s\" erasable=%d wait_ticks=%d",
-                   priv->addr, priv->name, priv->disc_status, priv->profile_no, priv->profile_name,
-                   priv->is_erasable, wait_ticks);
+                   addr, name != NULL ? name : "", res->disc_status, res->profile_no, res->profile_name,
+                   res->is_erasable, wait_ticks);
 }
 
 static void
-refresh_speed_list (XfburnDevice * device, struct burn_drive_info *drive_info)
+probe_speed_list_into_result (const gchar *addr,
+                              const gchar *name,
+                              struct burn_drive_info *drive_info,
+                              XfburnDeviceProbeResult *res)
 {
-  XfburnDevicePrivate *priv = GET_PRIVATE (device);
-
   struct burn_speed_descriptor *speed_list = NULL;
   gint ret;
   gint atip_ret = 0;
@@ -396,9 +433,9 @@ refresh_speed_list (XfburnDevice * device, struct burn_drive_info *drive_info)
   gint64 t_call;
 
   /* On CD-R / CD-RW media, read ATIP first so libburn populates ATIP min/max write speeds */
-  if (priv->profile_no == XFBURN_PROFILE_CDR || priv->profile_no == XFBURN_PROFILE_CDRW) {
+  if (res->profile_no == XFBURN_PROFILE_CDR || res->profile_no == XFBURN_PROFILE_CDRW) {
     t_call = g_get_monotonic_time ();
-    XFBURN_LOG_CALL_ENTER ("burn_disc_read_atip", "addr=\"%s\" profile_no=0x%x", priv->addr, priv->profile_no);
+    XFBURN_LOG_CALL_ENTER ("burn_disc_read_atip", "addr=\"%s\" profile_no=0x%x", addr, res->profile_no);
     atip_ret = burn_disc_read_atip (drive_info->drive);
     XFBURN_LOG_CALL_EXIT ("burn_disc_read_atip", t_call, "ret=%d", atip_ret);
     xfburn_log_drain_backend_messages ("refresh_speed_list_atip", NULL, 0);
@@ -406,7 +443,7 @@ refresh_speed_list (XfburnDevice * device, struct burn_drive_info *drive_info)
 
   /* Query MMC speed descriptors (ACh GET PERFORMANCE / Mode Page 2Ah) */
   t_call = g_get_monotonic_time ();
-  XFBURN_LOG_CALL_ENTER ("burn_drive_get_speedlist", "addr=\"%s\"", priv->addr);
+  XFBURN_LOG_CALL_ENTER ("burn_drive_get_speedlist", "addr=\"%s\"", addr);
   ret = burn_drive_get_speedlist (drive_info->drive, &speed_list);
   XFBURN_LOG_CALL_EXIT ("burn_drive_get_speedlist", t_call, "ret=%d speed_list=%p", ret, (void *) speed_list);
   xfburn_log_drain_backend_messages ("refresh_speed_list", NULL, 0);
@@ -424,44 +461,44 @@ refresh_speed_list (XfburnDevice * device, struct burn_drive_info *drive_info)
       g_string_append_printf (raw_desc, "src=%d w=%d r=%d end_lba=%d",
                               el->source, el->write_speed, el->read_speed, el->end_lba);
 
-      if (speed > 0 && no_speed_duplicate (priv->supported_speeds, speed)) {
-        priv->supported_speeds = g_slist_prepend (priv->supported_speeds, GINT_TO_POINTER (speed));
+      if (speed > 0 && no_speed_duplicate (res->supported_speeds, speed)) {
+        res->supported_speeds = g_slist_prepend (res->supported_speeds, GINT_TO_POINTER (speed));
       }
 
       el = el->next;
     }
 
-    XFBURN_LOG_DEBUG ("MEDIA", "addr=\"%s\" raw_speed_descriptors=\"%s\"", priv->addr, raw_desc->str);
+    XFBURN_LOG_DEBUG ("MEDIA", "addr=\"%s\" raw_speed_descriptors=\"%s\"", addr, raw_desc->str);
     g_string_free (raw_desc, TRUE);
     burn_drive_free_speedlist (&speed_list);
   } else if (ret < 0) {
     /* ret < 0: Log diagnostic details and continue gracefully without crashing via g_error */
     XFBURN_LOG_ERROR ("MEDIA",
                       "severe error while retrieving speed list for addr=\"%s\" name=\"%s\" (ret=%d)",
-                      priv->addr, priv->name, ret);
+                      addr, name != NULL ? name : "", ret);
     xfburn_log_drain_backend_messages ("refresh_speed_list_error", NULL, 0);
-    xfburn_log_dump_device_hardware (priv->addr, NULL);
-    g_warning ("severe error while retrieving speed list for '%s' (ret=%d)", priv->addr, ret);
+    xfburn_log_dump_device_hardware (addr, NULL);
+    g_warning ("severe error while retrieving speed list for '%s' (ret=%d)", addr, ret);
   }
 
   /* Supplement with libburn's min/max write speeds (populated from ATIP and drive capabilities) */
   min_speed = burn_drive_get_min_write_speed (drive_info->drive);
   max_speed = burn_drive_get_write_speed (drive_info->drive);
 
-  if (min_speed > 0 && no_speed_duplicate (priv->supported_speeds, min_speed)) {
-    priv->supported_speeds = g_slist_prepend (priv->supported_speeds, GINT_TO_POINTER (min_speed));
+  if (min_speed > 0 && no_speed_duplicate (res->supported_speeds, min_speed)) {
+    res->supported_speeds = g_slist_prepend (res->supported_speeds, GINT_TO_POINTER (min_speed));
   }
-  if (max_speed > 0 && no_speed_duplicate (priv->supported_speeds, max_speed)) {
-    priv->supported_speeds = g_slist_prepend (priv->supported_speeds, GINT_TO_POINTER (max_speed));
+  if (max_speed > 0 && no_speed_duplicate (res->supported_speeds, max_speed)) {
+    res->supported_speeds = g_slist_prepend (res->supported_speeds, GINT_TO_POINTER (max_speed));
   }
 
-  if (priv->supported_speeds != NULL) {
+  if (res->supported_speeds != NULL) {
     GString *speeds_str = g_string_new (NULL);
     GSList *it;
 
-    priv->supported_speeds = g_slist_sort (priv->supported_speeds, &cmp_ints);
+    res->supported_speeds = g_slist_sort (res->supported_speeds, &cmp_ints);
 
-    for (it = priv->supported_speeds; it != NULL; it = it->next) {
+    for (it = res->supported_speeds; it != NULL; it = it->next) {
       if (speeds_str->len > 0) {
         g_string_append_c (speeds_str, ',');
       }
@@ -469,20 +506,513 @@ refresh_speed_list (XfburnDevice * device, struct burn_drive_info *drive_info)
     }
     XFBURN_LOG_INFO ("MEDIA",
                      "addr=\"%s\" atip_ret=%d min_write_speed_kbps=%d max_write_speed_kbps=%d supported_speeds_kbps=\"%s\"",
-                     priv->addr, atip_ret, min_speed, max_speed, speeds_str->str);
+                     addr, atip_ret, min_speed, max_speed, speeds_str->str);
     g_string_free (speeds_str, TRUE);
   } else if (ret >= 0) {
     XFBURN_LOG_WARN ("MEDIA",
                      "addr=\"%s\" reported speed list is empty (ret=%d atip_ret=%d min=%d max=%d)",
-                     priv->addr, ret, atip_ret, min_speed, max_speed);
-    g_warning ("reported speed list is empty for device:");
-    g_warning ("%s can burn: %d [cdr: %d, cdrw: %d, dvdr: %d, dvdram: %d]", (priv)->name, ((priv)->cdr || (priv)->cdrw || (priv)->dvdr || (priv)->dvdram), (priv)->cdr, (priv)->cdrw, (priv)->dvdr, (priv)->dvdram);
+                     addr, ret, atip_ret, min_speed, max_speed);
+    g_warning ("reported speed list is empty for device '%s'", name != NULL ? name : addr);
   }
+}
+
+static GMutex drive_grab_mutex;
+static GCond drive_grab_cond;
+static gboolean drive_grabbed = FALSE;
+static gboolean drive_grabbed_by_burn = FALSE;
+static GCancellable *active_probe_cancellable = NULL;
+static gint active_drive_grabs = 0;
+static gint active_burn_grabs = 0;
+
+static gboolean
+acquire_grab_slot (gboolean is_probe, GCancellable *probe_cancellable)
+{
+  g_mutex_lock (&drive_grab_mutex);
+
+  if (is_probe) {
+    if (drive_grabbed && !drive_grabbed_by_burn) {
+      gint64 deadline = g_get_monotonic_time () + 8 * G_USEC_PER_SEC;
+
+      while (drive_grabbed && !drive_grabbed_by_burn) {
+        gint64 step_end;
+
+        if (probe_cancellable != NULL && g_cancellable_is_cancelled (probe_cancellable)) {
+          g_mutex_unlock (&drive_grab_mutex);
+          return FALSE;
+        }
+        step_end = MIN (deadline, g_get_monotonic_time () + 200 * 1000);
+        g_cond_wait_until (&drive_grab_cond, &drive_grab_mutex, step_end);
+        if (g_get_monotonic_time () >= deadline) {
+          break;
+        }
+      }
+    }
+
+    if (drive_grabbed || (probe_cancellable != NULL && g_cancellable_is_cancelled (probe_cancellable))) {
+      g_mutex_unlock (&drive_grab_mutex);
+      return FALSE;
+    }
+    drive_grabbed = TRUE;
+    drive_grabbed_by_burn = FALSE;
+    g_clear_object (&active_probe_cancellable);
+    if (probe_cancellable != NULL) {
+      active_probe_cancellable = g_object_ref (probe_cancellable);
+    }
+    g_atomic_int_set (&active_drive_grabs, 1);
+    g_atomic_int_set (&active_burn_grabs, 0);
+    g_mutex_unlock (&drive_grab_mutex);
+    return TRUE;
+  }
+
+  /* Burn/blank job: cancel any active UI probe and wait briefly for it to release the drive */
+  if (drive_grabbed && !drive_grabbed_by_burn) {
+    gint64 deadline = g_get_monotonic_time () + 12 * G_USEC_PER_SEC;
+
+    if (active_probe_cancellable != NULL) {
+      GCancellable *to_cancel = g_object_ref (active_probe_cancellable);
+      g_mutex_unlock (&drive_grab_mutex);
+      XFBURN_LOG_INFO ("DEV", "Cancelling in-flight device probe so burn/blank job can acquire drive");
+      g_cancellable_cancel (to_cancel);
+      g_object_unref (to_cancel);
+      g_mutex_lock (&drive_grab_mutex);
+    }
+
+    while (drive_grabbed && !drive_grabbed_by_burn) {
+      if (!g_cond_wait_until (&drive_grab_cond, &drive_grab_mutex, deadline)) {
+        XFBURN_LOG_WARN ("DEV", "Timed out waiting for in-flight probe to release drive");
+        break;
+      }
+    }
+  }
+
+  if (drive_grabbed) {
+    g_mutex_unlock (&drive_grab_mutex);
+    return FALSE;
+  }
+
+  drive_grabbed = TRUE;
+  drive_grabbed_by_burn = TRUE;
+  g_clear_object (&active_probe_cancellable);
+  g_atomic_int_set (&active_drive_grabs, 1);
+  g_atomic_int_set (&active_burn_grabs, 1);
+  g_mutex_unlock (&drive_grab_mutex);
+  return TRUE;
+}
+
+static void
+release_grab_slot (void)
+{
+  g_mutex_lock (&drive_grab_mutex);
+  drive_grabbed = FALSE;
+  drive_grabbed_by_burn = FALSE;
+  g_clear_object (&active_probe_cancellable);
+  g_atomic_int_set (&active_drive_grabs, 0);
+  g_atomic_int_set (&active_burn_grabs, 0);
+  g_cond_broadcast (&drive_grab_cond);
+  g_mutex_unlock (&drive_grab_mutex);
+}
+
+#ifdef HAVE_GUDEV
+static XfburnUmountResult
+try_unmount_for_grab (XfburnUdevManager *udevman,
+                      const gchar *addr,
+                      GCancellable *cancellable,
+                      gchar **error_msg)
+{
+  XfburnUmountResult res;
+
+  if (udevman == NULL || addr == NULL || addr[0] == '\0') {
+    return XFBURN_UMOUNT_NOT_MOUNTED;
+  }
+
+  res = xfburn_udev_manager_unmount_device (udevman, addr, cancellable, error_msg);
+  if (res != XFBURN_UMOUNT_NOT_MOUNTED) {
+    return res;
+  }
+
+  /* If the kernel mount table already shows this device mounted, GVFS/GVolumeMonitor
+   * may still be delivering the D-Bus mount-added event. Give it a brief cancellable
+   * window before attempting an exclusive libburn open (which would otherwise fail
+   * after 6 seconds with EBUSY). */
+  if (xfburn_udev_manager_is_mounted_in_kernel (addr)) {
+    gint wait_attempt;
+
+    XFBURN_LOG_INFO ("DEV",
+                     "Device addr=\"%s\" is mounted in /proc/self/mounts but not yet in GVolumeMonitor; waiting briefly for mount sync",
+                     addr);
+    for (wait_attempt = 0; wait_attempt < 3; wait_attempt++) {
+      if (!cancellable_sleep_ms (200, cancellable)) {
+        return XFBURN_UMOUNT_CANCELLED;
+      }
+      res = xfburn_udev_manager_unmount_device (udevman, addr, cancellable, error_msg);
+      if (res != XFBURN_UMOUNT_NOT_MOUNTED) {
+        return res;
+      }
+      if (!xfburn_udev_manager_is_mounted_in_kernel (addr)) {
+        break;
+      }
+    }
+  }
+
+  return XFBURN_UMOUNT_NOT_MOUNTED;
+}
+#endif
+
+static gboolean
+grab_drive_internal (const gchar *addr,
+                     struct burn_drive_info **drive_info,
+                     gboolean is_probe,
+                     GCancellable *cancellable,
+                     gboolean *out_cancelled,
+                     gboolean *out_umount_failed,
+                     gchar **out_error_msg)
+{
+  int ret = 0;
+  gchar drive_addr[BURN_DRIVE_ADR_LEN];
+  gchar *addr_mut;
+  int i;
+  const int max_checks = is_probe ? 2 : 3;
+  gint64 t_call;
+#ifdef HAVE_GUDEV
+  XfburnUdevManager *udevman = NULL;
+  XfburnUmountResult umount_res;
+#endif
+
+  if (out_cancelled != NULL) {
+    *out_cancelled = FALSE;
+  }
+  if (out_umount_failed != NULL) {
+    *out_umount_failed = FALSE;
+  }
+  if (out_error_msg != NULL) {
+    *out_error_msg = NULL;
+  }
+
+  if (addr == NULL || addr[0] == '\0') {
+    return FALSE;
+  }
+
+  if (cancellable != NULL && g_cancellable_is_cancelled (cancellable)) {
+    if (out_cancelled != NULL) {
+      *out_cancelled = TRUE;
+    }
+    return FALSE;
+  }
+
+  if (!acquire_grab_slot (is_probe, cancellable)) {
+    if (cancellable != NULL && g_cancellable_is_cancelled (cancellable)) {
+      if (out_cancelled != NULL) {
+        *out_cancelled = TRUE;
+      }
+      return FALSE;
+    }
+    DBG ("Drive already grabbed, skipping concurrent grab attempt for '%s'", addr);
+    XFBURN_LOG_DEBUG ("DEV", "Drive already grabbed, skipping concurrent grab attempt for addr=\"%s\" is_probe=%d",
+                      addr, is_probe);
+    return FALSE;
+  }
+
+  t_call = g_get_monotonic_time ();
+  XFBURN_LOG_CALL_ENTER ("burn_drive_convert_fs_adr", "addr=\"%s\"", addr);
+  addr_mut = g_strdup (addr);
+  ret = burn_drive_convert_fs_adr (addr_mut, drive_addr);
+  g_free (addr_mut);
+  XFBURN_LOG_CALL_EXIT ("burn_drive_convert_fs_adr", t_call, "ret=%d drive_addr=\"%s\"", ret, drive_addr);
+  xfburn_log_drain_backend_messages ("convert_fs_adr", NULL, 0);
+
+  if (ret <= 0) {
+    release_grab_slot ();
+    XFBURN_LOG_ERROR ("DEV", "Device address does not lead to a burner addr=\"%s\" (ret=%d)", addr, ret);
+    xfburn_log_dump_device_hardware (addr, NULL);
+    g_warning ("Device address does not lead to a burner '%s' (ret=%d).", addr, ret);
+    return FALSE;
+  }
+
+#ifdef HAVE_GUDEV
+  udevman = xfburn_udev_manager_ref_global ();
+
+  /* Unmount any active filesystem on the optical drive BEFORE calling libburn,
+   * avoiding a guaranteed 6-second EBUSY wait inside burn_drive_scan_and_grab(). */
+  umount_res = try_unmount_for_grab (udevman, addr, cancellable, out_error_msg);
+  if (umount_res == XFBURN_UMOUNT_CANCELLED) {
+    if (out_cancelled != NULL) {
+      *out_cancelled = TRUE;
+    }
+    g_clear_object (&udevman);
+    release_grab_slot ();
+    return FALSE;
+  }
+  if (umount_res == XFBURN_UMOUNT_FAILED) {
+    if (out_umount_failed != NULL) {
+      *out_umount_failed = TRUE;
+    }
+    XFBURN_LOG_WARN ("DEV", "Aborting grab for addr=\"%s\" because volume unmount failed", addr);
+    g_clear_object (&udevman);
+    release_grab_slot ();
+    return FALSE;
+  }
+#endif
+
+  /* Try to grab the drive; retries handle transient drive spin-up or OS automount races. */
+  for (i = 1; i <= max_checks; i++) {
+    if (cancellable != NULL && g_cancellable_is_cancelled (cancellable)) {
+      if (out_cancelled != NULL) {
+        *out_cancelled = TRUE;
+      }
+      ret = 0;
+      break;
+    }
+
+    t_call = g_get_monotonic_time ();
+    XFBURN_LOG_CALL_ENTER ("burn_drive_scan_and_grab", "drive_addr=\"%s\" attempt=%d/%d", drive_addr, i, max_checks);
+    ret = burn_drive_scan_and_grab (drive_info, drive_addr, 0);
+    XFBURN_LOG_CALL_EXIT ("burn_drive_scan_and_grab", t_call, "ret=%d attempt=%d/%d", ret, i, max_checks);
+    xfburn_log_drain_backend_messages ("scan_and_grab", NULL, 0);
+
+    if (ret > 0) {
+      break;
+    }
+
+    if (i < max_checks) {
+      if (cancellable != NULL && g_cancellable_is_cancelled (cancellable)) {
+        if (out_cancelled != NULL) {
+          *out_cancelled = TRUE;
+        }
+        break;
+      }
+
+#ifdef HAVE_GUDEV
+      if (out_error_msg != NULL) {
+        g_clear_pointer (out_error_msg, g_free);
+      }
+      umount_res = try_unmount_for_grab (udevman, addr, cancellable, out_error_msg);
+      if (umount_res == XFBURN_UMOUNT_CANCELLED) {
+        if (out_cancelled != NULL) {
+          *out_cancelled = TRUE;
+        }
+        break;
+      }
+      if (umount_res == XFBURN_UMOUNT_FAILED) {
+        if (out_umount_failed != NULL) {
+          *out_umount_failed = TRUE;
+        }
+        XFBURN_LOG_WARN ("DEV", "Stopping grab retries for addr=\"%s\" because volume unmount failed", addr);
+        break;
+      }
+      if (umount_res == XFBURN_UMOUNT_NOT_MOUNTED) {
+        if (!cancellable_sleep_ms ((guint) (i * 150), cancellable)) {
+          if (out_cancelled != NULL) {
+            *out_cancelled = TRUE;
+          }
+          break;
+        }
+      }
+#else
+      if (!cancellable_sleep_ms ((guint) (i * 150), cancellable)) {
+        if (out_cancelled != NULL) {
+          *out_cancelled = TRUE;
+        }
+        break;
+      }
+#endif
+    }
+  }
+
+#ifdef HAVE_GUDEV
+  g_clear_object (&udevman);
+#endif
+
+  if (ret <= 0) {
+    release_grab_slot ();
+    if (out_cancelled == NULL || !(*out_cancelled)) {
+      XFBURN_LOG_ERROR ("DEV", "Unable to grab drive at addr=\"%s\" after %d attempts (ret=%d)",
+                        addr, max_checks, ret);
+      xfburn_log_dump_device_hardware (addr, NULL);
+      g_warning ("Unable to grab the drive at path '%s' (ret=%d).", addr, ret);
+    }
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
 /*******************/
 /*- public methods-*/
 /*******************/
+
+void
+xfburn_device_probe_result_clear (XfburnDeviceProbeResult *result)
+{
+  if (result == NULL) {
+    return;
+  }
+
+  g_clear_pointer (&result->addr, g_free);
+  g_clear_pointer (&result->error_msg, g_free);
+  g_clear_slist (&result->supported_speeds, NULL);
+}
+
+gboolean
+xfburn_device_probe_addr (const gchar *addr,
+                          const gchar *name,
+                          gboolean get_speed_info,
+                          gboolean details_known,
+                          GCancellable *cancellable,
+                          XfburnDeviceProbeResult *out_result)
+{
+  struct burn_drive_info *drive_info = NULL;
+
+  g_return_val_if_fail (out_result != NULL, FALSE);
+
+  memset (out_result, 0, sizeof (*out_result));
+  out_result->addr = g_strdup (addr);
+  out_result->disc_status = BURN_DISC_UNGRABBED;
+
+  if (addr == NULL || addr[0] == '\0') {
+    return FALSE;
+  }
+
+  if (!grab_drive_internal (addr, &drive_info, TRUE, cancellable,
+                            &out_result->cancelled, &out_result->umount_failed,
+                            &out_result->error_msg)) {
+    if (!out_result->cancelled) {
+      g_warning ("Couldn't grab drive in order to update speed list.");
+    }
+    out_result->disc_status = BURN_DISC_UNGRABBED;
+    return FALSE;
+  }
+
+  if (!details_known) {
+    out_result->has_libburn_info = TRUE;
+    out_result->cdr = drive_info->write_cdr;
+    out_result->cdrw = drive_info->write_cdrw;
+    out_result->dvdr = drive_info->write_dvdr;
+    out_result->dvdram = drive_info->write_dvdram;
+    out_result->buffer_size = drive_info->buffer_size;
+    out_result->dummy_write = drive_info->write_simulate;
+    out_result->tao_block_types = drive_info->tao_block_types;
+    out_result->sao_block_types = drive_info->sao_block_types;
+    out_result->raw_block_types = drive_info->raw_block_types;
+    out_result->packet_block_types = drive_info->packet_block_types;
+  }
+
+  probe_disc_into_result (addr, name, drive_info, cancellable, out_result);
+  if (!out_result->cancelled && get_speed_info) {
+    probe_speed_list_into_result (addr, name, drive_info, out_result);
+  }
+
+  xfburn_device_release_probe (drive_info);
+
+  if (out_result->cancelled || (cancellable != NULL && g_cancellable_is_cancelled (cancellable))) {
+    out_result->cancelled = TRUE;
+    return FALSE;
+  }
+
+  out_result->grabbed = TRUE;
+  return TRUE;
+}
+
+gboolean
+xfburn_device_grab_addr_for_probe (const gchar *addr,
+                                   GCancellable *cancellable,
+                                   struct burn_drive_info **drive_info,
+                                   gboolean *out_cancelled,
+                                   gboolean *out_umount_failed,
+                                   gchar **out_error_msg)
+{
+  return grab_drive_internal (addr,
+                              drive_info,
+                              TRUE,
+                              cancellable,
+                              out_cancelled,
+                              out_umount_failed,
+                              out_error_msg);
+}
+
+void
+xfburn_device_release_probe (struct burn_drive_info *drive_info)
+{
+  if (drive_info == NULL) {
+    return;
+  }
+
+#ifdef HAVE_GUDEV
+  xfburn_udev_manager_note_probe_release ();
+#endif
+  xfburn_device_release (drive_info, 0);
+#ifdef HAVE_GUDEV
+  xfburn_udev_manager_note_probe_release ();
+#endif
+}
+
+void
+xfburn_device_wait_for_probes (void)
+{
+  gint64 deadline = g_get_monotonic_time () + 15 * G_USEC_PER_SEC;
+
+  g_mutex_lock (&drive_grab_mutex);
+  if (drive_grabbed && !drive_grabbed_by_burn && active_probe_cancellable != NULL) {
+    GCancellable *to_cancel = g_object_ref (active_probe_cancellable);
+    g_mutex_unlock (&drive_grab_mutex);
+    g_cancellable_cancel (to_cancel);
+    g_object_unref (to_cancel);
+    g_mutex_lock (&drive_grab_mutex);
+  }
+
+  while (drive_grabbed && !drive_grabbed_by_burn) {
+    if (!g_cond_wait_until (&drive_grab_cond, &drive_grab_mutex, deadline)) {
+      XFBURN_LOG_WARN ("DEV", "Timed out waiting for background probes to finish during shutdown");
+      break;
+    }
+  }
+  g_mutex_unlock (&drive_grab_mutex);
+}
+
+void
+xfburn_device_apply_probe_result (XfburnDevice *device,
+                                  XfburnDeviceProbeResult *result)
+{
+  XfburnDevicePrivate *priv;
+
+  g_return_if_fail (XFBURN_IS_DEVICE (device));
+  g_return_if_fail (result != NULL);
+
+  priv = GET_PRIVATE (device);
+
+  priv->last_umount_failed = result->umount_failed;
+
+  if (!result->grabbed) {
+    priv->profile_no = 0;
+    *(priv->profile_name) = '\0';
+    priv->is_erasable = 0;
+    g_clear_slist (&priv->supported_speeds, NULL);
+    priv->disc_status = BURN_DISC_UNGRABBED;
+    return;
+  }
+
+  if (result->has_libburn_info) {
+    priv->details_known = TRUE;
+    priv->cdr = result->cdr;
+    priv->cdrw = result->cdrw;
+    priv->dvdr = result->dvdr;
+    priv->dvdram = result->dvdram;
+    priv->buffer_size = result->buffer_size;
+    priv->dummy_write = result->dummy_write;
+    priv->tao_block_types = result->tao_block_types;
+    priv->sao_block_types = result->sao_block_types;
+    priv->raw_block_types = result->raw_block_types;
+    priv->packet_block_types = result->packet_block_types;
+  }
+
+  priv->disc_status = result->disc_status;
+  priv->profile_no = result->profile_no;
+  g_strlcpy (priv->profile_name, result->profile_name, sizeof (priv->profile_name));
+  priv->is_erasable = result->is_erasable;
+
+  g_clear_slist (&priv->supported_speeds, NULL);
+  priv->supported_speeds = result->supported_speeds;
+  result->supported_speeds = NULL;
+}
 
 void
 xfburn_device_fillin_libburn_info (XfburnDevice *device, struct burn_drive_info *drive)
@@ -511,8 +1041,6 @@ xfburn_device_fillin_libburn_info (XfburnDevice *device, struct burn_drive_info 
   DBG (DEVICE_INFO_PRINTF (priv));
 }
 
-static gint active_drive_grabs = 0;
-
 gboolean
 xfburn_device_is_busy (void)
 {
@@ -520,80 +1048,52 @@ xfburn_device_is_busy (void)
 }
 
 gboolean
-xfburn_device_grab (XfburnDevice * device, struct burn_drive_info **drive_info)
+xfburn_device_is_burning (void)
+{
+  return g_atomic_int_get (&active_burn_grabs) > 0;
+}
+
+gboolean
+xfburn_device_details_known (XfburnDevice *device)
 {
   XfburnDevicePrivate *priv = GET_PRIVATE (device);
-  int ret = 0;
-  gchar drive_addr[BURN_DRIVE_ADR_LEN];
-  int i;
-  const int max_checks = 4;
-  gint64 t_call;
-#ifdef HAVE_GUDEV
-  XfburnUdevManager *udevman = xfburn_udev_manager_get_global ();
-#endif
 
-  if (g_atomic_int_get (&active_drive_grabs) > 0) {
-    DBG ("Drive already grabbed, skipping concurrent grab attempt for '%s'", priv->addr);
-    XFBURN_LOG_DEBUG ("DEV", "Drive already grabbed, skipping concurrent grab attempt for addr=\"%s\"", priv->addr);
-    return FALSE;
-  }
+  return priv->details_known;
+}
 
-  t_call = g_get_monotonic_time ();
-  XFBURN_LOG_CALL_ENTER ("burn_drive_convert_fs_adr", "addr=\"%s\"", priv->addr);
-  ret = burn_drive_convert_fs_adr (priv->addr, drive_addr);
-  XFBURN_LOG_CALL_EXIT ("burn_drive_convert_fs_adr", t_call, "ret=%d drive_addr=\"%s\"", ret, drive_addr);
-  xfburn_log_drain_backend_messages ("convert_fs_adr", NULL, 0);
+gboolean
+xfburn_device_last_umount_failed (XfburnDevice *device)
+{
+  XfburnDevicePrivate *priv = GET_PRIVATE (device);
 
-  if (ret <= 0) {
-    XFBURN_LOG_ERROR ("DEV", "Device address does not lead to a burner addr=\"%s\" (ret=%d)", priv->addr, ret);
-    xfburn_log_dump_device_hardware (priv->addr, NULL);
-    g_warning ("Device address does not lead to a burner '%s' (ret=%d).", priv->addr, ret);
-    return FALSE;
-  }
+  return priv->last_umount_failed;
+}
 
-  g_atomic_int_inc (&active_drive_grabs);
+gboolean
+xfburn_device_grab (XfburnDevice * device, struct burn_drive_info **drive_info)
+{
+  XfburnDevicePrivate *priv;
+  gchar *addr_copy;
+  gboolean ret;
+  gchar *err_msg = NULL;
 
-  /* we need to try to grab several times, because
-   * the drive might be busy detecting the disc */
-  for (i = 1; i <= max_checks; i++) {
-    t_call = g_get_monotonic_time ();
-    XFBURN_LOG_CALL_ENTER ("burn_drive_scan_and_grab", "drive_addr=\"%s\" attempt=%d/%d", drive_addr, i, max_checks);
-    ret = burn_drive_scan_and_grab (drive_info, drive_addr, 0);
-    XFBURN_LOG_CALL_EXIT ("burn_drive_scan_and_grab", t_call, "ret=%d attempt=%d/%d", ret, i, max_checks);
-    xfburn_log_drain_backend_messages ("scan_and_grab", NULL, 0);
+  g_return_val_if_fail (XFBURN_IS_DEVICE (device), FALSE);
 
-    if (ret > 0) {
-      break;
-    } else if (i < max_checks) {
-#ifdef HAVE_GUDEV
-      if (!g_main_context_is_owner (g_main_context_default ()) ||
-          !xfburn_udev_manager_check_ask_umount (udevman, device)) {
-        usleep (i * 100001);
-      }
-#else
-      usleep (i * 100001);
-#endif
-    }
-  }
+  priv = GET_PRIVATE (device);
+  addr_copy = g_strdup (priv->addr);
 
-  if (ret <= 0) {
-    g_atomic_int_add (&active_drive_grabs, -1);
-    XFBURN_LOG_ERROR ("DEV", "Unable to grab drive at addr=\"%s\" after %d attempts (ret=%d)",
-                      priv->addr, max_checks, ret);
-    xfburn_log_dump_device_hardware (priv->addr, NULL);
-    g_warning ("Unable to grab the drive at path '%s' (ret=%d).", priv->addr, ret);
-    return FALSE;
-  }
+  ret = grab_drive_internal (addr_copy, drive_info, FALSE, NULL, NULL, NULL, &err_msg);
 
-  return TRUE;
+  g_free (err_msg);
+  g_free (addr_copy);
+  return ret;
 }
 
 gboolean
 xfburn_device_refresh_info (XfburnDevice * device, gboolean get_speed_info)
 {
-  XfburnDevicePrivate *priv = GET_PRIVATE (device);
-
-  struct burn_drive_info *drive_info = NULL;
+  XfburnDevicePrivate *priv;
+  XfburnDeviceProbeResult result;
   gboolean ret;
 
   if (G_UNLIKELY (device == NULL)) {
@@ -606,29 +1106,10 @@ xfburn_device_refresh_info (XfburnDevice * device, gboolean get_speed_info)
     return FALSE;
   }
 
-  /* reset other internal structures */
-  priv->profile_no = 0;
-  *(priv->profile_name) = '\0';
-  priv->is_erasable = 0;
-
-  /* empty previous speed list */
-  g_clear_slist (&priv->supported_speeds, NULL);
-
-  if (!xfburn_device_grab (device, &drive_info)) {
-    ret = FALSE;
-    g_warning ("Couldn't grab drive in order to update speed list.");
-    priv->disc_status = BURN_DISC_UNGRABBED;
-  } else {
-    if (!priv->details_known)
-      xfburn_device_fillin_libburn_info (device, drive_info);
-
-    ret = TRUE;
-    refresh_disc (device, drive_info);
-    if (get_speed_info)
-      refresh_speed_list (device, drive_info);
-
-    xfburn_device_release (drive_info, 0);
-  }
+  priv = GET_PRIVATE (device);
+  ret = xfburn_device_probe_addr (priv->addr, priv->name, get_speed_info, priv->details_known, NULL, &result);
+  xfburn_device_apply_probe_result (device, &result);
+  xfburn_device_probe_result_clear (&result);
 
   return ret;
 }
@@ -647,7 +1128,7 @@ xfburn_device_release (struct burn_drive_info *drive_info, gboolean eject)
   XFBURN_LOG_CALL_EXIT ("burn_drive_release", t_call, "forget_ret=%d eject=%d", ret, eject);
   xfburn_log_drain_backend_messages ("device_release", NULL, 0);
 
-  g_atomic_int_add (&active_drive_grabs, -1);
+  release_grab_slot ();
 
   if (G_LIKELY (ret == 1))
     return TRUE;
@@ -671,6 +1152,7 @@ xfburn_device_set_name (XfburnDevice *device, const gchar *vendor, const gchar *
 {
   XfburnDevicePrivate *priv = GET_PRIVATE (device);
 
+  g_free (priv->name);
   priv->name = g_strconcat (vendor, " ", product, NULL);
 
   return priv->name;
