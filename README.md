@@ -10,7 +10,7 @@
 ## Installing on Ubuntu-Based Distributions (`.deb`)
 
 1. Download the latest `xfburn-x_*_amd64.deb` from **[GitHub Releases](https://github.com/asdfjkl/xfburn-x/releases)**.
-2. Install the required runtime libraries and then install the `.deb` package:
+2. Install the `.deb` package and the required runtime libraries:
 
 ```bash
 # 1. Install Xfburn-X
@@ -23,30 +23,26 @@ sudo apt remove xfburn-x
 
 ## New Features
 
-* **Automatic Post-Burn Per-Sector Verification ("Verify after burn")** — Enabled by default for ISO image burns, Data compositions (CD, DVD, Blu-ray, M-DISC), and Audio CDs (automatically disabled for Dummy write and ISO-only creation). Computes 64-bit per-sector hashes on the fly in RAM (~8 bytes/sector, no temporary disk space required), re-assesses the disc after burning, reads back every written sector via `libburn` with internal retries disabled, displays live verification progress/speed and error counts, and reports exact failing LBA ranges.
-* **Disc Info Inspector (`Action → Disc Info`)** — Non-blocking modal dialog displaying detailed drive and media metadata via `libburn`: drive model, firmware revision, serial number, buffer size, and supported MMC profiles; disc status, media profile, manufacturer guess, Media ID (ASCII & Hex), Product ID, Book Type, DVD physical format/layers, CD ATIP Lead-In/Lead-Out MSF & LBA, BD spare area and BD-R POW; capacity, format descriptors, and Next Writable Address; supported write/read speeds and write modes; and a full Sessions & Tracks (TOC) table, with auto-refresh on media changes and one-click **Copy** to clipboard.
-* **User-Mode Diagnostic Flight-Recorder Logging** — Automatically writes structured, unprivileged session logs to `~/.local/state/xfburn-x/logs/` (rotating the 10 most recent sessions; overridable via `--log-file=PATH` / `-l` or `XFBURN_X_LOG_FILE`). Captures real-time `libburn`/`libisofs` messages and SCSI sense errors, sysfs SCSI I/O counters, USB link speed/power/autosuspend and USB 3.0 LPM telemetry, udev/unmount events, call-duration and stall watchdogs, 2-second burn/verify progress heartbeats, and async-signal-safe crash stack traces, with a **"Save Log..."** button in the burn progress dialog.
-* **Drive Disconnect & Transport Error Diagnostics** — Distinguishes physical USB/SATA drive disconnects and SCSI host/transport failures from genuine disc read/write errors directly via `libburn` messages and world-readable sysfs attributes, cleanly aborting affected burns or verifications with actionable hints (USB power/cables, USB 3.0 LPM `U1`/`U2` sleep states, runtime autosuspend, or SATA cabling) instead of misreporting a defective disc.
-* **Asynchronous Non-Blocking Drive Probing & Unmounting** — Moves optical drive probing, speed/capability queries, and GIO unmount handling onto cancellable background worker threads so inserting discs, switching drives, or opening burn/blank/info dialogs no longer freezes the UI.
-* **Updated Translations Across All 60 Languages** — Translated all newly introduced `xfburn-x` UI, dialog, diagnostic, desktop, and AppStream strings across every locale in `po/LINGUAS`.
-* **Automated Unit Tests & Packaging Tooling** — Added Meson/GTest suites covering logging/error classification, burn speed calculations, async device probing, Disc Info reporting, and disc-usage widgets, along with a convenience `Makefile` wrapper, `debian/` packaging (`make deb`), and a GitHub Actions release pipeline.
-
+* **Verify after Burn** — Automatic Verification after burn: re-assesses the disc after burning, reads back every written sector via `libburn` with internal retries disabled, displays live verification progress/speed and error counts, and reports exact failing LBA ranges.
+* **Disc Info Inspector (`Action → Disc Info`)** — Displays drive (drive model, firmware revision, serial number, etc.) and media metadata (i.e. Media ID, manufacturer etc.)
+* **User-Mode Diagnostic Flight-Recorder Logging** — Automatically writes session logs to `~/.local/state/xfburn-x/logs/` (rotating the 10 most recent sessions; overridable via `--log-file=PATH` / `-l` or `XFBURN_X_LOG_FILE`). Captures real-time `libburn`/`libisofs` messages and SCSI sense errors, sysfs SCSI I/O counters, USB link speed/power/autosuspend and USB 3.0 LPM telemetry, udev/unmount events, call-duration and stall watchdogs, 2-second burn/verify progress heartbeats, and async-signal-safe crash stack traces, with a **"Save Log..."** button in the burn progress dialog. Attach these with error info if you run into issues
+* **Drive Disconnect & Transport Error Diagnostics** — External BD-R drives (USB power/cables, USB 3.0 LPM `U1`/`U2` sleep states, runtime autosuspend) connected via USB 3.0 often run into power issues. Error diagnostic distinguishes physical USB/SATA drive disconnects and SCSI host/transport failures from genuine disc read/write errors directly
+* **Asynchronous Non-Blocking Drive Probing & Unmounting** — Inserting discs, switching drives, or opening burn/blank/info dialogs no longer freezes the UI.
+  
 ---
 
 ## Bugfixes (Since Forking from Upstream Xfburn)
 
-* **Fixed Blu-ray / Large Data Collection "Proceed to Burn" Grayed Out & Bogus Capacity Dropdown** — Fixed a GObject initialization bug in `XfburnDiscUsage` where populating the disc-size dropdown inside `_init()` read the base class's 7 placeholder test entries (`"size 1"` … `"10^12"`) instead of the concrete Data or Audio subclass media tables. This capped data compositions at 7.9 GB DVD and left **Proceed to Burn** disabled for Blu-ray collections (e.g. 20 GB on a 22.5 GB BD-R). Moved dropdown population to `constructed()`, fixed auto-selection ordering, and added bounds guards.
-* **Fixed CD-RW `0x` Burn Speed Bug & Broken Media Profile Speed Mapping** — Fixed an off-by-one check in `xfburn_media_profile_to_kb()` where CD-RW (`0x0a`) failed `media_no <= XFBURN_PROFILE_CDR (0x09)`, fell back to Blu-ray 1x speed (`4496 kB/s`), and truncated 10x CD-RW (`1764 kB/s`) to `0x`. Replaced range heuristics with an explicit switch covering all CD, DVD (including DVD-ROM, DVD-R DL Jump, DVD+RW DL), and BD (including BD-ROM and BD-R RRM) profiles with exact floating-point 1x factors.
-* **Fixed Missing / Unlabeled Write Speeds on Certain Drives & Media** — Added CD ATIP probing (`burn_disc_read_atip()`) and `libburn` min/max write speed fallback discovery when `burn_drive_get_speedlist()` is incomplete, formatted fractional speeds accurately as `<x>x (<kB/s> kB/s)` (e.g. `2.4x` DVD+RW), and replaced raw `-1` fallback labels with `"Min"`.
-* **Fixed Erratic Burn & Verification Speed Readouts** — Replaced noisy instantaneous/cumulative speed calculations with windowed moving-average speed readouts during both writing and verification, and surfaced live verification read/verify error counts directly in the progress dialog status line.
-* **Fixed Runaway Fake Read-Error Cascade on Drive Disconnect During Verification** — Fixed verification continuing into single-sector fallback probing after a drive disconnected mid-verify, which previously caused the read-error counter to climb rapidly as if the disc were unreadable. Verification now retries once after a short delay on transient SCSI host resets while the drive remains grabbed, and immediately aborts with a dedicated drive-disconnect communication warning/error when connection is lost.
-* **Fixed Post-Burn Udev / GDK Mutex Deadlocks & GUI Freezes** — Resolved GDK thread-lock deadlocks and UI freezes triggered when udev volume-change events or background blank/unmount threads interacted with GTK main-thread callbacks.
-* **Fixed Main-Thread Blocking Drive Grabs, `usleep()` Stalls & Udev Re-Probe Loops** — Removed blocking synchronous drive grabs and `usleep()` polling from the GTK main thread, added synthetic udev release cooldown suppression so releasing a probed drive does not immediately re-trigger endless refreshes, and added clean probe drain synchronization before `burn_finish()` on application exit.
-* **Fixed Concurrent Drive Grab / Refresh Races During Active Burns** — Serialized drive acquisition so background device refreshes and Disc Info scans yield immediately whenever an active burn or blank operation holds the drive.
-* **Fixed Fatal `g_error()` Crashes on Transient Drive Communication Errors** — Replaced fatal `g_error()` aborts on transient `libburn` drive errors with graceful error reporting and diagnostic logging.
-* **Fixed Burn Image & Blank Dialog Race Conditions and Object Lifecycle Issues** — Removed redundant synchronous media grabs in the ISO Burn Image dialog by routing updates through the async device box, disabled blanking while a device refresh is in progress, guarded against `NULL` device selection, added proper `XfburnDevice` reference counting in the blanking worker thread, and corrected `XfburnUdevManagerClass` to inherit from `GObjectClass` instead of `XfburnProgressDialogClass`.
-* **Fixed Desktop & Application Icon Resolution Issues** — Installed `stock_xfburn-x` icons under `hicolor/*/apps/` in addition to `stock/media/`, added `StartupWMClass=xfburn-x` to `xfburn-x.desktop`, declared `hicolor-icon-theme` as a `.deb` dependency, and updated `make uninstall` to refresh user-local icon and desktop caches so stale local caches do not shadow system `.deb` installs.
-
+* Fixed Blu-ray / Large Data Collection "Proceed to Burn" Grayed Out & Bogus Capacity Dropdown
+* Fixed CD-RW `0x` Burn Speed Bug & Broken Media Profile Speed Mapping
+* Fixed Missing / Unlabeled Write Speeds on Certain Drives & Media
+* Fixed Erratic Burn & Verification Speed Readouts
+* Fixed Post-Burn Udev / GDK Mutex Deadlocks & GUI Freezes
+* Fixed Main-Thread Blocking Drive Grabs, `usleep()` Stalls & Udev Re-Probe Loops
+* Fixed Concurrent Drive Grab / Refresh Races During Active Burns
+* Fixed Fatal `g_error()` Crashes on Transient Drive Communication Errors
+* Fixed Burn Image & Blank Dialog Race Conditions and Object Lifecycle Issues
+  
 ---
 
 ## Requirements
